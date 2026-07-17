@@ -40,8 +40,9 @@ La columna `tipo` en `docs/mapping_figuras.csv` distingue tres orígenes:
   No hay script que la genere. El archivo de imagen final va directo en
   `figures/<slug>/`, sin carpeta correspondiente en `R/`.
 - **esquema**: diagrama hecho a mano (PowerPoint, Illustrator, BioRender),
-  no proviene de datos ni de código. Vive en
-  `assets/diagramas_manuales/<slug>/` con el archivo editable si existe.
+  no proviene de datos ni de código. La imagen final va directo en
+  `figures/<slug>/`, igual que una foto. El archivo editable (si existe)
+  no se versiona en este repo.
 - **mixto**: figura con paneles de distinto origen (ej. `vector_construccion`
   tiene un esquema + dos fotos). Anotarlo panel por panel en la columna
   `notas`.
@@ -62,7 +63,6 @@ data/raw/              datos originales — nunca se editan a mano
 data/external/         referencias externas (CAGE, EPD, ChIP-seq, PUFFIN...)
 data/processed/        intermedios generados por scripts
 figures/<slug>/        salida final de cada figura, código, foto o esquema
-assets/diagramas_manuales/<slug>/   esquemas hechos a mano
 tables/                tablas suplementarias y resultados de stats
 docs/mapping_figuras.csv            tabla puente figura ↔ script ↔ sección
 docs/paper_referencia.md            copia de trabajo del paper
