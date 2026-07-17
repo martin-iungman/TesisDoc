@@ -1,0 +1,264 @@
+---
+title: "Library (tesis)"
+---
+
+```{r}
+#| code-summary: Settings
+library(BSgenome.Hsapiens.UCSC.hg38)
+library(rtracklayer)
+library(tidyverse)
+library(furrr)
+library(patchwork)
+library(ggnewscale)
+library(ggpubr)
+theme_set(theme_bw())
+```
+
+```{r}
+#| code-summary: import
+lib=rtracklayer::import.bed("Library_data/res/library.bed")
+dna<-getSeq(Hsapiens,lib)
+values(lib)=tibble(seq_id=lib$name)
+prom_df<-read_tsv("Analysis/Tables/prom_df.tsv")
+```
+
+```{r}
+prom_df %>% count(type) %>%
+  mutate(n=ifelse(type=="cancer_wt", 147, n), 
+         type=ifelse(type=="promoter", "Promotor", ifelse(type=="enhancer", "Enhancer", "Cancer related \n promoter"))) %>% 
+  ggplot(aes(type, n, label=n))+
+  geom_col(fill="#358AAA")+
+  geom_label(nudge_y=1500, fill="#AADAD4", size = 6)+
+  labs(y="Frecuencia", x="Tipo de secuencia") +
+  ylim(c(0,25000))+
+  theme_pubclean(base_size=22)
+ggsave("Tesis/MyM/lib_types.jpg",  width = 9, height = 6.75, units="in")
+```
+
+```{r}
+prom_df %>% 
+  filter(type=="promoter") %>% 
+  ggplot(aes(g_c*100)) +
+  geom_density(col="#358AAA", linewidth=2, fill="#358AAA", alpha=0.6)+
+  xlab("Contenido [G+C] (%)")+
+  ylab("Densidad")+
+  theme_pubclean(base_size = 22)
+ggsave("Tesis/MyM/lib_gc.jpg", width = 9, height = 6.75, units="in")
+```
+
+```{r}
+prom_df %>% 
+  filter(type=="promoter") %>% 
+  count(CGI) %>% filter(CGI) %>% 
+  mutate(CGI="Isla CpG") %>%
+  ggplot(aes(CGI, n, label=n))+
+  geom_col(aes(y=20851), fill="#dfedf6")+
+  geom_col(fill="#358AAA")+
+  geom_label(nudge_y=1500, fill="#AADAD4", size=6)+
+  ylab("Frecuencia")+ylim(c(0,20851))+xlab("")+
+  theme_pubclean(base_size=22)
+ggsave("Tesis/MyM/lib_cpg.jpg", width = 3, height = 6.75, units="in")
+```
+
+```{r}
+prom_df %>% 
+  filter(type=="promoter") %>% 
+  select(TATA_EPD, CCAAT_EPD, INR_EPD, GCbox_EPD) %>% 
+  pivot_longer(everything()) %>% 
+  mutate(name=str_remove(name, "_EPD")) %>% 
+  count(name, value) %>% 
+  filter(value) %>% 
+  ggplot(aes(x=name, label=n))+
+  geom_col(aes(y=20851), fill="#dfedf6")+
+  geom_col(aes(y=n), fill="#358AAA")+
+  geom_label(nudge_y=1500, aes(y=n), fill="#AADAD4", size=6)+
+  labs(y="Frecuencia", x="Motivo")+
+  theme_pubclean(base_size = 22)
+ggsave("Tesis/MyM/lib_epd_motif.jpg",width = 9, height = 6.75, units="in")
+```
+
+```{r}
+prom_df %>% filter(type=="promoter") %>%
+  select(ends_with("TSS")) %>% 
+  pivot_longer(ends_with("TSS")) %>% 
+  mutate(name=ifelse(name=="other_TSS", "No\ncanónico", ifelse(name=="INR_strong_TSS", "INR\nfuerte", name)) %>% 
+           str_remove("_TSS"))%>% 
+  count(name, value) %>% 
+  filter(value) %>% arrange(desc(n)) %>% 
+  mutate(name=fct_inorder(name)) %>% 
+  ggplot(aes(x=name, label=n))+
+  geom_col(aes(y=20851), fill="#dfedf6")+
+  geom_col(aes(y=n), fill="#358AAA")+
+  geom_label(nudge_y=1500, aes(y=n), fill="#AADAD4", size=6)+
+  labs(y="Frecuencia", x="Motivo en TSS")+
+  theme_pubclean(base_size = 22)
+ggsave("Tesis/MyM/lib_tss_motif.jpg",width = 9, height = 6.75, units="in")
+```
+
+```{r}
+read_tsv("Analysis/Tables/phylo100_1pb_lib.tsv")->phylo1pb_prom_df
+
+phylo1pb_prom_df %>% group_by(relpos) %>% 
+summarise(med_score=median(score, na.rm=T)) %>%
+ggplot(aes(16-relpos,med_score))+
+  geom_line(linewidth=0.2)+
+  xlab("Posicion relativa al TSS")+
+  ylab("Mediana del PhyloP score") +
+  theme_pubclean(base_size = 22)
+
+ggsave("Tesis/MyM/phylop.jpg",width = 9, height = 6.75, units="in")
+```
+
+```{r}
+phylo1pb_prom_df %>% group_by(relpos) %>% 
+summarise(med_score=median(score, na.rm=T)) %>%
+ggplot(aes(16-relpos,med_score))+
+  geom_line(linewidth=0.2)+
+  xlab("Posicion relativa al TSS")+
+  ylab("Mediana del PhyloP score") +
+  theme_pubclean(base_size = 22) +
+  geom_vline(xintercept=c(-50,-150), linetype="dashed", linewidth=0.3)
+
+ggsave("Tesis/MyM/phylop_con_rangos.jpg",width = 9, height = 6.75, units="in")
+```
+
+```{r}
+set="primary_cell"
+cell_ont=readxl::read_xls(paste0("External_data/FANTOM5/",set,"_ontology_FANTOM5.xlsx")) %>% dplyr::rename("sample_id"=`Sample ID`)
+inputFiles = list.files(paste0("External_data/FANTOM5/hg38_",set), full.names = T,pattern=".nobarcode.ctss.bed.gz$")
+sample_id=inputFiles%>%str_extract("CNhs.{5}")
+cell_ont=tibble(filename=inputFiles, sample_id=sample_id)%>%inner_join(cell_ont, by=c("sample_id"))
+cell_ont_list=cell_ont%>%group_split(`Facet ontology term`)
+libsize=read.delim("External_data/FANTOM5/library_size_pc.txt", sep = " ", header = F)%>%mutate(sample_id=str_extract(V2, "CNhs.{5}"))
+names(libsize)=c("size", "filename", "sample_id")
+cell_ont=cell_ont%>%left_join(libsize, by=c("filename", "sample_id"))
+filenames=paste0("External_data/FANTOM5/Library_filt_CAGE/",unique(cell_ont$`Facet ontology term`),".bed")
+filenames=filenames[filenames%in%list.files("External_data/FANTOM5/Library_filt_CAGE", full.names = T)]
+libsize2=cell_ont%>%group_by(`Facet ontology term`)%>%summarise(libsize=sum(size, na.rm=T))
+filt_filenames_df=tibble(filt_filename=filenames, `Facet ontology term`=str_remove(filenames, "External_data/FANTOM5/Library_filt_CAGE/")%>%str_remove(".bed$"))%>%left_join(libsize2)
+beds=map(filt_filenames_df$filt_filename, import.bed)
+group_bed=do.call("c",beds)
+ beds_sum=group_bed%>%as_tibble()%>%group_by(seqnames, start, strand,name)%>%summarise(sum_score=sum(score, na.rm = T))
+beds_sum_gr=GRanges(seqnames = beds_sum$seqnames, IRanges(start = beds_sum$start, width = 1),strand = beds_sum$strand, name=beds_sum$name, score=beds_sum$sum_score )
+
+#lib_ext<-promoters(lib, downstream = 352, upstream=0)
+beds_sum_gr<- beds_sum_gr %>% 
+  plyranges::join_overlap_left_directed(lib)
+#beds_sum_gr<-subset(beds_sum_gr, !is.na(score.y))
+proms=unique(beds_sum_gr$name)
+lib_seq=map(proms, ~lib[lib$seq_id==.x])
+bed_seq=map(proms, ~subset(beds_sum_gr, name==.x))
+dfs=map2(lib_seq,bed_seq, ~tibble(pos=seq(start(.x),end(.x)),
+                                    relpos=1:width(.x), strand=unique(strand(.x)), seq_id=unique(.x$seq_id))%>%
+             left_join(as_tibble(.y), by=c("pos"="start","strand")) %>%
+             mutate(score=replace_na(score,0), 
+                    seq_id=unique(na.omit(seq_id)), 
+                    strand=unique(na.omit(strand)))%>%
+             select(pos,relpos,seq_id,score, strand)
+           )
+
+relpos_df=dfs%>%
+  map(~mutate(.x,relscore=score/sum(score),
+              relpos=ifelse(strand=="-", max(relpos):1,relpos),
+              sumscore=sum(score)))%>%
+  list_rbind()
+```
+
+```{r}
+relpos_df%>% 
+  filter(sumscore>10,  str_detect(seq_id, "^FP"))%>%
+  arrange(desc(relscore)) %>% 
+  mutate(seq_id=fct_inorder(seq_id))%>%
+  ggplot(aes(relpos-237, seq_id, fill=relscore*100))+geom_tile(na.rm=T)+
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())+
+  scale_fill_gradient(high="#005d67", low="white")+
+  labs(x="Posición relativa", y="Promotor", fill="Actividad\nrelativa (%)")+scale_x_continuous(breaks=c(c(15,seq(0,-200, by=-50))))+
+  theme_pubr()+
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+ggsave("Tesis/MyM/tss_relpos.jpg",width = 9, height = 6.75, units="in")
+```
+
+```{r}
+relpos_df%>% 
+  filter(sumscore>10,  str_detect(name, "^FP"))%>%
+  arrange(desc(relscore)) %>% 
+  mutate(name=fct_inorder(name), relpos=relpos-237)%>%
+  filter(relpos>-51) %>% 
+  ggplot(aes(relpos, name, fill=relscore*100))+geom_tile(na.rm=T)+
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())+
+  scale_fill_gradient(high="#black", low="white")+
+  labs(x="Posición relativa", y="Promotor", fill="Actividad\nrelativa (%)")+scale_x_continuous(breaks=c(c(15,seq(15,-50, by=-15))))+
+  theme_pubr()+
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+ggsave("Tesis/MyM/tss_relpos_zoom.jpg",width = 9, height = 6.75, units="in")
+```
+
+```{r}
+p1= relpos_df%>%filter(sumscore>10,str_detect(name, "^FP"))%>%group_by(relpos)%>%summarise(median_score=median(relscore))%>%
+  mutate(relpos=relpos-237) %>% 
+  filter(relpos>-51) %>% 
+  ggplot(aes(relpos,median_score))+geom_line()+xlab("")+ylab("Actividad relativa (mediana)")+
+  theme_pubr()+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x= element_blank(),
+        axis.line.x = element_blank())
+
+p2= relpos_df%>% 
+  filter(sumscore>10,  str_detect(name, "^FP"))%>%
+  arrange(desc(relscore)) %>% 
+  mutate(name=fct_inorder(name), relpos=relpos-237)%>%
+  filter(relpos>-51) %>% 
+  ggplot(aes(relpos, name, fill=relscore*100))+geom_tile(na.rm=T)+
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())+
+  scale_fill_gradient(high="black", low="white")+
+  labs(x="Posición relativa", y="Promotor", fill="Actividad\nrelativa (%)")+scale_x_continuous(breaks=c(c(15,seq(15,-50, by=-15))))+
+  theme_pubr(legend = "bottom")+
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+
+aplot::gglist(list(p1,p2), ncol=1, heights=c(0.4,1))
+```
+
+```{r}
+prom_df %>% 
+  filter(type == "promoter", !is.na(turnover)) %>% 
+  left_join(tibble(
+    cambio = c("Ambigua", "Cambio\nde tejido", "Inserción\nen humanos", 
+               "Consistente", "Deleción\nen ratón", "Actividad\ndisminuida en ratón"), 
+    turnover = c("ambiguous", "expression-turnover", "human-inserted", 
+                 "matched", "mouse-deleted", "mouse-diminished")
+  )) %>% 
+  count(cambio) %>% 
+  mutate(total_n = sum(n)) %>% 
+  arrange(desc(n)) %>% 
+  mutate(name = fct_inorder(cambio)) %>% 
+  ggplot(aes(x = name, label = n)) +
+  geom_col(aes(y = total_n), fill = "#dfedf6") +
+  geom_col(aes(y = n), fill = "#358AAA") +
+  geom_label(aes(y = n), nudge_y = 1800, fill = "#AADAD4") +
+  labs(y = "Frecuencia", x = "Conservación funcional ratón-humano") +
+  theme_pubclean(base_size = 18)+
+  theme(axis.text.x=element_text(angle=45, hjust=0.75))
+ggsave("Tesis/Fig1/conservacion_func_barplot.jpg",width = 9, height = 12, units="in")
+```
+
+```{r}
+prom_df %>% 
+  filter(type == "promoter", !is.na(turnover)) %>% 
+  left_join(tibble(
+    cambio = c("Ambigua", "Cambio\nde tejido", "Inserción\nen humanos", 
+               "Consistente", "Deleción\nen ratón", "Actividad\ndisminuida en ratón"), 
+    turnover = c("ambiguous", "expression-turnover", "human-inserted", 
+                 "matched", "mouse-deleted", "mouse-diminished")
+  )) %>% 
+  count(cambio) %>% 
+  mutate(total_n = sum(n)) %>% 
+arrange(n) %>% 
+  mutate(name = fct_inorder(cambio)) %>% 
+  ggplot(aes(x = name, label = n)) +
+  geom_col(aes(y = total_n), fill = "#dfedf6") +
+  geom_col(aes(y = n), fill = "#358AAA") +
+  geom_label(aes(y = n), nudge_y = 500, fill = "#AADAD4") + 
+  labs(y = "Frecuencia", x = "Conservación funcional ratón-humano") +
+  theme_pubclean(base_size = 18)+  coord_flip() 
+ggsave("Tesis/MyM/conservacion_func_barplot.jpg",width = 9, height = 6.75, units="in")
+```
