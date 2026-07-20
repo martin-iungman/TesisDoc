@@ -1,7 +1,7 @@
-# tata_cgi_actividad (ver docs/mapping_figuras.csv para el numero de
-# figura vigente - a la fecha sin resolver, ver notas del CSV)
-# Efecto de la presencia de TATA-box e islas CpG sobre la actividad media,
-# agrupando promotores en bins de 100 segun su rank de actividad.
+# tata_cgi_actividad = Fig. R6 (ver docs/mapping_figuras.csv)
+# Efecto de la presencia de TATA-box, islas CpG y CCAAT-box sobre la
+# actividad media, agrupando promotores en bins de 100 segun su rank de
+# actividad.
 #
 # Requiere: data/processed/activity_stats_highconf.tsv y
 # data/processed/prom_df.tsv (ver R/00_prom_features y R/01_activity_stats).
@@ -37,6 +37,23 @@ data <- data %>%
     ungroup()) %>%
   bind_rows()
 
+presence_labels <- c("FALSE" = "Ausencia", "TRUE" = "Presencia")
+
+motif_scatter <- function(data, motif, y_label, title) {
+  data %>%
+    group_by(mean_sw, rep) %>%
+    summarise(prop = sum(.data[[motif]]) / n(), .groups = "drop") %>%
+    ggplot(aes(as.numeric(mean_sw), prop)) +
+    geom_point(col = "#14AFB2") +
+    geom_smooth(col = "#216869") +
+    theme_pubclean() +
+    theme(text = element_text(size = 30)) +
+    facet_wrap(~rep) +
+    ylim(0, 1) +
+    labs(x = "Bins de actividad media", y = y_label) +
+    ggtitle(title)
+}
+
 violin_by_motif <- function(data, rep_id, motif, fill_label) {
   p <- ggviolin(data %>% filter(rep == rep_id),
     x = motif, y = "mean", fill = motif, draw_quantiles = 0.5,
@@ -44,6 +61,7 @@ violin_by_motif <- function(data, rep_id, motif, fill_label) {
   )
   p + stat_compare_means() +
     theme_pubclean() +
+    scale_x_discrete(labels = presence_labels) +
     labs(fill = fill_label, x = NULL, y = "Actividad media") +
     theme(legend.position = "none", axis.ticks.x = element_blank(), text = element_text(size = 40)) +
     ylim(c(0.5, 6.2))
@@ -51,18 +69,7 @@ violin_by_motif <- function(data, rep_id, motif, fill_label) {
 
 # --- TATA-box ---------------------------------------------------------
 
-panel_tata_scatter <- data %>%
-  group_by(mean_sw, rep) %>%
-  summarise(TATA_EPD = sum(TATA_EPD) / n(), .groups = "drop") %>%
-  ggplot(aes(as.numeric(mean_sw), TATA_EPD)) +
-  geom_point(col = "#14AFB2") +
-  geom_smooth(col = "#216869") +
-  theme_pubclean() +
-  theme(text = element_text(size = 30)) +
-  facet_wrap(~rep) +
-  ylim(0, 1) +
-  labs(x = "Actividad media (agrupadas por rank)", y = "Proporción de promotores\ncon TATA-box") +
-  ggtitle("TATA-box")
+panel_tata_scatter <- motif_scatter(data, "TATA_EPD", "Proporción de promotores\ncon TATA-box", "TATA-box")
 ggsave(file.path(out_dir, "tata_scatter.jpg"), panel_tata_scatter, width = 9, height = 6.75, units = "in")
 
 ggsave(file.path(out_dir, "tata_violin_rep1.jpg"), violin_by_motif(data, "Rep 1", "TATA_EPD", "TATA-box"), width = 9, height = 6.75, units = "in")
@@ -70,21 +77,18 @@ ggsave(file.path(out_dir, "tata_violin_rep2.jpg"), violin_by_motif(data, "Rep 2"
 
 # --- Isla CpG -----------------------------------------------------------
 
-panel_cgi_scatter <- data %>%
-  group_by(mean_sw, rep) %>%
-  summarise(CGI = sum(CGI) / n(), .groups = "drop") %>%
-  ggplot(aes(as.numeric(mean_sw), CGI)) +
-  geom_point(col = "#14AFB2") +
-  geom_smooth(col = "#216869") +
-  theme_pubclean() +
-  theme(text = element_text(size = 30)) +
-  facet_wrap(~rep) +
-  ylim(0, 1) +
-  labs(x = "Bins de actividad media", y = "Proporción de promotores\ncon islas CpG") +
-  ggtitle("Isla CpG")
+panel_cgi_scatter <- motif_scatter(data, "CGI", "Proporción de promotores\ncon islas CpG", "Isla CpG")
 ggsave(file.path(out_dir, "cgi_scatter.jpg"), panel_cgi_scatter, width = 9, height = 6.75, units = "in")
 
 ggsave(file.path(out_dir, "cgi_violin_rep1.jpg"), violin_by_motif(data, "Rep 1", "CGI", "Isla CpG"), width = 9, height = 6.75, units = "in")
 ggsave(file.path(out_dir, "cgi_violin_rep2.jpg"), violin_by_motif(data, "Rep 2", "CGI", "Isla CpG"), width = 9, height = 6.75, units = "in")
+
+# --- CCAAT-box ------------------------------------------------------------
+
+panel_ccaat_scatter <- motif_scatter(data, "CCAAT_EPD", "Proporción de promotores\ncon CCAAT-box", "CCAAT-box")
+ggsave(file.path(out_dir, "ccaat_scatter.jpg"), panel_ccaat_scatter, width = 9, height = 6.75, units = "in")
+
+ggsave(file.path(out_dir, "ccaat_violin_rep1.jpg"), violin_by_motif(data, "Rep 1", "CCAAT_EPD", "CCAAT-box"), width = 9, height = 6.75, units = "in")
+ggsave(file.path(out_dir, "ccaat_violin_rep2.jpg"), violin_by_motif(data, "Rep 2", "CCAAT_EPD", "CCAAT-box"), width = 9, height = 6.75, units = "in")
 
 message("Figuras guardadas en ", out_dir)
