@@ -97,7 +97,7 @@ panel_b_bars <- tmp %>%
   ylab("Proporción") +
   theme_pubr() +
   theme(text = element_text(size = 25))
-ggsave(file.path(out_dir, "panel_b_gc_bias_bars.jpg"), panel_b_bars, width = 9, height = 6.75, units = "in")
+ggsave(file.path(out_dir, "panel_b_gc_bias_bars.jpg"), panel_b_bars, width = 13, height = 6.75, units = "in")
 
 # --- Panel C: violin de G+C, secuenciados vs no --------------------------
 
