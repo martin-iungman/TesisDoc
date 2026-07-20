@@ -57,6 +57,7 @@ panel_tata_scatter <- data %>%
   ggplot(aes(as.numeric(mean_sw), TATA_EPD)) +
   geom_point(col = "#14AFB2") +
   geom_smooth(col = "#216869") +
+  theme_pubclean() +
   theme(text = element_text(size = 30)) +
   facet_wrap(~rep) +
   ylim(0, 1) +
@@ -75,6 +76,7 @@ panel_cgi_scatter <- data %>%
   ggplot(aes(as.numeric(mean_sw), CGI)) +
   geom_point(col = "#14AFB2") +
   geom_smooth(col = "#216869") +
+  theme_pubclean() +
   theme(text = element_text(size = 30)) +
   facet_wrap(~rep) +
   ylim(0, 1) +

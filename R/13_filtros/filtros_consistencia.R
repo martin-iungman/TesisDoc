@@ -39,6 +39,7 @@ p <- panel_a_base %>%
   geom_point(size = 0.5, alpha = 0.7) +
   labs(x = "Actividad media (Rep 1)", y = "Actividad media (Rep 2)") +
   scale_color_manual(values = c("Alta" = "#1B8C8E", "Baja" = "#0D2C54")) +
+  theme_bw() +
   theme(text = element_text(size = 25)) +
   guides(color = guide_legend(override.aes = list(size = 3, alpha = 1)))
 p <- ggExtra::ggMarginal(p, type = "density", margins = "both", col = "#0D2C54")
@@ -58,6 +59,7 @@ p <- panel_b_base %>%
   ggplot(aes(`Rep 1`, `Rep 2`)) +
   geom_point(size = 0.5, alpha = 0.5, col = "#1B8C8E") +
   labs(x = "Actividad media (Rep 1)", y = "Actividad media (Rep 2)") +
+  theme_bw() +
   theme(text = element_text(size = 25))
 p <- ggExtra::ggMarginal(p, type = "density", margins = "both", col = "#0D2C54")
 ggsave(file.path(out_dir, "panel_b_correlacion_postfiltro.jpg"), p, width = 7, height = 6.75, units = "in")
@@ -92,6 +94,7 @@ p1 <- count_by_rep_combo(data_long %>% filter(counts > 0) %>% distinct(seq_id, r
   ggtitle("Totales observadas") +
   xlab("Réplica") +
   ylab("Frecuencia") +
+  theme_bw() +
   theme(legend.position = "none", text = element_text(size = 15))
 
 p2 <- count_by_rep_combo(stats_highconf %>% distinct(seq_id, rep), n_lib) %>%
@@ -102,6 +105,7 @@ p2 <- count_by_rep_combo(stats_highconf %>% distinct(seq_id, rep), n_lib) %>%
   ggtitle("Post-filtros") +
   xlab("Réplica") +
   ylab("Frecuencia") +
+  theme_bw() +
   theme(legend.position = "none", text = element_text(size = 15))
 
 ggsave(file.path(out_dir, "panel_c_candidato1_n_por_replica.jpg"), p1 + p2, width = 9, height = 6.75, units = "in")

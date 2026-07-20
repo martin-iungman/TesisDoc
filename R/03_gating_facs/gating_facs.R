@@ -60,6 +60,7 @@ panel_a <- data_df %>%
   geom_density(alpha = 0.8) +
   xlab("log EGFP") +
   scale_fill_manual(values = c(Library = "#97E196", WT = "#f5fdff")) +
+  theme_bw() +
   theme(
     legend.key.size = unit(4, "line"), legend.text = element_text(size = 35),
     legend.title = element_text(size = 40), axis.title = element_text(size = 45),
@@ -100,6 +101,7 @@ panel_b <- dens %>%
   xlab("log10 EGFP") +
   ylab("Densidad") +
   scale_x_log10() +
+  theme_bw() +
   theme(legend.key.size = unit(1, "line"), text = element_text(size = 20))
 ggsave(file.path(out_dir, "panel_b_discretizacion_gates.jpg"), panel_b, width = 9, height = 6.75, units = "in")
 

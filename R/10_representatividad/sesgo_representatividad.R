@@ -84,6 +84,7 @@ panel_b_lineal <- tmp %>%
   xlab("Contenido de [G+C]") +
   ylab("Proporción de lecturas secuenciadas") +
   scale_color_manual(values = clrs[c(3, 5)], labels = c("Distribución uniforme", "Observada")) +
+  theme_pubr() +
   theme(legend.title = element_blank(), legend.position = "top")
 ggsave(file.path(out_dir, "panel_b_gc_bias_lineal.jpg"), panel_b_lineal, width = 9, height = 6.75, units = "in")
 
@@ -94,6 +95,7 @@ panel_b_bars <- tmp %>%
   facet_wrap(~rep) +
   xlab("Contenido de [G+C]") +
   ylab("Proporción") +
+  theme_pubr() +
   theme(text = element_text(size = 25))
 ggsave(file.path(out_dir, "panel_b_gc_bias_bars.jpg"), panel_b_bars, width = 9, height = 6.75, units = "in")
 
