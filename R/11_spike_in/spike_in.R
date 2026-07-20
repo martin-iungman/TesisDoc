@@ -39,7 +39,7 @@ p <- spikes %>%
   xlab("Muestra") +
   labs(col = "Spike-In") +
   theme_pubclean() +
-  theme(text = element_text(size = 15))
+  theme(text = element_text(size = 15), panel.spacing = unit(3, "lines"))
 
 ggsave(file.path(out_dir, paste0(slug, ".jpg")), p, width = 9, height = 6.75, units = "in")
 

@@ -85,7 +85,7 @@ panel_b_lineal <- tmp %>%
   ylab("Proporción de lecturas secuenciadas") +
   scale_color_manual(values = clrs[c(3, 5)], labels = c("Distribución uniforme", "Observada")) +
   theme_pubr() +
-  theme(legend.title = element_blank(), legend.position = "top")
+  theme(legend.title = element_blank(), legend.position = "top", panel.spacing = unit(3, "lines"))
 ggsave(file.path(out_dir, "panel_b_gc_bias_lineal.jpg"), panel_b_lineal, width = 9, height = 6.75, units = "in")
 
 panel_b_bars <- tmp %>%
@@ -96,7 +96,7 @@ panel_b_bars <- tmp %>%
   xlab("Contenido de [G+C]") +
   ylab("Proporción") +
   theme_pubr() +
-  theme(text = element_text(size = 25))
+  theme(text = element_text(size = 25), panel.spacing = unit(3, "lines"))
 ggsave(file.path(out_dir, "panel_b_gc_bias_bars.jpg"), panel_b_bars, width = 13, height = 6.75, units = "in")
 
 # --- Panel C: violin de G+C, secuenciados vs no --------------------------
