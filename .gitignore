@@ -3,6 +3,9 @@
 .Rhistory
 .RData
 .Ruserdata
+# stray default graphics device file some base-R plotting calls create
+# (e.g. VennDiagram::venn.diagram) when run from Rscript
+Rplots.pdf
 
 # OS
 .DS_Store
