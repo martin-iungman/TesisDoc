@@ -141,6 +141,10 @@ wilcox_df <- map2(
   list_rbind() %>%
   left_join(wilcox, by = "feature")
 
+# saved for R/09_coocurrencia (M12), which needs the significant/consistent
+# feature list without recomputing every Wilcoxon test.
+write_tsv(wilcox_df, "data/processed/activity_summary.tsv")
+
 # --- Graficos resumen: seq y endo ------------------------------------------
 
 plot_summary <- function(df, features) {
