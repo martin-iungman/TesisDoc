@@ -11,12 +11,13 @@
 
 translib_analysis <- "../transcriptional_library/Analysis/Tables"
 
-# Cis-regulatory module (CRM) counts: non-redundant ReMap ChIP-seq TF
-# peaks per promoter. The raw source (External_data/remap2022_nr_macs2_
-# hg38_v1_0.bed, 5.2GB, ~one row per individual TF:celltype peak) would
-# need a bedtools-style merge + per-region TF aggregation we don't have
-# reconstructed. PENDING: find/rebuild that aggregation script.
-path_library_remap_crm <- file.path(translib_analysis, "library_remap_CRM.bed")
+# Cis-regulatory module (CRM) overlap: RESOLVED 2026-07-21, now built as a
+# 0/1 "any ReMap TF peak overlap" flag directly from the raw
+# External_data/remap2022_nr_macs2_hg38_v1_0.bed (5.2GB) in
+# build_prom_features.R - no longer reads library_remap_CRM.bed. Note this
+# is a simplification, not a port: it drops ReMap's CRM (merged-region,
+# TF-count) aggregation since N_TF_CRM was only ever used downstream as
+# N_TF_CRM == 0.
 
 # FANTOM5 per-sample CAGE activity (136MB), used for tissue-specificity
 # classification (sample_specificity_class) and the Gini index

@@ -294,25 +294,23 @@ prom_df <- left_join(prom_df, wide_dnase, by = "seq_id")
 rm(dnase, lib2, ol, long_dnase, wide_dnase)
 
 # --- Cis-regulatory modules (CRM), tissue specificity, shape, HEK293 -----
-# EXCEPTION: reads transcriptional_library/Analysis/Tables directly - see
-# R/00_prom_features/analysis_tables_exceptions.R for why and what's pending.
+# EXCEPTION (tissue specificity, shape): reads transcriptional_library/
+# Analysis/Tables directly - see R/00_prom_features/analysis_tables_exceptions.R
+# for why and what's pending.
 
 source("R/00_prom_features/analysis_tables_exceptions.R")
 
-crm <- read_tsv(path_library_remap_crm,
-  col_names = c(
-    "seqnames", "start", "end", "seq_id", "score", "strand", "seqnames_peak", "start_peak",
-    "end_peak", "peak", "N_TF_CRM", "strand_peak", "thickstart_peak", "thickend_peak", "rgb"
-  ),
-  show_col_types = FALSE
-)
-prom_df <- crm %>%
-  select(seq_id, N_TF_CRM) %>%
-  group_by(seq_id) %>%
-  summarise(N_TF_CRM = sum(N_TF_CRM)) %>%
-  right_join(prom_df, by = "seq_id") %>%
-  mutate(N_TF_CRM = replace_na(N_TF_CRM, 0))
-rm(crm)
+# Cis-regulatory module overlap: raw ReMap2022 non-redundant TF peaks
+# (ported from transcriptional_library/Analysis/scripts/TF_remap_funciona.R's
+# "EL POSTA" section). N_TF_CRM is only ever consumed downstream as
+# N_TF_CRM == 0 ("no TF peak overlap"), so it's built here as a 0/1 flag
+# rather than reconstructing ReMap's CRM (merged-region, TF-count)
+# aggregation - no longer reads Analysis/Tables/library_remap_CRM.bed.
+remap <- rtracklayer::import.bed(path_remap_nr)
+remap_lib <- plyranges::join_overlap_inner(remap, lib)
+prom_df <- prom_df %>%
+  mutate(N_TF_CRM = as.integer(seq_id %in% remap_lib$seq_id))
+rm(remap, remap_lib)
 
 # Tissue specificity: classification (discrete) + Gini index (numeric).
 # sample_specific = >10TPM in some sample, active (>=1TPM) in <10 samples
