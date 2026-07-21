@@ -166,9 +166,9 @@ plot_summary <- function(df, features) {
 }
 
 panel_seq <- plot_summary(wilcox_df, vbles_split[[1]])
-ggsave(file.path(out_dir, "summary_seq.jpg"), panel_seq, width = 9, height = 6.75, units = "in")
+ggsave(file.path(out_dir, "summary_seq.jpg"), panel_seq, width = 13.5, height = 6.75, units = "in")
 
 panel_endo <- plot_summary(wilcox_df, vbles_split[[2]])
-ggsave(file.path(out_dir, "summary_endo.jpg"), panel_endo, width = 9, height = 6.75, units = "in")
+ggsave(file.path(out_dir, "summary_endo.jpg"), panel_endo, width = 13.5, height = 6.75, units = "in")
 
 message("Figuras guardadas en ", out_dir)
