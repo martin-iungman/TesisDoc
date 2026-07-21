@@ -37,6 +37,9 @@ path_fantom5_primary_cell_raw <- file.path(translib, "External_data/FANTOM5/hg38
 # path_fantom5_filt_cage <- "data/external/FANTOM5/Library_filt_CAGE"
 path_fantom5_filt_cage <- file.path(translib, "External_data/FANTOM5/Library_filt_CAGE")
 
+# ReMap non-redundant peaks (5.2GB raw) - see analysis_tables_exceptions.R,
+# CRM currently reads the Analysis/Tables precomputed intersection instead.
+
 # Flow cytometry validation, individual per-cell EGFP fluorescence tables
 # (519MB, one .cells.csv per sample/promoter). Source: FlowJo export, no
 # regeneration script (raw instrument data).

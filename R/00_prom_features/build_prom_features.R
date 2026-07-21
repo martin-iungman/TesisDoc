@@ -217,6 +217,175 @@ turnover_df <- values(hg19_young_lib) %>%
 
 prom_df <- prom_df %>% left_join(turnover_df, by = "name")
 
+# --- Repeated elements (RepeatMasker) -------------------------------------
+# strand is ignored here (matches the original pipeline): RepeatMasker's
+# "cons_strand" column uses +/C, not +/-/*, so GRanges() leaves strand="*"
+# for all rows and the join below is not strand-aware.
+
+repeatmasker <- read_delim(path_repeatmasker, col_names = TRUE, delim = " ", show_col_types = FALSE)
+repeatmasker_gr <- GRanges(repeatmasker) %>%
+  plyranges::join_overlap_intersect(lib, .) %>%
+  subset(width > 10)
+
+dna_repeat <- getSeq(Hsapiens, repeatmasker_gr)
+G_C_repeat <- Biostrings::oligonucleotideFrequency(dna_repeat, width = 1, as.prob = TRUE)[, c("C", "G")] %>% rowSums()
+repeatmasker_gr$G_C_repeat <- round(G_C_repeat, 3)
+repeatmasker_df <- repeatmasker_gr %>%
+  as_tibble() %>%
+  mutate(
+    repeat_family = ifelse(repeat_class %in% c("Low_complexity", "Simple_repeat"), "LCR", "TE"),
+    repeat_superclass = str_remove(repeat_class, "/.+$")
+  ) %>%
+  rename(repeat_overlap = width)
+
+LCR_df <- repeatmasker_df %>%
+  filter(repeat_family == "LCR") %>%
+  select(seq_id, repeat_overlap, G_C_repeat) %>%
+  group_by(seq_id) %>%
+  summarise(LCR_overlap = sum(repeat_overlap), G_C_LCR = sum(G_C_repeat * repeat_overlap) / LCR_overlap)
+TE_df <- repeatmasker_df %>%
+  filter(repeat_family == "TE") %>%
+  select(seq_id, repeat_overlap, G_C_repeat, repeat_superclass) %>%
+  group_by(seq_id) %>%
+  summarise(TE_overlap = sum(repeat_overlap), G_C_TE = sum(G_C_repeat * repeat_overlap) / TE_overlap, TE_superclass = unique(repeat_superclass)[[1]])
+
+prom_df <- prom_df %>%
+  left_join(LCR_df, by = "seq_id") %>%
+  left_join(TE_df, by = "seq_id") %>%
+  mutate(
+    across(c(LCR_overlap, TE_overlap, G_C_TE, G_C_LCR), ~ replace_na(.x, 0)),
+    TE_superclass = TE_superclass %>% fct_lump_min(100)
+  )
+rm(repeatmasker, repeatmasker_gr, repeatmasker_df, dna_repeat)
+
+# --- Enhancers (FANTOM5, distance-window overlap counts) ------------------
+
+enhancers <- import.bed("data/external/F5.hg38.enhancers.bed")
+lib10kb <- promoters(lib, upstream = 5000, downstream = 5000)
+lib50kb <- promoters(lib, upstream = 25000, downstream = 25000)
+lib100kb <- promoters(lib, upstream = 50000, downstream = 50000)
+
+lib$enh10kb <- countOverlaps(lib10kb, enhancers)
+lib$enh50kb <- countOverlaps(lib50kb, enhancers)
+lib$enh100kb <- countOverlaps(lib100kb, enhancers)
+prom_df <- left_join(prom_df, values(lib) %>% as_tibble() %>% select(seq_id, enh10kb, enh50kb, enh100kb), by = "seq_id")
+
+# --- Chromatin accessibility (DNase, ENCODE) -------------------------------
+
+dnase <- rtracklayer::import.bw(path_dnase, as = "GRanges")
+lib2 <- lib
+strand(lib2) <- "*"
+# restrict the genome-wide DNase track down to the library's chromosomes
+seqlevels(dnase, pruning.mode = "coarse") <- seqlevels(lib2)
+ol <- plyranges::find_overlaps(dnase, lib2)
+long_dnase <- as_tibble(ol) %>%
+  select(-strand) %>%
+  left_join(as_tibble(lib) %>% select(seq_id, strand), by = "seq_id") %>%
+  filter(str_detect(seq_id, "^FP")) %>%
+  group_by(seq_id) %>%
+  mutate(range_order = (ifelse(strand == "-", row_number(-start), row_number(start)) - 1) * 25)
+wide_dnase <- long_dnase %>%
+  select(seq_id, range_order, score) %>%
+  group_by(seq_id) %>%
+  mutate(mean_dnase = mean(score)) %>%
+  pivot_wider(names_from = range_order, values_from = score, names_prefix = "dnase_") %>%
+  select(-dnase_275)
+prom_df <- left_join(prom_df, wide_dnase, by = "seq_id")
+rm(dnase, lib2, ol, long_dnase, wide_dnase)
+
+# --- Cis-regulatory modules (CRM), tissue specificity, shape, HEK293 -----
+# EXCEPTION: reads transcriptional_library/Analysis/Tables directly - see
+# R/00_prom_features/analysis_tables_exceptions.R for why and what's pending.
+
+source("R/00_prom_features/analysis_tables_exceptions.R")
+
+crm <- read_tsv(path_library_remap_crm,
+  col_names = c(
+    "seqnames", "start", "end", "seq_id", "score", "strand", "seqnames_peak", "start_peak",
+    "end_peak", "peak", "N_TF_CRM", "strand_peak", "thickstart_peak", "thickend_peak", "rgb"
+  ),
+  show_col_types = FALSE
+)
+prom_df <- crm %>%
+  select(seq_id, N_TF_CRM) %>%
+  group_by(seq_id) %>%
+  summarise(N_TF_CRM = sum(N_TF_CRM)) %>%
+  right_join(prom_df, by = "seq_id") %>%
+  mutate(N_TF_CRM = replace_na(N_TF_CRM, 0))
+rm(crm)
+
+# Tissue specificity: classification (discrete) + Gini index (numeric).
+# sample_specific = >10TPM in some sample, active (>=1TPM) in <10 samples
+# group_enrichment = 50% of total activity accumulated in <=7 samples
+# sample_enhanced = some sample >=4x the mean of active samples
+# all_samples_detected = none of the above, active in >=80% of samples
+# mixed = everything else
+sample_activity <- read_tsv(path_sample_cage_activity, show_col_types = FALSE)
+sample_activity_lib <- sample_activity %>% filter(name %in% prom_df$name)
+n_samples <- unique(sample_activity_lib$sample) %>% length()
+obj <- sample_activity_lib %>%
+  mutate(tpm = counts * 1e6 / libsize) %>%
+  group_by(name) %>%
+  mutate(active = tpm > 1, n_detected = sum(active), sample_enhancement = tpm / (sum(tpm) / n_detected)) %>%
+  ungroup()
+enrichment <- obj %>%
+  group_by(name) %>%
+  arrange(name, desc(tpm)) %>%
+  mutate(i = row_number(), group_enrichment = cumsum(tpm) / (sum(tpm) - cumsum(tpm))) %>%
+  filter(active, group_enrichment > 1, i <= (0.1 * n_samples)) %>%
+  filter(i == min(i)) %>%
+  mutate(sample_specificity_class = "group_enrichment")
+enhanced <- obj %>% filter(sample_enhancement >= 4, active == TRUE)
+class_long <- obj %>%
+  mutate(sample_specificity_class = ifelse(name %in% (enrichment$name[enrichment$sample_specificity_class == "group_enrichment"]), "group_enrichment",
+    ifelse(n_detected == 0, "non_detected",
+      ifelse(name %in% enhanced$name, "sample_enhanced",
+        ifelse(n_detected > 0.8 * n_samples, "all_samples_detected", "mixed")
+      )
+    )
+  ))
+class_short <- class_long %>%
+  select(name, sample_specificity_class, n_detected) %>%
+  distinct()
+prom_df <- left_join(prom_df, class_short %>% rename(active_fantom5_samples = n_detected), by = "name")
+
+gini <- function(x, weights = rep(1, length = length(x))) {
+  ox <- order(x)
+  x <- x[ox]
+  weights <- weights[ox] / sum(weights)
+  p <- cumsum(weights)
+  nu <- cumsum(weights * x)
+  n <- length(nu)
+  nu <- nu / nu[n]
+  sum(nu[-1] * p[-n]) - sum(nu[-n] * p[-1])
+}
+gini_values <- obj %>%
+  filter(n_detected > 0) %>%
+  group_by(name) %>%
+  summarise(sample_specificity_gini = gini(tpm), sum_tpm_fantom5 = sum(tpm))
+prom_df <- left_join(prom_df, gini_values, by = "name")
+rm(sample_activity, sample_activity_lib, obj, enrichment, enhanced, class_long, class_short, gini_values)
+
+# Promoter shape (CAGEr interquantile width): Broad if >25bp else Narrow.
+# shape_merged's "name" holds short gene-symbol-like names (e.g.
+# "KLHL17_1"), matching prom_df's "name" column - NOT prom_df's seq_id.
+shape <- read_tsv(path_shape_merged, show_col_types = FALSE) %>%
+  group_by(name) %>%
+  filter(dominant_ctss.score == max(dominant_ctss.score)) %>%
+  ungroup() %>%
+  mutate(shape_class = ifelse(interquantile_width > 25, "Broad", "Narrow")) %>%
+  select(name, shape_class, interquantile_width) %>%
+  distinct(name, .keep_all = TRUE)
+prom_df <- left_join(prom_df, shape, by = "name")
+rm(shape)
+
+# Endogenous HEK293 activity (CAGEr).
+hek_df <- read_tsv(path_hek_cager, show_col_types = FALSE) %>%
+  group_by(name) %>%
+  summarise(hek_tpm = sum(score.y, na.rm = TRUE), hek_interq_width = sum(interquantile_width))
+prom_df <- left_join(prom_df, hek_df, by = c("seq_id" = "name"))
+rm(hek_df)
+
 # --- Write output -----------------------------------------------------
 
 dir.create("data/processed", showWarnings = FALSE, recursive = TRUE)
