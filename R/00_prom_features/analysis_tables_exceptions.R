@@ -28,6 +28,7 @@ path_sample_cage_activity <- file.path(translib_analysis, "sample_CAGE_activity.
 # PENDING: locate/rebuild the raw CAGEr shape-calling pipeline.
 path_shape_merged <- file.path(translib_analysis, "shape_merged.tsv")
 
-# HEK293 endogenous CAGE activity (3MB). PENDING: locate/rebuild the raw
-# HEK293 CAGE processing (CAGEr) pipeline.
-path_hek_cager <- file.path(translib_analysis, "HEK_CAGEr_df.tsv")
+# HEK293 endogenous CAGE activity: RESOLVED 2026-07-21, now built from
+# raw FANTOM5 data in build_prom_features.R (ported from
+# transcriptional_library/Analysis/scripts/hek_cage.qmd via CAGEr) -
+# no longer reads from Analysis/Tables.

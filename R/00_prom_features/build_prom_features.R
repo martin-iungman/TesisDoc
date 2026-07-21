@@ -379,12 +379,34 @@ shape <- read_tsv(path_shape_merged, show_col_types = FALSE) %>%
 prom_df <- left_join(prom_df, shape, by = "name")
 rm(shape)
 
-# Endogenous HEK293 activity (CAGEr).
-hek_df <- read_tsv(path_hek_cager, show_col_types = FALSE) %>%
+# Endogenous HEK293 activity - FANTOM5 CAGE (raw), processed with CAGEr
+# (ported from transcriptional_library/Analysis/scripts/hek_cage.qmd).
+library(CAGEr)
+lib_hek <- rtracklayer::import.bed("data/raw/library.bed")
+lib_hek$gene_name <- lib_hek$name
+
+hek <- CAGEr::CAGEexp(
+  genomeName = "BSgenome.Hsapiens.UCSC.hg38",
+  inputFiles = "data/external/FANTOM5/hg38_cell_line/embryonic%20kidney%20cell%20line%3a%20HEK293%2fSLAM%20untreated.CNhs11046.10450-106F9.hg38.nobarcode.ctss.bed.gz",
+  inputFilesType = "bedScore",
+  sampleLabels = "HEK"
+)
+hek <- CAGEr::getCTSS(hek)
+hek <- annotateCTSS(hek, lib_hek, upstream = 0, downstream = 252)
+hek <- CAGEr::normalizeTagCount(hek, method = "powerLaw", fitInRange = c(5, 1000), alpha = 1.18, T = 1e6)
+hek <- filterLowExpCTSS(hek, thresholdIsTpm = TRUE, nrPassThreshold = 1, threshold = 0.5)
+hek <- paraclu(hek, keepSingletonsAbove = 1, nrCores = 5)
+hek <- cumulativeCTSSdistribution(hek, clusters = "tagClusters", useMulticore = TRUE)
+hek <- quantilePositions(hek, clusters = "tagClusters", qLow = 0.1, qUp = 0.9)
+
+hek_df <- tagClustersGR(hek, 1, qLow = 0.1, qUp = 0.9) %>%
+  plyranges::join_overlap_left_directed(lib_hek, .) %>%
+  as_tibble()
+hek_summ <- hek_df %>%
   group_by(name) %>%
   summarise(hek_tpm = sum(score.y, na.rm = TRUE), hek_interq_width = sum(interquantile_width))
-prom_df <- left_join(prom_df, hek_df, by = c("seq_id" = "name"))
-rm(hek_df)
+prom_df <- left_join(prom_df, hek_summ, by = c("seq_id" = "name"))
+rm(lib_hek, hek, hek_df, hek_summ)
 
 # --- Write output -----------------------------------------------------
 
