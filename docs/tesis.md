@@ -201,7 +201,9 @@ Estimación masiva de las propiedades transcripcionales de promotores basales hu
 
 Efectos de la secuencia promotor sobre la fuerza transcripcional
 
-- figura explicativa clara sobre metodologia \+ CpG \+ TATA \+ NFYA \+ SP1/2  
+- figura explicativa clara sobre metodologia \+ CpG \+ TATA \+ NFYA   
+- \+ SP1/2 \+ NFYA   
+-   
 - summary seq  
 - tissue sp \+ ?? \+summary endo  
 - integrador?
@@ -410,7 +412,7 @@ De las restantes secuencias presentes en la *library*, 2910 son regiones de enha
 
 Fig. M9   
    
-Elementos del promotor basalCaracterización de los promotores
+Elementos de secuencia del promotor basalCaracterización de los promotores
 
 La base de datos EPD provee información respecto a la presencia de motivos típicos en sus promotores anotados, a partir de la búsqueda de patrones y su localización respecto al TSS: TATA-box, CCAAT-box, GC-box e INR. Según sus datos, del 23851 secuencias, el 47.7% contiene un GC-box, el 32% un INR fuerte, el 16.3% un CCAAT-box y solo el 8% TATA-box (Fig. M10A).
 
@@ -420,14 +422,15 @@ La presencia de islas CpG fue determinada a partir de las anotaciones provenient
 
 La frecuencia nucleotídica y su identidad en sitios específicos fue evaluada con el paquete de R-Bioconductor Biostrings[^5]. Se evaluó el contenido de G y C (Fig. M10C), así como la identidad del dinucleótido del TSS (Fig. XD). Los patrones buscados de forma estricta fueron YCASW para el INR “fuerte”, TCT para el clásico motivo de proteínas ribosomales y el dinucleótido YR (PyPu)[^6]. Respecto a este último patrón se discernir también en sus cuatro posibilidades (CA, CG, TA, TG). Aquellos promotores que no cuadran en su TSS con alguno de los patrones mencionados, fueron catalogados como “No canónicos”. Se incluye el dinucleótido GC para evidenciar que la prevalencia del CG no es simplemente producto de alto contenido de dichos nucleótidos.  
 
-Patrones de conservación de los promotores basales  
+Patrones de conservación de los promotores basales
+
 A su vez, se incorporaron datos que reflejan la historia evolutiva de los promotores, tanto a nivel de secuencia como funcional. Por un lado, se extrajeron datos de PhyloP score (81) provenientes de la comparación entre el genoma hg38 y 100 especies de mamíferos. Evaluando la mediana de dicho valor del “metapromotor” a cada base (Fig. M11A), se observa claramente una mayor conservación en la región proximal al TSS (+16 a \-50), con claros picos alrededor del \+1 y del \-30, asociado al TATA-box. En una región de intermedia cercanía (-50 a \-150) hay un progresivo decaimiento de la conservación, mientras que se acerca mucho a valores de evolución neutra para la región más distal (-150 a \-235). A su vez, para cada una de estas regiones, en cada promotor, se evaluó el PhyloP score medio. En términos de conservación funcional, nos basamos en datos de Young et al. (19), quienes utilizan datos de actividad promotora en tejidos de humano y ratón para considerar si, las secuencias que se pueden considerar homólogas, están activas en ambas especies, si perdieron actividad promotora en humanos o en ratón o si, por el contrario, la adquirieron en alguna de estas especies (Fig M11B). 
 
 Fig. M11. evo library
 
-Actividad endógena de los promotores
+Patrones de actividad endógena de los promotores
 
-Se obtuvieron datos de accesibilidad de cromatina en HEK293 provenientes de ENCODE (accesible como ENCSR956YZJ). La presencia de Módulos Regulatoios en *cis* (CRM) se determino con datos de Remap basados en cientos de muestras de ChIP-seq [(44)](https://www.zotero.org/google-docs/?sWJeqi). La posición de los enhancers anotados se obtuvo de UCSC. 
+Se obtuvieron datos de accesibilidad de cromatina en HEK293 provenientes de ENCODE (accesible como ENCSR956YZJ). La presencia de Módulos Regulatorios en *cis* (CRM) se determino con datos de Remap basados en cientos de muestras de ChIP-seq [(44, ver](https://www.zotero.org/google-docs/?sWJeqi) Análisis de datos de ChIP-seq[)](https://www.zotero.org/google-docs/?sWJeqi). La posición de los enhancers anotados se obtuvo de UCSC. 
 
 La actividad promotora endógena fue cuantificada a partir de datos de CAGE, provistos por el consorcio FANTOM5. Estos datos se utilizaron tanto para la determinación de la actividad en muestras específicas, así como para obtener valores del comportamiento de los promotores a lo largo de todas las muestras, como la especificidad de tejido del promotor o su forma (la distribución de sus TSS). Para las muestras específicas (HEK293, HeLa, músculo esquelético), se utilizó el paquete de R CAGEr v2.12.0 [(83)](https://www.zotero.org/google-docs/?OtTt7L). Específicamente, aplicamos una normalización de *power-law* para calcular los niveles de expresión en *Tags* Por Millón (TPM), filtrando aquellas señales que estuvieran por debajo de un umbral de 1 TPM. Los clusters de TSS se definieron mediante el algoritmo *paraclu* (84). Para refinar la señal, se conservó el 80% central del rango de expresión y se intersectó con las coordenadas genómicas de la *library* para evaluar la actividad endógena específica de cada promotor.
 
@@ -436,6 +439,12 @@ G=1-i=1n(pi-pi-1)(qi+qi-1)							(E3)
 donde, en este caso, *pi* y *qi* son las proporciones acumuladas de los grupos de muestras y de la actividad promotora, respectivamente.
 
 La forma de los promotores se calculó a partir de la combinación de todas las muestras de FANTOM5 analizadas (células primarias y tejidos). En este caso, también se utilizó el paquete *CAGEr* y se aplicó una normalización de *power-law*. Los *clusters* de TSS se obtuvieron mediante el método *distclu*, con una distancia máxima entre TSSs de 5 y un mínimo de 10 *counts* por TSS. Se utilizó el ancho intercuantílico (0.05-0.95) como *proxy* de la forma. Los valores se dividieron en terciles de ancho, conservando el primer y tercer tercil como promotores focalizados y anchos, respectivamente. En caso de que se obtuvieran múltiples *clusters* de TSS para una misma región promotora, solo se utilizó aquel que solapaba con la posición establecida por la EPD.
+
+Coocurrencia de las características de los promotores basales
+
+Las características de los promotores, tanto aquellas basadas en la secuencia como aquellas que surgen de estudiarlos en sus contextos endógenos, no son completamente independientes entre sí (Fig. M12). Esto implica que frecuentemente, sea complejo poder asignar a un efecto observado, una característica particular, con confianza de que no se trate de un efecto confusor de otra característica con alto grado de coocurrencia. Si bien esto se puede resolver en ciertos casos con una estratificación por a potencial característica confusora, en los casos mas extremos de co-presencia, esta tarea resulta prácticamente imposible y es un limitante en este tipo de enfoques experimentales, basados en secuencias naturales.  
+
+Fig. M12 coocurrencia
 
 Algoritmos de predicción de la actividad promotora basados en la secuencia
 
@@ -477,7 +486,7 @@ Las características cuyo intervalo de confianza incluye el valor 0.5 en alguna 
 
 Análisis de datos de ChIP-seq
 
-Se obtuvieron picos de ChIP-seq no redundantes de la base de datos ReMap y se intersectaron con la *library* de promotores para determinar el estado de unión de cada proteína. El análisis se restringió a los factores de transcripción (TFs) que presentaron picos en al menos 100 promotores en ambas réplicas biológicas.  
+Se obtuvieron picos de ChIP-seq no redundantes de la base de datos ReMap y se intersectaron con la *library* de promotores para determinar el estado de unión de cada proteína. La intersección positiva de al menos un pico, fue evidencia suficiente para considerar la presencia de un CRM. El análisis se restringió a los factores de transcripción (TFs) que presentaron picos en al menos 100 promotores en ambas réplicas biológicas.  
 Las asociaciones entre la ocupación proteica y tanto el ruido como la actividad transcripcional se evaluaron utilizando el mismo marco de trabajo aplicado a todas las características binarias. De manera paralela, se llevó a cabo un análisis para modificaciones de histonas y marcas epigenéticas obtenidas del conjunto de datos de ChIP-Atlas (58).
 
 Análisis de enriquecimiento funcional
