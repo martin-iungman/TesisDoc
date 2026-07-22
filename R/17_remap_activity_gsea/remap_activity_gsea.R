@@ -151,6 +151,28 @@ panel_low <- wilcox_wide %>%
   scale_fill_manual(values = c("Actividad baja" = "#7FB800"))
 ggsave(file.path(out_dir, "remap_act_low.jpg"), panel_low, width = 9, height = 8, units = "in")
 
+# --- Scatter del TF con efecto mas negativo (analogo a los de R8) ---------
+# Union a PHF19 (subunidad de PRC2) vs. actividad, en bins de 100
+# promotores ordenados por rango - mismo formato que los scatters de
+# R/16_tf_contexto_endogeno para NFYA/SP1/SP2.
+
+top_neg_tf <- wilcox_df %>%
+  filter(val == "estimate") %>%
+  group_by(feature) %>%
+  summarise(min_estimate = min(estimate), .groups = "drop") %>%
+  slice_min(min_estimate, n = 1) %>%
+  pull(feature)
+
+data_TF_top_neg <- add_mean_sw_bins(data %>% select(seq_id, rep, mean)) %>%
+  left_join(remap_hits %>% filter(TF == top_neg_tf) %>% distinct(seq_id) %>% mutate(bound = TRUE), by = "seq_id") %>%
+  mutate(bound = replace_na(bound, FALSE))
+
+ggsave(
+  file.path(out_dir, paste0(top_neg_tf, "_scatter.jpg")),
+  tf_scatter(data_TF_top_neg, "bound", paste0("Unión a ", top_neg_tf, " (mayor efecto negativo sobre actividad)")),
+  width = 9, height = 6.75, units = "in"
+)
+
 # --- GSEA sobre la lista de TFs ordenada por efecto en actividad ----------
 
 pregsea_act <- function(rep_id) {

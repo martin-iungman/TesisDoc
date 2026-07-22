@@ -27,3 +27,34 @@ count_bar_labeled <- function(data, x, n, total, base_size = 16,
   if (coord_flip) p <- p + coord_flip()
   p
 }
+
+# Bins de 100 promotores segun rango de actividad media, por replica (se
+# descarta el resto de la division para que los bins queden parejos). Usado
+# para los scatters de union de TF/motivo vs. actividad (R/16_tf_contexto_
+# endogeno, R/17_remap_activity_gsea).
+add_mean_sw_bins <- function(df) {
+  excess <- df %>% group_by(rep) %>% summarise(excess = n() %% 100, .groups = "drop")
+  df %>%
+    group_split(rep) %>%
+    purrr::map2(excess$excess, ~ .x %>%
+      mutate(mean_rank_sw = row_number(mean)) %>%
+      filter(mean_rank_sw > .y) %>%
+      mutate(mean_rank_sw = row_number(mean), mean_sw = ceiling(mean_rank_sw / 100)) %>%
+      ungroup()) %>%
+    purrr::list_rbind()
+}
+
+# Proporcion de promotores con `feature`==TRUE por bin de actividad
+# (mean_sw, ver add_mean_sw_bins), con smooth loess por replica.
+tf_scatter <- function(df, feature, titulo) {
+  df %>%
+    group_by(rep, mean_sw) %>%
+    summarise(prop = sum(.data[[feature]]) / n(), .groups = "drop") %>%
+    ggplot(aes(mean_sw, prop)) +
+    geom_point(col = thesis_clr) +
+    geom_smooth(col = "#216869") +
+    facet_wrap(~rep) +
+    ylim(0, 1) +
+    labs(x = "Actividad media (bins de 100, ordenados por rango)", y = "Proporción de promotores", title = titulo) +
+    theme_bw(base_size = 16)
+}
