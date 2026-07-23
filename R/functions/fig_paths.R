@@ -3,13 +3,15 @@
 # that can change when the thesis is reorganized (only the slug is
 # hardcoded in the calling script).
 
-# Returns "M10", "R8", etc. for an unambiguous numero_actual, or
-# "sinnum" when the CSV marks it unresolved (contains "?" or "/").
+# Returns "M10", "R8", "R2.4", etc. for an unambiguous numero_actual
+# (M-figures are M<N>; R-figures are R<deck>.<slide>, deck/slide within
+# the Resultados 1/2 pptx decks), or "sinnum" when the CSV marks it
+# unresolved (contains "?" or "/").
 fig_number_prefix <- function(slug, mapping_path = "docs/mapping_figuras.csv") {
   mapping <- readr::read_csv(mapping_path, show_col_types = FALSE)
   row <- mapping[mapping$slug == slug, ]
   if (nrow(row) == 0) stop("slug '", slug, "' not found in ", mapping_path)
-  m <- regmatches(row$numero_actual, regexpr("^Fig\\.\\s*[MR][0-9]+$", row$numero_actual))
+  m <- regmatches(row$numero_actual, regexpr("^Fig\\.\\s*(M[0-9]+|R[0-9]+\\.[0-9]+)$", row$numero_actual))
   if (length(m) == 0) return("sinnum")
   sub("^Fig\\.\\s*", "", m)
 }
