@@ -58,3 +58,66 @@ tf_scatter <- function(df, feature, titulo) {
     labs(x = "Actividad media (bins de 100, ordenados por rango)", y = "Proporción de promotores", title = titulo) +
     theme_bw(base_size = 16)
 }
+
+# ROC curve (por umbral de rango) de una feature booleana contra
+# var_rank_sw (rango de varianza dentro de cada bin de actividad media -
+# ver add_mean_sw_bins), para testear si una feature de secuencia predice
+# ruido inusualmente alto/bajo. Ported from transcriptional_library/
+# Analysis/scripts/noise_analysis.qmd.
+roc_curve <- function(data, feature) {
+  purrr::map(1:99, ~ data %>%
+    count(gr = var_rank_sw > .x, across(all_of(feature))) %>%
+    mutate(threshold = .x)) %>%
+    purrr::list_rbind() %>%
+    pivot_wider(names_from = c(gr, all_of(feature)), values_from = n) %>%
+    mutate(TPR = TRUE_TRUE / (TRUE_TRUE + FALSE_TRUE), FPR = TRUE_FALSE / (FALSE_FALSE + TRUE_FALSE)) %>%
+    arrange(FPR)
+}
+
+# Area bajo la curva (regla del trapecio) de un roc_curve().
+noise_auc <- function(roc) {
+  total <- 0
+  for (i in seq_len(nrow(roc) - 1)) {
+    deltax <- roc$FPR[i + 1] - roc$FPR[i]
+    deltay <- roc$TPR[i + 1] - roc$TPR[i]
+    total <- sum(total, deltax * roc$TPR[i] + deltax * deltay / 2, na.rm = TRUE)
+  }
+  total
+}
+
+# Scatter de ruido (var_rank_sw) vs. bin de actividad media, coloreado por
+# una feature booleana, con smooth por nivel (paleta separada para puntos
+# vs. curvas via ggnewscale, igual que el original).
+noise_scatter <- function(data, feature, titulo, leyenda) {
+  data %>%
+    ggplot(aes(mean_sw, var_rank_sw, col = .data[[feature]])) +
+    geom_point(size = 0.2, alpha = 0.5) +
+    facet_wrap(~rep) +
+    labs(x = "Bin de actividad media", y = "Rango de varianza (dentro del bin)", col = leyenda, title = titulo) +
+    scale_color_manual(values = c("grey", thesis_clr), guide = guide_legend(override.aes = list(size = 3))) +
+    ggnewscale::new_scale_color() +
+    geom_smooth(aes(col = .data[[feature]]), se = FALSE, linewidth = 1.2, show.legend = FALSE) +
+    scale_color_manual(values = c("#525252", "#136869")) +
+    theme_pubr(base_size = 16)
+}
+
+# Curva ROC (una linea por replica, con AUC en el titulo) de una feature
+# booleana prediciendo var_rank_sw alto.
+noise_roc <- function(data, feature, titulo) {
+  data %>%
+    group_split(rep) %>%
+    purrr::map(~ roc_curve(.x, feature) %>% mutate(rep = unique(.x$rep), AUC = noise_auc(.))) %>%
+    purrr::list_rbind() %>%
+    ggplot(aes(FPR, TPR, col = rep)) +
+    geom_line(linewidth = 1) +
+    geom_abline(linetype = "dashed", col = "grey50") +
+    geom_text(
+      data = . %>% distinct(AUC, rep) %>% mutate(AUC = paste("AUC:", round(AUC, 3))) %>%
+        bind_cols(tibble(TPR = c(0.9, 0.8), FPR = 0.02)),
+      aes(label = AUC), hjust = "left", show.legend = FALSE
+    ) +
+    ggtitle(titulo) +
+    scale_color_manual(values = c("#0D2C54", "#AD343E")) +
+    theme_pubr(base_size = 16) +
+    labs(col = "")
+}
