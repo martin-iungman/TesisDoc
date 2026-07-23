@@ -8,6 +8,10 @@
 #   promotores de alta confianza" - hay dos candidatos igual de
 #   plausibles en transcriptional_library/Tesis/tesis.R (n_per_rep.jpg y
 #   venn_rep_postfilter.jpg), ambos generados abajo. Definir cual es.
+# Panel D: correlacion de la VARIANZA (ruido) entre replicas, sobre el
+#   subconjunto de alta confianza - analogo al panel B pero para var en
+#   vez de mean. Portado de transcriptional_library/Analysis/scripts/
+#   final_github.R ("Variance correlation" / var_replicates.pdf).
 #
 # Requiere: data/processed/activity_stats_full.tsv,
 # data/processed/activity_stats_highconf.tsv y data/processed/data_long.tsv
@@ -128,5 +132,24 @@ VennDiagram::venn.diagram(
   fill = c("#AADAD4", "#358AAA", "#dfedf6"),
   cat.cex = c(0, 0, 0)
 )
+
+# --- Panel D: correlacion de varianza (ruido) entre replicas -------------
+
+panel_d_base <- stats_highconf %>%
+  select(seq_id, var, rep) %>%
+  pivot_wider(values_from = "var", names_from = "rep")
+
+p <- panel_d_base %>%
+  ggplot(aes(`Rep 1`, `Rep 2`)) +
+  geom_point(size = 0.5, alpha = 0.3, col = "#1B8C8E") +
+  labs(x = "Varianza (Rep 1)", y = "Varianza (Rep 2)") +
+  geom_smooth(method = "lm", col = "#0D2C54") +
+  theme_bw() +
+  theme(text = element_text(size = 25))
+p <- ggExtra::ggMarginal(p, type = "density", margins = "both", col = "#0D2C54")
+ggsave(file.path(out_dir, "panel_d_var_replicates.jpg"), p, width = 9, height = 6.75, units = "in")
+
+cor_var <- panel_d_base %>% summarise(corre = cor(`Rep 1`, `Rep 2`, use = "complete.obs", method = "pearson"))
+message("Pearson varianza (post-filtro): ", round(cor_var$corre, 3))
 
 message("Paneles guardados en ", out_dir, ". Panel C sin resolver - ver dos candidatos.")
