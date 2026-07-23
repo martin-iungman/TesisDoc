@@ -152,24 +152,26 @@ Además de las figuras del paper, que podria sumar?
 
 **Introducción**
 
-**Materiales y metodos**  
-Descripción general
+**Materiales y metodos**
+
+**Experimentales:**  
+	Descripción general del enfoque
 
 - Pipeline
 
-**Experimentales:**  
-Construcción de los plasmidos conteniendo la library de promotores
+Construcción de los plásmidos reporteros conteniendo la library de promotores basales
 
-- Esquema vector \+ PCR \+ microscopía
+- Esquema vector \+ microscopía  
+- PCR control integración
 
 	Cultivo celular y transfección  
 	Citometría de flujo y clasificación de células
 
 - Potencia??  
-- Esquema de density con los gates?
+- Esquema de density con los gates
 
 	Control por spike-in de celulas  
-	Co-extraccion de ADN/ARN y secuenciacion de amplicones  
+	Co-extraccion de ADN/ARN y secuenciación de amplicones  
 	RT-qPCR de EGFP
 
 - qPCR   
@@ -178,18 +180,43 @@ Construcción de los plasmidos conteniendo la library de promotores
 	Anexo Primers y secuencias
 
 **Metodología bioinformática:**  
+**Procesamiento de datos y cuantificación de la actividad promotora**  
 	Procesamiento de los datos de secuenciacion
 
 - Pipeline preprocessing  
-- S1A (sample effort) \+ S6A (bimodal)
+- sample effort \+ bimodal 
 
-	Caracterización de la library
+	**Caracterización de la library**  
+	Composicion y diseño de la library
 
-- Descripción library  
-- caracteristicas de seq de la lib  
-- evo library (young 2015 \+ phylop)
+- type \+ esquema lib \+ heatmap cage
 
-	Asociacion de las caracteristicas del promotor con actividad y ruido transcripcional  
+Elementos de secuencia del promotor basal
+
+- epd+cgi+tss+gc
+
+	Patrones de conservación de los promotores basales
+
+- young 2015 \+ phylop
+
+Patrones de actividad endógena de los promotores
+
+- tissue sp \+ shape
+
+Coocurrencia de las características de los promotores basales
+
+- coocurrencia
+
+	Algoritmos de predicción de la actividad promotora basados en la secuencia
+
+- esquema puffin
+
+	Análisis de datos masivos de ChIP-seq  
+**Evaluación del efecto de las características del promotor sobre los patrones transcripcionales medidos**  
+	Asociacion de las características del promotor con la actividad transcripcional  
+	Asociacion de las características del promotor con el ruido transcripcional  
+Análisis de enriquecimiento funcional de la unión de TFs  
+**Promotores alternativos**  
 	Clasificación de promotores alternativos
 
 **Resultados**  
@@ -250,7 +277,7 @@ Fig. M1 (pipeline exp)
 
 Construcción de los plásmidos reporteros conteniendo la *library* de promotores basales
 
-Los oligonucleótidos de cadena simple que conforman la *library* (cuya composición y detalle se especifican en la Sección Métodos Computacionales), se amplificaron inicialmente mediante PCR de extensión por solapamiento (*overlap extension PCR*) usando Platinum SuperFi II Master Mix (ThermoFisher, 12368010\) y los *primers* PromLib Forward y Reverse (Anexo) durante 14 ciclos, seguidos de una purificación por columna (QIAGEN, 28104). 
+Los oligonucleótidos de cadena simple que conforman la *library* (cuya composición y detalle se especifican en la Sección Métodos Computacionales), se amplificaron inicialmente mediante PCR de extensión por solapamiento (*overlap extension PCR*) usando Platinum SuperFi II Master Mix (ThermoFisher, 12368010\) y los *primers* PromLib Forward y Reverse (ver Anexo Tabla 2\) durante 14 ciclos, seguidos de una purificación por columna (QIAGEN, 28104). 
 
 El vector *backbone* (Fig. M2A) —término utilizado para este plásmido a lo largo de este trabajo— en el que se clonó la *library*, es una variante del reportero fluorescente bicromático (EGFP \+ DsRed) de *splicing* alternativo desarrollado por Orengo et al. (74). En esta variante, mutaciones específicas en el sitio de *splicing* 3' del exón alternativo aseguran la expresión exclusiva de EGFP. A su vez, el plásmido empleado comprende sitios LoxP no idénticos flanqueando la construcción reportera, que permiten su integración sitio-específica en células mediante un sistema de intercambio de casetes mediado por recombinasa (RMCE).
 
@@ -258,9 +285,11 @@ La elección de un vector derivado de un reportero de *splicing* alternativo obe
 
 Para la integración de la *library* al plásmido *backbone,* se digirió a este último con las enzimas de restricción NdeI y NheI (ThermoFisher, FD0583 y FD0974), y se purificó el fragmento del vector lineal por electroforesis preparativa en gel de agarosa, utilizando un gel 1% y el kit QIAQuick Gel Extraction (QIAGEN, 28704). Con el objetivo de mejorar la eficiencia del clonado posterior, se utilizó el kit de purificación de productos de PCR QiaQuick (QIAGEN, 28104\) seguido por el kit de purificación MinElute (QIAGEN, 28004), que a su vez permite la concentración del fragmento en menor volúmen. La *library* se clonó en el plásmido digerido mediante ensamblaje Gibson (*Gibson assembly mix*, NEB, E2611L) en una relación molar inserto-vector de 3:1, con 0.250pmoles de ADN total. La reacción de ensamblaje Gibson se precipitó con isopropanol para remover las sales que puedan interferir con la electroporación posterior. Se introdujo el precipitado por electroporación en células MegaX DH10B T1R Electrocomp™ (ThermoFisher, C640003) para su transformación. Las bacterias fueron plaqueadas en placas cuadradas (245mm de largo) de LB ágar con ampicilina 100mg/L. Finalmente, los plásmidos se aislaron usando el kit de purificación de plásmidos PureLink™ Expi Endotoxin-Free Maxi (Invitrogen, A31217). 
 
-Para comprobar la correcta inserción del promotor, se realizó un ensayo de *colony* PCR (directo de bacterias, sin purificación del ADN) utilizando los *primers* PromLib. No se detectó la presencia del promotor CMV original (\~700 pb), mientras que las bandas obtenidas corresponden al tamaño esperado de la *library* (\~300 pb) (Fig. M2C)
+Fig M2. ESQUEMA VECTOR \+ microscopia 
 
-Fig M2. ESQUEMA VECTOR \+ microscopia \+ PCR
+Para comprobar la correcta inserción del promotor, se realizó un ensayo de *colony* PCR (directo de bacterias, sin purificación del ADN) utilizando los *primers* PromLib. No se detectó la presencia del promotor CMV original (\~700 pb), mientras que las bandas obtenidas corresponden al tamaño esperado de la *library* (\~300 pb) (Fig. M3)
+
+Fig M3. PCR integracion
 
 Cultivo celular y transfección
 
@@ -268,7 +297,7 @@ Se utilizaron las células HEK293T-A2 (34), que ya han sido caracterizadas y pos
 
 Para generar líneas celulares estables con integración genómica del reportero, la *library* se co-transfectó con un 10% (m/m) de un plásmido que codifica la recombinasa Cre. Se transfectaron un total de 15 µg de ADN plasmídico en ocho placas de 10 cm utilizando Lipofectamine 3000 (ThermoFisher, L3000-015) y Opti-MEM (Gibco, 31985-070), siguiendo las instrucciones del fabricante. Después de la transfección, las células se seleccionaron con 2 µg/mL de puromicina (Gibco, A1113802) durante dos semanas. Posteriormente, las células se distribuyeron en dos grupos distintos, los cuales se trataron como réplicas biológicas independientes. 
 
-Para las transfecciones individuales de los plásmidos reporteros, se empleó el mismo procedimiento escalando proporcionalmente las cantidades: 2 µg de ADN plasmídico en un único well de una placa de seis wells. Esto incluye tanto los controles con el plásmido *backbone* con CMV, tanto en su versión bicromática como mutada, como aquellos con promotores específicos de la *library* utilizados para el control de consistencia. La confección de estos últimos implicó en primera instancia la amplificación de los promotores desde el *pool* de la *library* (en Anexo se presentan los *primers* correspondientes a cada uno), y su clonado por ensamblaje de Gibson en el plásmido *backbone* digerido.
+Para las transfecciones individuales de los plásmidos reporteros, se empleó el mismo procedimiento escalando proporcionalmente las cantidades: 2 µg de ADN plasmídico en un único well de una placa de seis wells. Esto incluye tanto los controles con el plásmido *backbone* con CMV, tanto en su versión bicromática como mutada, como aquellos con promotores específicos de la *library* utilizados para el control de consistencia. La confección de estos últimos implicó en primera instancia la amplificación de los promotores desde el *pool* de la *library* (en Anexo Tabla 1 se presentan los *primers* correspondientes a cada uno), y su clonado por ensamblaje de Gibson en el plásmido *backbone* digerido.
 
 Las células se visualizaron en un microscopio ECHO Revolve (RVL-100M) con un objetivo de 20X.
 
@@ -278,19 +307,19 @@ Para el *sorting* de la *library* de promotores, se utilizó un equipo Beckman C
 
 Para tener seguridad sobre el nivel de discretización suficiente para la distinción de los patrones de ruido y media que pudiéramos observar, se realizó un análisis de potencia considerando múltiples alternativas. Es importante comentar que los costos del ensayo crecen en gran medida con el aumento de las fracciones recolectadas, tanto por el tiempo de *sorting* creciente como los costos de secuenciación. Por lo tanto, la elección final resulta de un compromiso entre nuestra capacidad de medir las variables de interés (expresión media y dispersión) y el costo del experimento.
 
-Fig M3. Potencia(hacer)
+Fig M4. Potencia(hacer)
 
-Se estableció que todas las fracciones tengan idéntico número de células para evitar sesgos diferenciales entre fracciones en el tratamiento posterior de las mismas. Para la determinación de los umbrales, se usó como base una citometría de flujo de las mismas células. La fracción \#6 sería aquella con menos células y por lo tanto es la que definiría el tiempo total (y con ello el costo) del *sorting*, y no poseería un límite superior. Se decidió por lo tanto que comprenda el 1% de la población total de células, estableciendo así la posición del umbral más alto. Respecto al menor, se lo ubicó a partir en del pico del control negativo de células HEK293T-A2 no transfectadas y de las celulas transfectadas(Fig. M4A). Una vez establecidos el límite inferior y el umbral más alto, se dividió el rango que queda en seis intervalos de tamaño constante en escala logarítmica (Fig. M4B). El diseño con intervalos equivalentes en tamaño es esencial para la correcta comparación entre fracciones. Como control positivo se emplearon células que portan el reportero bajo el promotor CMV. 
+Se estableció que todas las fracciones tengan idéntico número de células para evitar sesgos diferenciales entre fracciones en el tratamiento posterior de las mismas. Para la determinación de los umbrales, se usó como base una citometría de flujo de las mismas células. La fracción \#6 sería aquella con menos células y por lo tanto es la que definiría el tiempo total (y con ello el costo) del *sorting*, y no poseería un límite superior. Se decidió por lo tanto que comprenda el 1% de la población total de células, estableciendo así la posición del umbral más alto. Respecto al menor, se lo ubicó a partir en del pico del control negativo de células HEK293T-A2 no transfectadas y de las celulas transfectadas(Fig. M5A). Una vez establecidos el límite inferior y el umbral más alto, se dividió el rango que queda en seis intervalos de tamaño constante en escala logarítmica (Fig. M5B). El diseño con intervalos equivalentes en tamaño es esencial para la correcta comparación entre fracciones. Como control positivo se emplearon células que portan el reportero bajo el promotor CMV. 
 
 SPara la preparación del experimento en sí mismas, se analizaron las células HEK293T-A2 transfectadas con la *library* hasta recolectar un total de 250.000 células por gate, las cuales se preservaron en DNA/RNA Shield (Zymo Research, R1100-250) para los experimentos posteriores. Este procedimiento se realizó tres veces a partir de cultivos independientes de células transfectadas con la *library*. La decisión de recolectar idéntica cantidad de células para todas las fracciones, y que no sea proporcional al porcentaje de células en la población total, busca evitar sesgos en los procesos posteriores de extracción de ADN y PCR, principalmente. Eventualmente, sin embargo, esto llevará a distorsiones en las distribuciones reconstruidas de los promotores, que serán corregidas computacionalmente (ver Cuantificación de la actividad media y el ruido de los promotores de la *library)*
 
-Fig M4. Figura gates
+Fig M5. Figura gates
 
 Controles de *spike-in* basados en células
 
 Para evaluar posibles sesgos técnicos entre las distintas fracciones introducidas durante la manipulación de las muestras *post-sorting* (desde la extracción de ácidos nucleicos hasta la secuenciación), decidimos introducir moléculas identificables en cantidades conocidas (*spike-in*) a las mismas. La incorporación de *spike-in* es una práctica frecuente en análisis genómicos/transcriptómicos que implican la comparación cuantitativa precisa entre muestras procesadas por separado. Aunque el procedimiento estándar es el agregado de moléculas de ADN, ARN o células de otras especies, dadas las características del presente ensayo decidimos generar un control *spike-in* similar pero discernible al material con el que se iba a trabajar: células HEK293T-A2 con el reportero incorporado en el genoma. 
 
-Brevemente, se clonaron tres secuencias de aproximadamente el mismo tamaño y contenido de GC que las de la *library* (ver Anexo) en el vector *backbone* y se co-transfectaron con el plásmido de expresión de la recombinasa Cre en células HEK293T-A2, para obtener líneas estables, en la forma descrita anteriormente. Se agregaron 30, 300 o 3000 células de cada línea de *spike-in* respectivamente en cada tubo de recolección de FACS, juntándolas con las células separadas por el *sorter*.
+Brevemente, se clonaron tres secuencias de aproximadamente el mismo tamaño y contenido de GC que las de la *library* (ver Anexo Tabla 2\) en el vector *backbone* y se co-transfectaron con el plásmido de expresión de la recombinasa Cre en células HEK293T-A2, para obtener líneas estables, en la forma descrita anteriormente. Se agregaron 30, 300 o 3000 células de cada línea de *spike-in* respectivamente en cada tubo de recolección de FACS, juntándolas con las células separadas por el *sorter*.
 
 Co-extraccion de ADN/ARN  y RT-qPCR de EGFP
 
@@ -298,7 +327,7 @@ Co-extraccion de ADN/ARN  y RT-qPCR de EGFP
 
 El ADNg y el ARN total se co-extrajeron de las fracciones obtenidas utilizando el *Quick-DNA/RNA Miniprep Kit* (Zymo Research, D7001). Mientras que la extracción del ADNg es central para el ensayo, el ARN se utilizó para evaluar la correlación entre el *sorting* asociado a la señal de EGFP y los niveles de transcripto de dicho gen. Dado que el objetivo es vincular la secuencia promotora con su actividad transcripcional a través de la intensidad de fluorescencia, resulta crucial verificar la correspondencia entre la señal proteica y la abundancia del ARNm de EGFP.
 
-El ADNc se sintetizó a partir de las muestras de ARN de cada *bin* de células utilizando el *cDNA Synthesis Kit* (Thermo Scientific, K1622) siguiendo las instrucciones del fabricante. La transcripción reversa se realizó con 500ng de ARN total. Posteriormente, se determinaron los niveles de ARN de EGFP mediante PCR cuantitativa (qPCR) con primers específicos (ver Anexo), utilizando la mezcla de reacción  *Maxima SYBR Green/ROX qPCR Master Mix (2X)* (*Thermo Scientific,* K0222) en un sistema *ABI 7900HT Fast Real-Time PCR* (Applied Biosystems). Los niveles de expresión génica relativa se calcularon mediante el método 
+El ADNc se sintetizó a partir de las muestras de ARN de cada *bin* de células utilizando el *cDNA Synthesis Kit* (Thermo Scientific, K1622) siguiendo las instrucciones del fabricante. La transcripción reversa se realizó con 500ng de ARN total. Posteriormente, se determinaron los niveles de ARN de EGFP mediante PCR cuantitativa (qPCR) con primers específicos (ver Anexo Tabla 2), utilizando la mezcla de reacción  *Maxima SYBR Green/ROX qPCR Master Mix (2X)* (*Thermo Scientific,* K0222) en un sistema *ABI 7900HT Fast Real-Time PCR* (Applied Biosystems). Los niveles de expresión génica relativa se calcularon mediante el método 
 
 2−ΔCt 
 
@@ -306,19 +335,19 @@ El ADNc se sintetizó a partir de las muestras de ARN de cada *bin* de células 
 
 ΔCt \= (CtEGFP \- CtGAPDH)
 
-, usando GAPDH como control interno (Fig. M5). Se realizaron tres réplicas técnicas para cada determinación, utilizando el promedio de las mismas para el cálculo de la abundancia.
+, usando GAPDH como control interno (Fig. M6). Se realizaron tres réplicas técnicas para cada determinación, utilizando el promedio de las mismas para el cálculo de la abundancia.
 
-Fig. M5 QPCR 
+Fig. M6 QPCR 
 
-En primera instancia, los resultados (Fig. M5) indican que la fracción 0 (correspondiente al nivel mínimo de fluorescencia, apenas por sobre el de las células sin transfectar) no presentaba resultados consistentes. Este fenómeno es atribuible a la dificultad de discernir la señal de EGFP de la autofluorescencia propia de las células para células con niveles muy bajos de expresión. Por consiguiente, se decidió excluir esta población de la secuenciación. Asimismo, se descartó la réplica 3 debido a que no presentó un patrón de qPCR consistente (Fig. M5, derecha) y mostró un rendimiento insuficiente en la extracción de ADNg en varias de sus poblaciones (no mostrado).
+En primera instancia, los resultados (Fig. M6) indican que la fracción 0 (correspondiente al nivel mínimo de fluorescencia, apenas por sobre el de las células sin transfectar) no presentaba resultados consistentes. Este fenómeno es atribuible a la dificultad de discernir la señal de EGFP de la autofluorescencia propia de las células para células con niveles muy bajos de expresión. Por consiguiente, se decidió excluir esta población de la secuenciación. Asimismo, se descartó la réplica 3 debido a que no presentó un patrón de qPCR consistente (Fig. M6, derecha) y mostró un rendimiento insuficiente en la extracción de ADNg en varias de sus poblaciones (no mostrado).
 
-Adicionalmente, se evaluó la posible persistencia de células no transfectadas tras la selección con puromicina. Si bien estas células no generarían amplicones de la *library*, su acumulación en los gates de menor expresión podría afectar la representatividad del número de células positivas. Para detectar la correcta presencia de los promotores de la *library*, se utilizaron *primers* flanqueantes a los sitios LoxP de las células HEK293T-A2 (XXXX, ver Anexo) para realizar una PCR sobre el ADNg de las distintas fracciones, permitiendo discernir por tamaño la presencia del constructo de la *library* (Fig. M6). Aunque se detectaron células sin el reportero, su abundancia relativa fue uniforme en todas las muestras, por lo que no se consideró un factor de sesgo para los análisis posteriores.
+Adicionalmente, se evaluó la posible persistencia de células no transfectadas tras la selección con puromicina. Si bien estas células no generarían amplicones de la *library*, su acumulación en los gates de menor expresión podría afectar la representatividad del número de células positivas. Para detectar la correcta presencia de los promotores de la *library*, se utilizaron *primers* flanqueantes a los sitios LoxP de las células HEK293T-A2 (ver Anexo Tabla 2\) para realizar una PCR sobre el ADNg de las distintas fracciones, permitiendo discernir por tamaño la presencia del constructo de la *library* (Fig. M7). Aunque se detectaron células sin el reportero, su abundancia relativa fue uniforme en todas las muestras, por lo que no se consideró un factor de sesgo para los análisis posteriores.
 
-Fig. M6 IMAGEN PCR\_loxP\_gates\_ctl
+Fig. M7 IMAGEN PCR\_loxP\_gates\_ctl
 
 Secuenciación de amplicones (Amp-seq)
 
-Para la secuenciación paralela masiva del ADNg de las distintas fracciones, se empleó un enfoque de PCR de dos pasos. Primero, se realizó una PCR primaria usando los *primers* PromLib Forward y Reverse (Anexo) con *Platinum™ SuperFi II PCR Master Mix* (Thermo Fisher Scientific, Cat. No. 12-368-010), siguiendo las instrucciones del fabricante. Luego, se llevó a cabo una segunda PCR para incorporar las secuencias de los adaptadores de Illumina, manteniendo constante el *primer* *forward* con el índice i5 y usando un *primer* *reverse* con el índice i7 específico para cada muestra (Tabla S2), empleando nuevamente la *Platinum™ SuperFi II PCR Master Mix*. Los productos de la segunda PCR se purificaron mediante extracción de bandas del gel (QIAGEN, 28704\) y posteriormente se enviaron para la secuenciación de amplicones a MedGenome[^1]. Las secuenciacioónes se realizaronrealizó con una cobertura de 1000× utilizando lecturas *paired-end* de 150 pb en la plataforma *NovaSeq*. La incorporación de un índice i7 específico por muestra permite mezclar las muestras en una única corrida de secuenciación y evitar un posible *batch effect*. Sin embargo, cada réplica debió mantenerse en corridas en paralelo debido a la ausencia de más índices. 
+Para la secuenciación paralela masiva del ADNg de las distintas fracciones, se empleó un enfoque de PCR de dos pasos. Primero, se realizó una PCR primaria usando los *primers* PromLib Forward y Reverse (Tabla 1\) con *Platinum™ SuperFi II PCR Master Mix* (Thermo Fisher Scientific, Cat. No. 12-368-010), siguiendo las instrucciones del fabricante. Luego, se llevó a cabo una segunda PCR para incorporar las secuencias de los adaptadores de Illumina, manteniendo constante el *primer* *forward* con el índice i5 y usando un *primer* *reverse* con el índice i7 específico para cada muestra (ver Anexo Tabla S2), empleando nuevamente la *Platinum™ SuperFi II PCR Master Mix*. Los productos de la segunda PCR se purificaron mediante extracción de bandas del gel (QIAGEN, 28704\) y posteriormente se enviaron para la secuenciación de amplicones a MedGenome[^1]. Las secuenciacioónes se realizaronrealizó con una cobertura de 1000× utilizando lecturas *paired-end* de 150 pb en la plataforma *NovaSeq*. La incorporación de un índice i7 específico por muestra permite mezclar las muestras en una única corrida de secuenciación y evitar un posible *batch effect*. Sin embargo, cada réplica debió mantenerse en corridas en paralelo debido a la ausencia de más índices. 
 
 Secuencias de interes y primers utilizados
 
@@ -378,8 +407,9 @@ Tabla 2: Secuencia completa de los Spike-in generados e insertados, de los *prim
    
 Procesamiento de los datos de secuenciación
 
-Las lecturas *paired-end* de *Illumina* se procesaron inicialmente con *cutadapt* (56) para el filtrado por calidad y el recorte de *primers* y de calidad, y posteriormente con *FASTP* para el recorte de colas de poli-G y de baja calidad (77) (Fig. M7). Se descartaron aquellas lecturas que carecían de superposición de *primers*. El alineamiento contra las secuencias *FASTA* de la *library* se realizó mediante *HISAT2* (78). Únicamente se consideraron fragmentos con longitudes entre 230 y 270 pb, omitiendo los alineamientos secundarios. La abundancia de cada promotor en cada muestra se cuantificó con *SAMTOOLS* (1.20) (79). El control de calidad de las lecturas crudas se llevó a cabo con *FASTQC[^2]* y el desempeño del *pipeline* se reportó mediante *multiQC* (80).   
-Fig. M7 pipeline bioinfo
+Las lecturas *paired-end* de *Illumina* se procesaron inicialmente con *cutadapt* (56) para el filtrado por calidad y el recorte de *primers* y de calidad, y posteriormente con *FASTP* para el recorte de colas de poli-G y de baja calidad (77) (Fig. M8). Se descartaron aquellas lecturas que carecían de superposición de *primers*. El alineamiento contra las secuencias *FASTA* de la *library* se realizó mediante *HISAT2* (78). Únicamente se consideraron fragmentos con longitudes entre 230 y 270 pb, omitiendo los alineamientos secundarios. La abundancia de cada promotor en cada muestra se cuantificó con *SAMTOOLS* (1.20) (79). El control de calidad de las lecturas crudas se llevó a cabo con *FASTQC[^2]* y el desempeño del *pipeline* se reportó mediante *multiQC* (80). 
+
+Fig. M8 pipeline bioinfo
 
 Cuantificación de la actividad media y el ruido de los promotores de la *library*
 
@@ -400,33 +430,33 @@ Si [![][image6]](https://www.codecogs.com/eqnedit.php?latex=j#0) es par:
 
 [![][image7]](https://www.codecogs.com/eqnedit.php?latex=%5Ctext%7Bvar%7D\(j\)%20%3D%202%20%5Csum_%7Bi%3D1%7D%5E%7B\(j-1\)%2F2%7D%20\(i%20-%200.5\)%5E2#0)								(E2)
 
-Fig M8. sample effort \+ bimodal
+Fig M9. sample effort \+ bimodal
 
 **Caracterización de la *library***
 
 Composición y diseño de lLa *library*
 
-La *library* utilizada consiste en 23908 secuencias de 300 pb de longitud, de las cuales 20851 incluyen una región de promotor basal (core promoter) de \-251 a \+16 con respecto a la posición anotada como TSS principal en la Eukaryotic Promoter Database[^3] (EPD) (73), con adaptadores de 24pb en cada extremo para facilitar la clonación (Fig. M9 A-B). EPD define sus TSS (29512 sitios en total) a partir de datos del repositorio del consorcio FANTOM que utilizan la técnica *Cap Analysis of Gene Expression* (CAGE) para la determinación del extremo 5’ de los transcriptos con la precisión de un nucleótido y con ello inferir la actividad promotora a lo largo de todo el genoma en diversas muestras biológicas. Agrupando únicamente las muestras de dicho repositorio correspondientes a cultivos primarios de células, se observa como el TSS indicado por EPD para los promotores seleccionados de la *library* coincide con aquel más usado, si bien son mínimos los casos donde no se observa actividad proveniente de las bases vecinas (Fig. M9C). Es preciso aclarar que en ningún momento se evaluó el TSS en el contexto del reportero utilizado, por lo que cada vez que me refiera a dicho sitio a lo largo de esta tesis, será teniendo en cuenta al anotado.
+La *library* utilizada consiste en 23908 secuencias de 300 pb de longitud, de las cuales 20851 incluyen una región de promotor basal (core promoter) de \-251 a \+16 con respecto a la posición anotada como TSS principal en la Eukaryotic Promoter Database[^3] (EPD) (73), con adaptadores de 24pb en cada extremo para facilitar la clonación (Fig. M10 A-B). EPD define sus TSS (29512 sitios en total) a partir de datos del repositorio del consorcio FANTOM que utilizan la técnica *Cap Analysis of Gene Expression* (CAGE) para la determinación del extremo 5’ de los transcriptos con la precisión de un nucleótido y con ello inferir la actividad promotora a lo largo de todo el genoma en diversas muestras biológicas. Agrupando únicamente las muestras de dicho repositorio correspondientes a cultivos primarios de células, se observa como el TSS indicado por EPD para los promotores seleccionados de la *library* coincide con aquel más usado, si bien son mínimos los casos donde no se observa actividad proveniente de las bases vecinas (Fig. M10C). Es preciso aclarar que en ningún momento se evaluó el TSS en el contexto del reportero utilizado, por lo que cada vez que me refiera a dicho sitio a lo largo de esta tesis, será teniendo en cuenta al anotado.
 
-De las restantes secuencias presentes en la *library*, 2910 son regiones de enhancer de 152pb de longitud inmediatamente río arriba de 100pb del promotor FN1(Fig. M9 A-B). También hay un subgrupo de 147 promotores asociados al cáncer, tanto en sus versiones wild-type como mutantes, y que no responden a la estructura tal cual fue definida para los promotores EPD. Estos últimos grupos, aunque presentes en la *library* y secuenciados, no fueron considerados durante el análisis bioinformático posterior al recuento de actividad.
+De las restantes secuencias presentes en la *library*, 2910 son regiones de enhancer de 152pb de longitud inmediatamente río arriba de 100pb del promotor FN1(Fig. M10 A-B). También hay un subgrupo de 147 promotores asociados al cáncer, tanto en sus versiones wild-type como mutantes, y que no responden a la estructura tal cual fue definida para los promotores EPD. Estos últimos grupos, aunque presentes en la *library* y secuenciados, no fueron considerados durante el análisis bioinformático posterior al recuento de actividad.
 
-Fig. M9   
+Fig. M10   
    
 Elementos de secuencia del promotor basalCaracterización de los promotores
 
-La base de datos EPD provee información respecto a la presencia de motivos típicos en sus promotores anotados, a partir de la búsqueda de patrones y su localización respecto al TSS: TATA-box, CCAAT-box, GC-box e INR. Según sus datos, del 23851 secuencias, el 47.7% contiene un GC-box, el 32% un INR fuerte, el 16.3% un CCAAT-box y solo el 8% TATA-box (Fig. M10A).
+La base de datos EPD provee información respecto a la presencia de motivos típicos en sus promotores anotados, a partir de la búsqueda de patrones y su localización respecto al TSS: TATA-box, CCAAT-box, GC-box e INR. Según sus datos, del 23851 secuencias, el 47.7% contiene un GC-box, el 32% un INR fuerte, el 16.3% un CCAAT-box y solo el 8% TATA-box (Fig. M11A).
 
-Fig. M10
+Fig. M11
 
-La presencia de islas CpG fue determinada a partir de las anotaciones provenientes de UCSC, considerando aquellos casos donde se superponen más del 100pb con la secuencia promotora en cuestión. Las islas CpG son bastante prevalentes en promotores, observándose en el 64% de los mismos (Fig. M10B). También se buscó el solapamiento con elementos repetitivos y/o transponibles, anotados en la base de datos RepeatMasker[^4]. Además de las clases de transposones presentes en dicho repositorio, se incorporó una clase denominada “Repeticiones de Baja Complejidad”, agrupando las categorías *Simple Repeats* y *Low Complexity*, asi como una de “Elementos transponibles”. 
+La presencia de islas CpG fue determinada a partir de las anotaciones provenientes de UCSC, considerando aquellos casos donde se superponen más del 100pb con la secuencia promotora en cuestión. Las islas CpG son bastante prevalentes en promotores, observándose en el 64% de los mismos (Fig. M11B). También se buscó el solapamiento con elementos repetitivos y/o transponibles, anotados en la base de datos RepeatMasker[^4]. Además de las clases de transposones presentes en dicho repositorio, se incorporó una clase denominada “Repeticiones de Baja Complejidad”, agrupando las categorías *Simple Repeats* y *Low Complexity*, asi como una de “Elementos transponibles”. 
 
-La frecuencia nucleotídica y su identidad en sitios específicos fue evaluada con el paquete de R-Bioconductor Biostrings[^5]. Se evaluó el contenido de G y C (Fig. M10C), así como la identidad del dinucleótido del TSS (Fig. XD). Los patrones buscados de forma estricta fueron YCASW para el INR “fuerte”, TCT para el clásico motivo de proteínas ribosomales y el dinucleótido YR (PyPu)[^6]. Respecto a este último patrón se discernir también en sus cuatro posibilidades (CA, CG, TA, TG). Aquellos promotores que no cuadran en su TSS con alguno de los patrones mencionados, fueron catalogados como “No canónicos”. Se incluye el dinucleótido GC para evidenciar que la prevalencia del CG no es simplemente producto de alto contenido de dichos nucleótidos.  
+La frecuencia nucleotídica y su identidad en sitios específicos fue evaluada con el paquete de R-Bioconductor Biostrings[^5]. Se evaluó el contenido de G y C (Fig. M11C), así como la identidad del dinucleótido del TSS (Fig. 11D). Los patrones buscados de forma estricta fueron YCASW para el INR “fuerte”, TCT para el clásico motivo de proteínas ribosomales y el dinucleótido YR (PyPu)[^6]. Respecto a este último patrón se discernir también en sus cuatro posibilidades (CA, CG, TA, TG). Aquellos promotores que no cuadran en su TSS con alguno de los patrones mencionados, fueron catalogados como “No canónicos”. Se incluye el dinucleótido GC para evidenciar que la prevalencia del CG no es simplemente producto de alto contenido de dichos nucleótidos.  
 
 Patrones de conservación de los promotores basales
 
-A su vez, se incorporaron datos que reflejan la historia evolutiva de los promotores, tanto a nivel de secuencia como funcional. Por un lado, se extrajeron datos de PhyloP score (81) provenientes de la comparación entre el genoma hg38 y 100 especies de mamíferos. Evaluando la mediana de dicho valor del “metapromotor” a cada base (Fig. M11A), se observa claramente una mayor conservación en la región proximal al TSS (+16 a \-50), con claros picos alrededor del \+1 y del \-30, asociado al TATA-box. En una región de intermedia cercanía (-50 a \-150) hay un progresivo decaimiento de la conservación, mientras que se acerca mucho a valores de evolución neutra para la región más distal (-150 a \-235). A su vez, para cada una de estas regiones, en cada promotor, se evaluó el PhyloP score medio. En términos de conservación funcional, nos basamos en datos de Young et al. (19), quienes utilizan datos de actividad promotora en tejidos de humano y ratón para considerar si, las secuencias que se pueden considerar homólogas, están activas en ambas especies, si perdieron actividad promotora en humanos o en ratón o si, por el contrario, la adquirieron en alguna de estas especies (Fig M11B). 
+A su vez, se incorporaron datos que reflejan la historia evolutiva de los promotores, tanto a nivel de secuencia como funcional. Por un lado, se extrajeron datos de PhyloP score (81) provenientes de la comparación entre el genoma hg38 y 100 especies de mamíferos. Evaluando la mediana de dicho valor del “metapromotor” a cada base (Fig. M12A), se observa claramente una mayor conservación en la región proximal al TSS (+16 a \-50), con claros picos alrededor del \+1 y del \-30, asociado al TATA-box. En una región de intermedia cercanía (-50 a \-150) hay un progresivo decaimiento de la conservación, mientras que se acerca mucho a valores de evolución neutra para la región más distal (-150 a \-235). A su vez, para cada una de estas regiones, en cada promotor, se evaluó el PhyloP score medio. En términos de conservación funcional, nos basamos en datos de Young et al. (19), quienes utilizan datos de actividad promotora en tejidos de humano y ratón para considerar si, las secuencias que se pueden considerar homólogas, están activas en ambas especies, si perdieron actividad promotora en humanos o en ratón o si, por el contrario, la adquirieron en alguna de estas especies (Fig M12B). 
 
-Fig. M11. evo library
+Fig. M12. evo library
 
 Patrones de actividad endógena de los promotores
 
@@ -442,11 +472,24 @@ La forma de los promotores se calculó a partir de la combinación de todas las 
 
 Coocurrencia de las características de los promotores basales
 
-Las características de los promotores, tanto aquellas basadas en la secuencia como aquellas que surgen de estudiarlos en sus contextos endógenos, no son completamente independientes entre sí (Fig. M12). Esto implica que frecuentemente, sea complejo poder asignar a un efecto observado, una característica particular, con confianza de que no se trate de un efecto confusor de otra característica con alto grado de coocurrencia. Si bien esto se puede resolver en ciertos casos con una estratificación por a potencial característica confusora, en los casos mas extremos de co-presencia, esta tarea resulta prácticamente imposible y es un limitante en este tipo de enfoques experimentales, basados en secuencias naturales.  
+Las características de los promotores, tanto aquellas basadas en la secuencia como aquellas que surgen de estudiarlos en sus contextos endógenos, no son completamente independientes entre sí (Fig. M12). Esto implica que frecuentemente, sea complejo poder asignar a un efecto observado, una característica particular, con confianza de que no se trate de un efecto confusor de otra característica con alto grado de coocurrencia. Si bien esto se puede resolver en ciertos casos con una estratificación por a potencial característica confusora, en los casos más extremos de co-presencia, esta tarea resulta prácticamente imposible y es un limitante en este tipo de enfoques experimentales, basados en secuencias naturales.  
 
-Fig. M12 coocurrencia
+Fig. M12 co-ocurrencia
 
 Algoritmos de predicción de la actividad promotora basados en la secuencia
+
+Puffin es un modelo interpretable de aprendizaje automático que predice la señal de inicio transcripcional a resolución de base a partir de la secuencia del promotor, descomponiendo su predicción en la contribución aditiva de tres tipos de elementos de secuencia: motivos, iniciadores y trinucleótidos (85). A diferencia de otros modelos de *deep learning* de tipo "caja negra", Puffin permite atribuir la señal predicha a posiciones y motivos específicos de la secuencia, facilitando la interpretación mecanística de los determinantes de la actividad promotora. En este trabajo se utilizó un modelo pre-entrenado con datos de CAGE en humano (GRCh38).
+
+El modelo predice actividad a partir de regiones de al menos 650 pb. Dado que los promotores de la *library* poseen únicamente 252 pb, resultó imprescindible incluir la región lindante en su contexto de inserción, incorporando los *primers* y parte del gen EGFP hacia uno de los extremos. En el extremo opuesto, el promotor se encuentra próximo al sitio LoxP y, dado que se desconoce la identidad del sitio de inserción en el genoma, no se dispuso de esas bases para completar el tamaño de secuencia requerido. Para compensar esta limitación, se generaron 20 secuencias aleatorias que se añadieron a cada promotor evaluado, y la predicción final para cada uno se promedió entre estas 20 variantes. Si bien se evaluaron varias métricas de salida del modelo, para estimar la actividad promotora se utilizó el *score* obtenido en la posición 0 de cada promotor, que en términos generales coincide con el TSS de mayor actividad en los contextos endógenos evaluados por CAGE, según EPD.
+
+Adicionalmente, se incorporó la métrica de selectividad al contexto genómico ("*selectivity*"), reportada originalmente por Dudnyk et al. (85) a partir de predicciones con Puffin-D, una variante del modelo orientada a la predicción cuantitativa de expresión que, a diferencia de Puffin, admite hasta 100kb de secuencia como input, permitiendo así incorporar el contexto genómico circundante al promotor. Esta métrica cuantifica el grado de variación en el nivel de expresión predicho de un promotor al insertarlo *in silico* en miles de ubicaciones genómicas distintas, reflejando así su dependencia del contexto regulatorio circundante. En nuestro caso, no se recalculó esta métrica, sino que se utilizaron los valores ya reportados por los autores para el subconjunto de secuencias coincidentes con los promotores de nuestra *library*. 
+
+Análisis de datos masivos de ChIP-seq
+
+Se obtuvieron picos de ChIP-seq no redundantes de la base de datos ReMap y se intersectaron con la *library* de promotores para determinar el estado de unión de cada proteína. La intersección positiva de al menos un pico, fue evidencia suficiente para considerar la presencia de un CRM. El análisis se restringió a los factores de transcripción (TFs) que presentaron picos en al menos 100 promotores en ambas réplicas biológicas.  
+De manera paralela, se llevó a cabo un análisis para modificaciones de histonas y marcas epigenéticas obtenidas del conjunto de datos de ChIP-Atlas (58).
+
+**Evaluación del efecto de las características del promotor sobre los patrones transcripcionales medidos**
 
 Asociación de las características del promotor con la actividad y ruido transcripcional
 
@@ -484,14 +527,12 @@ Para cuantificar la incertidumbre del AUC estimado y descartar asociaciones no s
 
 Las características cuyo intervalo de confianza incluye el valor 0.5 en alguna de las réplicas fueron descartadas, ya que no pueden distinguirse de una clasificación aleatoria y, por tanto, no presentan un efecto significativo sobre el ruido transcripcional.
 
-Análisis de datos de ChIP-seq
+Análisis de enriquecimiento funcional de la unión de TFs
 
-Se obtuvieron picos de ChIP-seq no redundantes de la base de datos ReMap y se intersectaron con la *library* de promotores para determinar el estado de unión de cada proteína. La intersección positiva de al menos un pico, fue evidencia suficiente para considerar la presencia de un CRM. El análisis se restringió a los factores de transcripción (TFs) que presentaron picos en al menos 100 promotores en ambas réplicas biológicas.  
-Las asociaciones entre la ocupación proteica y tanto el ruido como la actividad transcripcional se evaluaron utilizando el mismo marco de trabajo aplicado a todas las características binarias. De manera paralela, se llevó a cabo un análisis para modificaciones de histonas y marcas epigenéticas obtenidas del conjunto de datos de ChIP-Atlas (58).
-
-Análisis de enriquecimiento funcional
-
+Las asociaciones entre la ocupación proteica de TFs y tanto el ruido como la actividad transcripcional se evaluaron utilizando el mismo marco de trabajo aplicado a todas las características binarias.   
 Se realizó un análisis de enriquecimiento de conjuntos de genes (*GSEA*) (89) sobre el subconjunto de factores de transcripción identificados utilizando términos de *Gene Ontology* (*GO*), ordenados ya sea por el tamaño del efecto del test de suma de rangos de *Wilcoxon* (*Wilcoxon rank-sum test*) o por el *AUC-ROC*.Estos análisis se implementaron mediante *scripts* propios utilizando los paquetes de *R/Bioconductor* *AnnotationDbi*, *clusterProfiler* (90) y *enrichplot*.
+
+**Promotores alternativos**
 
 Clasificación de promotores alternativos
 
