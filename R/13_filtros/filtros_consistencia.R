@@ -49,8 +49,8 @@ p <- panel_a_base %>%
 p <- ggExtra::ggMarginal(p, type = "density", margins = "both", col = "#0D2C54")
 ggsave(file.path(out_dir, "panel_a_correlacion_prefiltro.jpg"), p, width = 9, height = 6.75, units = "in")
 
-cor_prefiltro <- panel_a_base %>% summarise(corre = cor(`Rep 1`, `Rep 2`, use = "complete.obs", method = "pearson"))
-message("Pearson pre-filtro: ", round(cor_prefiltro$corre, 3))
+cor_prefiltro <- cor.test(panel_a_base$`Rep 1`, panel_a_base$`Rep 2`, method = "pearson")
+message("Pearson pre-filtro: ", round(cor_prefiltro$estimate, 3), ", p = ", format.pval(cor_prefiltro$p.value, digits = 3))
 
 # --- Panel B: correlacion entre replicas, post-filtro ----------------------
 
@@ -68,8 +68,8 @@ p <- panel_b_base %>%
 p <- ggExtra::ggMarginal(p, type = "density", margins = "both", col = "#0D2C54")
 ggsave(file.path(out_dir, "panel_b_correlacion_postfiltro.jpg"), p, width = 7, height = 6.75, units = "in")
 
-cor_postfiltro <- panel_b_base %>% summarise(corre = cor(`Rep 1`, `Rep 2`, use = "complete.obs", method = "pearson"))
-message("Pearson post-filtro: ", round(cor_postfiltro$corre, 3))
+cor_postfiltro <- cor.test(panel_b_base$`Rep 1`, panel_b_base$`Rep 2`, method = "pearson")
+message("Pearson post-filtro: ", round(cor_postfiltro$estimate, 3), ", p = ", format.pval(cor_postfiltro$p.value, digits = 3))
 
 # --- Panel C candidato 1: N de promotores detectados por replica ---------
 
@@ -149,7 +149,7 @@ p <- panel_d_base %>%
 p <- ggExtra::ggMarginal(p, type = "density", margins = "both", col = "#0D2C54")
 ggsave(file.path(out_dir, "panel_d_var_replicates.jpg"), p, width = 9, height = 6.75, units = "in")
 
-cor_var <- panel_d_base %>% summarise(corre = cor(`Rep 1`, `Rep 2`, use = "complete.obs", method = "pearson"))
-message("Pearson varianza (post-filtro): ", round(cor_var$corre, 3))
+cor_var <- cor.test(panel_d_base$`Rep 1`, panel_d_base$`Rep 2`, method = "pearson")
+message("Pearson varianza (post-filtro): ", round(cor_var$estimate, 3), ", p = ", format.pval(cor_var$p.value, digits = 3))
 
 message("Paneles guardados en ", out_dir, ". Panel C sin resolver - ver dos candidatos.")
