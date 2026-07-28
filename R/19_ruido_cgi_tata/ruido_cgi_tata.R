@@ -57,5 +57,10 @@ ggsave(
   noise_roc(data, "TATA_EPD", "Curva ROC - TATA-box"),
   width = 7, height = 6.75, units = "in"
 )
+ggsave(
+  file.path(out_dir, "ROC_TATA_expr.jpg"),
+  noise_roc_by_expr(data, "TATA_EPD", "Curva ROC - TATA-box"),
+  width = 5, height = 5, units = "in"
+)
 
 message("Figuras guardadas en ", out_dir)

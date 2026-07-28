@@ -147,7 +147,7 @@ p <- panel_d_base %>%
   theme_bw() +
   theme(text = element_text(size = 25))
 p <- ggExtra::ggMarginal(p, type = "density", margins = "both", col = "#0D2C54")
-ggsave(file.path(out_dir, "panel_d_var_replicates.jpg"), p, width = 9, height = 6.75, units = "in")
+ggsave(file.path(out_dir, "panel_d_var_replicates.jpg"), p, width = 7, height = 6.75, units = "in")
 
 cor_var <- cor.test(panel_d_base$`Rep 1`, panel_d_base$`Rep 2`, method = "pearson")
 message("Pearson varianza (post-filtro): ", round(cor_var$estimate, 3), ", p = ", format.pval(cor_var$p.value, digits = 3))

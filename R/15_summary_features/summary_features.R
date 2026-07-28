@@ -16,6 +16,7 @@ library(ggpubr)
 library(fastDummies)
 library(coin)
 source("R/functions/fig_paths.R")
+source("R/functions/plot_helpers.R")
 
 slug <- "summary_features_secuencia"
 out_dir <- fig_dir(slug)
@@ -25,93 +26,10 @@ prom_df <- read_tsv("data/processed/prom_df.tsv", show_col_types = FALSE) %>% fi
 data <- inner_join(stats_highconf, prom_df, by = c("seq_id", "name"))
 
 # --- Tabla de features booleanas (todas en espanol) -----------------------
+# build_tidy_features()/feature_groups en R/functions/plot_helpers.R
+# (compartido con R3.2, el mismo resumen pero para ruido en vez de actividad).
 
-tidy_data <- data %>%
-  fastDummies::dummy_cols("TE_superclass", ignore_na = TRUE, omit_colname_prefix = TRUE, remove_selected_columns = FALSE) %>%
-  fastDummies::dummy_cols("sample_specificity_class", ignore_na = TRUE, omit_colname_prefix = TRUE, remove_selected_columns = TRUE) %>%
-  group_by(rep) %>%
-  mutate(
-    `Alto contenido G+C` = (cut_number(g_c, n = 3) %>% as.numeric()) == 3,
-    across(c(DNA, SINE, LINE, LTR), ~ replace_na(.x, 0)),
-    `Sin actividad en ratón` = turnover %in% c("expression-turnover", "mouse-diminished"),
-    `Insertado en humanos` = turnover == "human-inserted",
-    `Elementos transponibles` = !is.na(TE_superclass),
-    `Repeticiones de baja complejidad` = LCR_overlap > 0,
-    `Alta conservación (16 a -50pb)` = (cut_number(phylop100_close, n = 3) %>% as.numeric()) == 3,
-    `Alta conservación (-50 a -150)` = (cut_number(phylop100_intermediate, n = 3) %>% as.numeric()) == 3,
-    `Alta conservación (-150 a -235)` = (cut_number(phylop100_far, n = 3) %>% as.numeric()) == 3,
-    `Alta especificidad tisular` = (cut_number(sample_specificity_gini, n = 3) %>% as.numeric()) == 3,
-    `Baja especificidad tisular` = (cut_number(sample_specificity_gini, n = 3) %>% as.numeric()) == 1,
-    shape_class_n = cut_number(interquantile_width, 3) %>% as_factor() %>% as.numeric(),
-    `Promotores angostos` = shape_class_n == 1,
-    `Promotores anchos` = shape_class_n == 3,
-    `Alta actividad en HEK293` = hek_tpm > median(data$hek_tpm[data$hek_tpm > 0], na.rm = TRUE),
-    `Sin módulo cis-regulatorio` = N_TF_CRM == 0,
-    `Alta accesibilidad de cromatina (DNase-seq)` = (cut_number(mean_dnase, n = 3) %>% as.numeric()) == 3,
-    across(starts_with("enh"), ~ .x > 0)
-  ) %>%
-  rename(
-    `TATA-box` = TATA_EPD,
-    CCAAT = CCAAT_EPD,
-    `GC-box` = GCbox_EPD,
-    `Islas CpG` = CGI,
-    Retrotransposón = DNA,
-    TCT = TCT_TSS,
-    `CG en TSS` = CG_TSS,
-    `TA en TSS` = TA_TSS,
-    `TG en TSS` = TG_TSS,
-    `CA en TSS` = CA_TSS,
-    `TSS no canónico` = other_TSS,
-    `TSS fuerte` = INR_strong_TSS,
-    `No detectado (FANTOM5)` = non_detected,
-    `Enhancers a 10kb` = enh10kb,
-    `Enhancers a 50kb` = enh50kb,
-    `Enhancers a 100kb` = enh100kb
-  ) %>%
-  select(
-    mean, rep,
-    LINE, SINE, LTR,
-    `Alto contenido G+C`, `Sin actividad en ratón`, `Insertado en humanos`,
-    `Elementos transponibles`, `Repeticiones de baja complejidad`,
-    `Alta conservación (16 a -50pb)`, `Alta conservación (-50 a -150)`, `Alta conservación (-150 a -235)`,
-    `TATA-box`, CCAAT, `GC-box`, `Islas CpG`, Retrotransposón, TCT,
-    `CG en TSS`, `TA en TSS`, `TG en TSS`, `CA en TSS`,
-    `TSS no canónico`, `TSS fuerte`,
-    `No detectado (FANTOM5)`,
-    `Alta especificidad tisular`, `Baja especificidad tisular`,
-    `Promotores angostos`, `Promotores anchos`,
-    `Alta actividad en HEK293`, `Alta accesibilidad de cromatina (DNase-seq)`,
-    `Enhancers a 50kb`, `Sin módulo cis-regulatorio`
-  ) %>%
-  mutate(
-    across(c(where(is.numeric), -contains("mean")), as.logical),
-    rep = as.factor(rep),
-    across(where(is.logical), ~ .x %>% factor(levels = c("TRUE", "FALSE")))
-  ) %>%
-  ungroup()
-
-# seq = de la secuencia del promotor; endo = de contexto endogeno/genomico
-# (clasificacion fija, migrada de transcriptional_library/Analysis/Tables/tidy_names.tsv)
-feature_groups <- tribble(
-  ~feature, ~group,
-  "LINE", "seq", "SINE", "seq", "LTR", "seq",
-  "Alto contenido G+C", "seq",
-  "Elementos transponibles", "seq",
-  "Repeticiones de baja complejidad", "seq",
-  "TATA-box", "seq", "CCAAT", "seq", "GC-box", "seq", "Islas CpG", "seq",
-  "Retrotransposón", "seq", "TCT", "seq",
-  "CG en TSS", "seq", "TA en TSS", "seq", "TG en TSS", "seq", "CA en TSS", "seq",
-  "TSS no canónico", "seq", "TSS fuerte", "seq",
-  "Sin actividad en ratón", "endo", "Insertado en humanos", "endo",
-  "Alta conservación (16 a -50pb)", "endo", "Alta conservación (-50 a -150)", "endo", "Alta conservación (-150 a -235)", "endo",
-  "No detectado (FANTOM5)", "endo",
-  "Alta especificidad tisular", "endo", "Baja especificidad tisular", "endo",
-  "Promotores angostos", "endo", "Promotores anchos", "endo",
-  "Alta actividad en HEK293", "endo",
-  "Alta accesibilidad de cromatina (DNase-seq)", "endo",
-  "Enhancers a 50kb", "endo",
-  "Sin módulo cis-regulatorio", "endo"
-)
+tidy_data <- build_tidy_features(data, keep = "mean")
 vbles_split <- map(c("seq", "endo"), ~ feature_groups$feature[feature_groups$group == .x])
 
 # --- Wilcoxon: efecto de cada feature sobre la actividad media ----------
