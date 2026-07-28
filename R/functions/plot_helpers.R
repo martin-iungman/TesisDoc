@@ -216,6 +216,34 @@ build_tidy_features <- function(data, keep) {
     ungroup()
 }
 
+# Barras de AUC-0.5 por feature/TF, coloreadas por sentido del efecto
+# sobre el ruido (ruido alto/bajo), filtradas a las que tienen IC que no
+# cruza 0.5 y el mismo sentido en ambas replicas. Usado por R3.2
+# (features curadas, show_labels=TRUE) y R3.3 (TFs de ReMap,
+# show_labels=FALSE - demasiados para etiquetar, igual que R2.6).
+plot_noise_auc_summary <- function(auc_df, show_labels = TRUE, base_size = 20) {
+  p <- auc_df %>%
+    mutate(noise = ifelse(AUC > 0.5, "Ruido alto", "Ruido bajo")) %>%
+    filter((ci2.5 > 0.5 & ci97.5 > 0.5) | (ci2.5 < 0.5 & ci97.5 < 0.5)) %>%
+    group_by(feature) %>%
+    mutate(n_dir = length(unique(noise))) %>%
+    filter(n_dir == 1, n() == 2) %>%
+    ungroup() %>%
+    arrange(desc(rep), AUC) %>%
+    mutate(feature = fct_inorder(feature)) %>%
+    ggplot(aes(x = AUC - 0.5, y = feature, group = fct_inorder(rep))) +
+    geom_col(orientation = "y", position = "dodge", aes(fill = noise, alpha = rep)) +
+    geom_errorbarh(aes(xmax = ci2.5 - 0.5, xmin = ci97.5 - 0.5), position = position_dodge(1), height = 0.05, col = "#777777", linewidth = 1.5) +
+    scale_x_continuous(labels = function(x) x + 0.5) +
+    scale_alpha_manual(values = c("Rep 1" = 1, "Rep 2" = 0.7)) +
+    scale_fill_manual(values = c("Ruido alto" = "#D6741F", "Ruido bajo" = "#7FB800")) +
+    theme_pubr(base_size = base_size) +
+    theme(legend.position = "top") +
+    labs(fill = "Efecto", x = "AUC (efecto sobre el ruido)", y = "Features", alpha = "")
+  if (!show_labels) p <- p + theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+  p
+}
+
 # Agrupa cada feature de build_tidy_features() en "seq" (secuencia del
 # promotor) o "endo" (contexto endogeno/genomico) - migrado de
 # transcriptional_library/Analysis/Tables/tidy_names.tsv. Usado por R7.

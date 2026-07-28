@@ -56,27 +56,10 @@ write_tsv(auc_df, file.path(out_dir, "ruido_summary_auc.tsv"))
 # --- Grafico resumen --------------------------------------------------
 # Features con IC que no cruza 0.5 Y mismo sentido (ruido alto/bajo) en
 # ambas replicas (mismo criterio de consistencia que R7, no estaba en
-# el plot_auc2 original).
+# el plot_auc2 original). plot_noise_auc_summary() en plot_helpers.R
+# (compartida con R3.3, la version de esto para TFs de ReMap).
 
-panel <- auc_df %>%
-  mutate(noise = ifelse(AUC > 0.5, "Ruido alto", "Ruido bajo")) %>%
-  filter((ci2.5 > 0.5 & ci97.5 > 0.5) | (ci2.5 < 0.5 & ci97.5 < 0.5)) %>%
-  group_by(feature) %>%
-  mutate(n_dir = length(unique(noise))) %>%
-  filter(n_dir == 1, n() == 2) %>%
-  ungroup() %>%
-  arrange(desc(rep), AUC) %>%
-  mutate(feature = fct_inorder(feature)) %>%
-  ggplot(aes(x = AUC - 0.5, y = feature, group = fct_inorder(rep))) +
-  geom_col(orientation = "y", position = "dodge", aes(fill = noise, alpha = rep)) +
-  geom_errorbarh(aes(xmax = ci2.5 - 0.5, xmin = ci97.5 - 0.5), position = position_dodge(1), height = 0.05, col = "#777777", linewidth = 1.5) +
-  scale_x_continuous(labels = function(x) x + 0.5) +
-  scale_alpha_manual(values = c("Rep 1" = 1, "Rep 2" = 0.7)) +
-  scale_fill_manual(values = c("Ruido alto" = "#D6741F", "Ruido bajo" = "#7FB800")) +
-  theme_pubr() +
-  theme(text = element_text(size = 20), legend.position = "top") +
-  labs(fill = "Efecto", x = "AUC (efecto sobre el ruido)", y = "Features", alpha = "")
-
+panel <- plot_noise_auc_summary(auc_df)
 ggsave(file.path(out_dir, "summary_noise.jpg"), panel, width = 13.5, height = 6.75, units = "in")
 
 message("Figuras guardadas en ", out_dir)
