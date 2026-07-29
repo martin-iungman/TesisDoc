@@ -40,7 +40,7 @@ trabajando a mano).
 
 - R 4.4+ con: `tidyverse`, `BSgenome.Hsapiens.UCSC.hg38`, `rtracklayer`,
   `plyranges`, `GenomicRanges`, `Biostrings`, `biomaRt`,
-  `EnsDb.Hsapiens.v86`, `patchwork`, `ggpubr`.
+  `EnsDb.Hsapiens.v86`, `patchwork`, `ggpubr`, `CAGEr`.
 - Este repo asume que `../transcriptional_library` (el repo de datos del
   labo) existe como carpeta hermana — varios scripts leen archivos
   externos pesados directamente de ahí en vez de duplicarlos acá (ver
