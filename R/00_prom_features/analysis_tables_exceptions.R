@@ -44,3 +44,17 @@ path_shape_merged <- file.path(translib_analysis, "shape_merged.tsv")
 # raw FANTOM5 data in build_prom_features.R (ported from
 # transcriptional_library/Analysis/scripts/hek_cage.qmd via CAGEr) -
 # no longer reads from Analysis/Tables.
+
+# PUFFIN (Dudnyk et al. 2024) prediction scores for our own library
+# sequences (teoTSS_score and related motif/effect columns), used by R4.5
+# (puffin_selectivity_predscore). Produced by running the external
+# puffin.py model + weights (not present in this repo) over ~24000
+# promoters x 5 random upstream-flank replicates - see
+# R/25_puffin/puffin_prediction_model.R for the ported (NOT RUN)
+# pipeline, and transcriptional_library/Analysis/scripts/
+# puffin_processing.qmd for the original. The per-sequence raw prediction
+# CSVs that pipeline writes no longer exist on disk; only this aggregated
+# summary survived. Authorized 2026-07-29 for R4.5 because rerunning the
+# actual model is out of scope. PENDING: rerun puffin_prediction_model.R
+# from raw library sequences if puffin.py/weights become available again.
+path_puffin_pred <- file.path(translib_analysis, "Dudnyk_puffin_prediction_summ.tsv")
