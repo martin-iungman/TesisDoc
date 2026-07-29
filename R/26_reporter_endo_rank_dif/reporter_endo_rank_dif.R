@@ -44,25 +44,29 @@ data <- inner_join(stats_highconf, prom_df, by = c("seq_id", "name")) %>%
   ungroup()
 
 observed <- data %>%
-  transmute(rep, patron, Observed = abs(rank_endo - rank_reporter))
+  transmute(rep, patron, value = abs(rank_endo - rank_reporter))
 
 control <- data %>%
   group_by(rep) %>%
-  group_modify(~ tibble(Control = abs(
+  group_modify(~ tibble(value = abs(
     sample(seq_len(nrow(.x)), size = nrow(.x) * 1000, replace = TRUE) -
       sample(seq_len(nrow(.x)), size = nrow(.x) * 1000, replace = TRUE)
   ))) %>%
-  ungroup()
+  ungroup() %>%
+  mutate(patron = "Permutado")
 
-p <- ggplot() +
-  geom_density(data = observed, aes(Observed, col = patron, fill = patron), alpha = 0.5) +
-  geom_density(data = control, aes(Control), col = "darkred", linetype = "dashed") +
+plot_data <- bind_rows(observed, control) %>%
+  mutate(patron = factor(patron, levels = c("Housekeeping", "Tissue-specific", "Permutado")))
+
+p <- ggplot(plot_data, aes(value, col = patron, fill = patron, linetype = patron)) +
+  geom_density(alpha = 0.5, linewidth = 0.7) +
   facet_wrap(~rep) +
-  scale_color_manual(values = c("Housekeeping" = "#1B8C8E", "Tissue-specific" = "#0D2C54")) +
-  scale_fill_manual(values = c("Housekeeping" = "#1B8C8E", "Tissue-specific" = "#0D2C54")) +
+  scale_color_manual(values = c("Housekeeping" = "#1B8C8E", "Tissue-specific" = "#0D2C54", "Permutado" = "darkred")) +
+  scale_fill_manual(values = c("Housekeeping" = "#1B8C8E", "Tissue-specific" = "#0D2C54", "Permutado" = "transparent")) +
+  scale_linetype_manual(values = c("Housekeeping" = "solid", "Tissue-specific" = "solid", "Permutado" = "dashed")) +
   labs(
     x = "Diferencia absoluta de rango (reportero vs. actividad endógena)",
-    y = "Densidad", col = "Patrón de expresión", fill = "Patrón de expresión"
+    y = "Densidad", col = NULL, fill = NULL, linetype = NULL
   ) +
   theme_bw(base_size = 20) +
   theme(legend.position = "top")
