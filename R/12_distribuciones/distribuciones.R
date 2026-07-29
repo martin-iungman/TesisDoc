@@ -112,4 +112,38 @@ panel_extra <- df %>%
 
 ggsave(file.path(out_dir, "extra_densidad_individual.jpg"), panel_extra, width = 9, height = 6.75, units = "in")
 
-message("Paneles B, C y el extra guardados en ", out_dir, ". Panel A (histogramas de reconstrucción) sigue pendiente.")
+# --- Panel A: histogramas de reconstruccion de distribuciones, por gate ---
+# Portado de transcriptional_library/Analysis/scripts/stable_validation.qmd
+# (ultimo chunk: gates_df %>% ... %>% ggplot(aes(sample, counts_rel,
+# fill=name)) + geom_col() + facet_wrap(~name+rep)). Construido enteramente
+# desde data/processed/data_long.tsv (counts_norm por gate/replica/seq_id,
+# ver R/01_activity_stats/build_activity_stats.R) - no requiere ninguna
+# excepcion, a diferencia de gates_counts.tsv del original.
+
+gates_hist <- read_tsv("data/processed/data_long.tsv", show_col_types = FALSE) %>%
+  filter(name %in% c("KIAA0753_1", "TMEM87A_1")) %>%
+  group_by(rep, name) %>%
+  mutate(counts_rel = counts_norm / sum(counts_norm)) %>%
+  ungroup()
+
+# Panel A1: solo KIAA0753_1, ambas replicas (diferenciadas por alpha)
+panel_a_kiaa <- gates_hist %>%
+  filter(name == "KIAA0753_1") %>%
+  ggplot(aes(sample, counts_rel, alpha = rep, group = rep)) +
+  geom_col(fill = "#AD343E", position = "dodge") +
+  scale_alpha_manual(values = c("Rep 1" = 0.5, "Rep 2" = 1)) +
+  labs(x = "Gate de fluorescencia EGFP", y = "Cuentas relativas", alpha = "Réplica", title = "KIAA0753_1") +
+  theme_pubclean()
+ggsave(file.path(out_dir, "panel_a_histograma_KIAA0753.jpg"), panel_a_kiaa, width = 9, height = 6.75, units = "in")
+
+# Panel A2: ambos promotores, solo replica 2 (como el slide de referencia)
+panel_a_ambos <- gates_hist %>%
+  filter(rep == "Rep 2") %>%
+  ggplot(aes(sample, counts_rel, fill = name)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c(KIAA0753_1 = "#AD343E", TMEM87A_1 = "#FFB400")) +
+  labs(x = "Gate de fluorescencia EGFP", y = "Cuentas relativas", fill = "Promotor") +
+  theme_pubclean()
+ggsave(file.path(out_dir, "panel_a_histograma_ambos_rep2.jpg"), panel_a_ambos, width = 9, height = 6.75, units = "in")
+
+message("Paneles A, B, C y el extra guardados en ", out_dir, ".")
