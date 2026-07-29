@@ -61,3 +61,15 @@ path_chipatlas_peaks_raw <- file.path(translib, "External_data/allPeaks_light.hg
 # type class, cell type. Small enough to read directly, not heavy, but
 # kept here alongside path_chipatlas_peaks_raw for the same pipeline.
 path_chipatlas_explist <- file.path(translib, "External_data/experimentList_chipatlas.tab")
+
+# FANTOM5 raw CTSS files for endogenous-activity CAGE processing (R4.x)
+# - kept together with the rest of FANTOM5 in transcriptional_library
+# rather than copied locally, even though individually small (per
+# author preference, 2026-07-29). See
+# R/00_prom_features/build_endo_cage_activity.R.
+path_fantom5_hela_raw <- list.files(
+  file.path(translib, "External_data/FANTOM5/hg38_cell_line"),
+  pattern = "HelaS3", full.names = TRUE
+)
+path_fantom5_tissue_ontology <- file.path(translib, "External_data/FANTOM5/tissue_ontology_FANTOM5.xlsx")
+path_fantom5_tissue_dir <- file.path(translib, "External_data/FANTOM5/hg38_tissue")

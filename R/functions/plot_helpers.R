@@ -59,6 +59,24 @@ tf_scatter <- function(df, feature, titulo) {
     theme_bw(base_size = 16)
 }
 
+# Actividad media de un promotor endogeno (CAGE TPM, FANTOM5) por bin de
+# actividad del reportero (mean_sw, ver add_mean_sw_bins), con smooth
+# lineal por replica y escala log10 en Y. Usado por R4 (HEK293/HeLa/
+# musculo esqueletico - ver R/00_prom_features/build_endo_cage_activity.R
+# y build_prom_features.R para hek_tpm).
+endo_activity_scatter <- function(data, tpm_col, titulo) {
+  data %>%
+    group_by(rep, mean_sw) %>%
+    summarise(tpm = mean(.data[[tpm_col]], na.rm = TRUE), .groups = "drop") %>%
+    ggplot(aes(mean_sw, tpm)) +
+    geom_point(col = "#AD343E") +
+    geom_smooth(col = "#216869", method = "lm") +
+    facet_wrap(~rep) +
+    scale_y_log10() +
+    labs(x = "Bins de actividad del promotor reportero", y = "Actividad media del promotor\nendógeno (CAGE TPM)", title = titulo) +
+    theme_bw(base_size = 16)
+}
+
 # Rango de varianza (ruido) dentro de cada bin de actividad media
 # (mean_sw, ver add_mean_sw_bins), por replica. add_noise_rank() hace
 # ambos pasos juntos - usado por todo R3 (ruido) para construir
