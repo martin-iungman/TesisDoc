@@ -34,7 +34,7 @@ p <- gates_hist %>%
   geom_col(fill = "#AD343E", position = "dodge") +
   scale_alpha_manual(values = c("Rep 1" = 0.5, "Rep 2" = 1)) +
   labs(x = "Gate de fluorescencia EGFP", y = "Cuentas relativas", alpha = "Réplica", title = "KIAA0753_1") +
-  theme_pubclean()
+  theme_pubclean(base_size = 20)
 ggsave(file.path(out_dir, "histograma_gates_KIAA0753.jpg"), p, width = 9, height = 6.75, units = "in")
 
 message("Figura guardada en ", out_dir)

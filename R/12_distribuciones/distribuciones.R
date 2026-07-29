@@ -63,7 +63,7 @@ panel_b <- gates_hist %>%
   geom_col(position = "dodge") +
   scale_fill_manual(values = c(KIAA0753_1 = "#AD343E", TMEM87A_1 = "#FFB400")) +
   labs(x = "Gate de fluorescencia EGFP", y = "Cuentas relativas", fill = "Promotor") +
-  theme_pubclean()
+  theme_pubclean(base_size = 20)
 
 ggsave(file.path(out_dir, "panel_b_histograma_gates_ejemplo.jpg"), panel_b, width = 9, height = 6.75, units = "in")
 
