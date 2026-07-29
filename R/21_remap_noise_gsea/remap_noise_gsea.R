@@ -17,7 +17,15 @@
 # script - claramente pensado como el `data_TF` de la seccion de
 # actividad (misma union de TFs) pero con var_rank_sw en vez de mean;
 # reconstruido aca desde remap_tf_hits.tsv siguiendo el mismo patron
-# que R2.6.
+# que R2.6. IMPORTANTE: las columnas booleanas se convierten a
+# factor(levels=c("TRUE","FALSE")) antes de pROC::roc(..., direction=
+# ">") - igual que build_tidy_features() y Histone_chipatlas.qmd's
+# tidy_hist_data (que sí definia esto para el analisis de ruido, a
+# diferencia de la seccion de actividad). Sin esto pROC ordena los
+# niveles de un logical alfabeticamente (FALSE=control, TRUE=caso) y
+# direction=">" queda invertido - confirmado con datos reales de TATA-
+# box: AUC=0.551 (correcto, TATA-box tiene mas ruido) vs AUC=0.449 (el
+# invertido) para la misma comparacion.
 
 library(tidyverse)
 library(pROC)
@@ -73,6 +81,8 @@ nTF <- data_TF %>%
 
 vbles <- nTF$name
 repname <- unique(data_TF$rep)
+
+data_TF <- data_TF %>% mutate(across(all_of(vbles), ~ factor(.x, levels = c("TRUE", "FALSE"))))
 
 # --- AUC (IC DeLong) de cada TF prediciendo ruido alto --------------------
 

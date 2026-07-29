@@ -76,9 +76,18 @@ vbles <- nTF$name
 repname <- unique(hist_data$rep)
 
 # --- AUC (IC DeLong) de cada marca prediciendo ruido alto -----------------
+# Columnas booleanas convertidas a factor(levels=c("TRUE","FALSE")) antes
+# de pROC::roc(..., direction=">") - igual que build_tidy_features() y
+# Histone_chipatlas.qmd's propio tidy_hist_data (que el original SI
+# convertia asi para el analisis de ruido). Sin esto, pROC ordena los
+# niveles de un logical alfabeticamente (FALSE=control, TRUE=caso) y
+# direction=">" queda invertido (confirmado con datos reales de TATA-box:
+# AUC=0.551 correcto vs 0.449 invertido para la misma comparacion).
 
 auc_df <- map(repname, function(r) {
-  df <- hist_data %>% filter(rep == r)
+  df <- hist_data %>%
+    filter(rep == r) %>%
+    mutate(across(all_of(vbles), ~ factor(.x, levels = c("TRUE", "FALSE"))))
   map(vbles, function(f) {
     roc_obj <- pROC::roc(df[[f]], df[["var_rank_sw"]], ci = TRUE, direction = ">", quiet = TRUE)
     tibble(feature = f, rep = r, AUC = as.numeric(roc_obj$ci[2]), ci2.5 = as.numeric(roc_obj$ci[1]), ci97.5 = as.numeric(roc_obj$ci[3]))
