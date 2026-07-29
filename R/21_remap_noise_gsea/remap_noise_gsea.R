@@ -96,7 +96,7 @@ auc_df <- map(repname, function(r) {
 
 write_tsv(auc_df, file.path(out_dir, "remap_tf_noise_auc.tsv"))
 
-panel <- plot_noise_auc_summary(auc_df, show_labels = FALSE)
+panel <- plot_noise_auc_summary(auc_df, show_labels = FALSE, show_errorbars = FALSE)
 ggsave(file.path(out_dir, "Remap_noise.jpg"), panel, width = 9, height = 6.75, units = "in")
 
 # --- GSEA (GO Cellular Component) sobre la lista de TFs por AUC ----------
