@@ -42,10 +42,13 @@ paper. Por eso:
   para mandar a la revista), generarlo con un script que lea el CSV y
   copie a `figures/_export_numerado/` — ese export es un producto
   derivado y descartable, nunca la fuente de verdad.
-- Cuando cambie `docs/Fig MyM.pptx` (o el correspondiente de Resultados),
-  releer su contenido slide por slide (el número de slide = número de
-  figura) y comparar contra `docs/mapping_figuras.csv` antes de asumir
-  que la numeración sigue igual — ver `docs/rutina_resync_figuras.md`.
+- Los decks `docs/Fig *.pptx` (MyM, R1, R2, ...) se traen automáticamente
+  desde Drive y se resincronizan contra `docs/mapping_figuras.csv` todos
+  los días hábiles (tarea programada `resync-figuras-mapping`). Si se
+  edita un deck a mano fuera de esa rutina, releer su contenido slide
+  por slide (el número de slide = número de figura) y comparar contra
+  el CSV antes de asumir que la numeración sigue igual — ver
+  `docs/rutina_resync_figuras.md`.
 
 ## Tipos de figura — no todo se genera por código
 
