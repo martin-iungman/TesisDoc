@@ -1,51 +1,71 @@
 # distribuciones_expresion (ver docs/mapping_figuras.csv para el numero de
 # figura vigente)
-# Validacion por citometria de 8 promotores individuales + 2 controles
-# (Control="US", Strong) contra la actividad estimada por el ensayo
-# high-throughput (library).
-# Panel B ("aka 1C"): densidad de fluorescencia EGFP para 2 promotores de
-#   ejemplo (KIAA0753_1, TMEM87A_1).
+# Validacion por citometria de 2 promotores de ejemplo (KIAA0753_1,
+# TMEM87A_1) contra la actividad estimada por el ensayo high-throughput
+# (library) y por el conteo de gates de sorting.
+# Panel A ("aka 1C"): densidad de fluorescencia EGFP (citometria) para los
+#   2 promotores de ejemplo.
+# Panel B: histograma de reconstruccion de distribucion (cuentas
+#   normalizadas por gate de sorting), ambos promotores, solo Rep 2 -
+#   mismo dato que Fig. R1.4 (histograma_gates_kiaa0753) pero con
+#   TMEM87A_1 tambien, para comparar forma de distribucion entre
+#   promotores.
 # Panel C ("aka 1D"): correlacion entre la media del ensayo high-throughput
 #   y la media del ensayo especifico (citometria) por promotor.
-# Extra (sin mapear a panel): densidad de EGFP para cada uno de los 8
-#   promotores, contra el control ("US"/Control) de fondo.
 #
-# PENDIENTE: "Panel A: histogramas de reconstruccion de distribuciones
-# (aka 1B)" mencionado en mapping_figuras.csv no esta en
-# transcriptional_library/Tesis/tesis.R - el codigo debe estar en otro
-# script, buscarlo mas adelante.
+# Resync 2026-07-29: separado en 3 figuras (docs/Fig R1.pptx paso a tener
+# slides propios para cada una) - el histograma de KIAA0753_1 solo (Fig.
+# R1.4) y la densidad individual de los 8 promotores (Fig. R1.5) ahora
+# viven en R/12_distribuciones/histograma_gates_kiaa0753.R y
+# densidad_promotores_individuales.R respectivamente; este script se quedo
+# con los paneles A/B/C y paso de "Fig. R1.4" a "Fig. R1.6".
 #
 # Requiere: data/processed/activity_stats_full.tsv (generado por
-# R/01_activity_stats/build_activity_stats.R) y ~519MB de datos de
-# citometria leidos directo de transcriptional_library (ver
-# R/00_prom_features/heavy_data_paths.R). Run from the TesisDoc repo root.
+# R/01_activity_stats/build_activity_stats.R), data/processed/data_long.tsv
+# y ~519MB de datos de citometria leidos directo de transcriptional_library
+# (ver R/00_prom_features/heavy_data_paths.R). Run from the TesisDoc repo
+# root.
 
 library(tidyverse)
 library(ggpubr)
 source("R/functions/fig_paths.R")
+source("R/functions/plot_helpers.R")
 source("R/00_prom_features/heavy_data_paths.R")
 
 slug <- "distribuciones_expresion"
 out_dir <- fig_dir(slug)
 
-# --- Cargar datos de citometria (FlowJo export, un .cells.csv por muestra) --
+df <- load_citometry_stable_validation(path_citometry_stable_validation)
 
-files <- list.files(path_citometry_stable_validation, pattern = ".cells", full.names = TRUE, recursive = TRUE)
-prom_name <- files %>%
-  str_remove("^.+Tables/(lvs-)?") %>%
-  str_remove("_Data .+$")
-df <- map2(files, prom_name, ~ read_csv(.x, show_col_types = FALSE) %>% mutate(sample_name = .y)) %>% list_rbind()
-names(df) <- str_replace_all(names(df), "-", "_")
-df$prom_name <- str_remove(df$sample_name, " -.+$")
+# --- Panel A: densidad de EGFP, 2 promotores de ejemplo -------------------
 
-# El orden de este vector tiene que coincidir con el orden en que
-# unique(df$prom_name) devuelve los short_name - fragil pero heredado tal
-# cual de transcriptional_library/Tesis/tesis.R.
-name_df <- tibble(
-  short_name = unique(df$prom_name),
-  name = c("BTG1_1", "ETS1_1", "KIAA0753_1", "LSM1_1", "METAP2_1", "PPP1R14B_3", "TMEM87A_1", "ZKSCAN2_1", "Control", "Strong")
-)
-df <- inner_join(name_df, df, by = c("short_name" = "prom_name"))
+panel_a <- df %>%
+  filter(name %in% c("KIAA0753_1", "TMEM87A_1")) %>%
+  ggplot(aes(Comp_FL2_A, fill = name, group = name)) +
+  geom_density(alpha = 0.6) +
+  scale_x_log10(limits = c(1, 1000)) +
+  theme_pubr() +
+  labs(x = "Señal de fluorescencia de EGFP", y = "Densidad", fill = "Promotor", alpha = NULL) +
+  scale_fill_manual(values = c(KIAA0753_1 = "#AD343E", TMEM87A_1 = "#FFB400"))
+
+ggsave(file.path(out_dir, "panel_a_densidad_ejemplo.jpg"), panel_a, width = 9, height = 6.75, units = "in")
+
+# --- Panel B: histograma de reconstruccion, ambos promotores, solo Rep 2 --
+
+gates_hist <- read_tsv("data/processed/data_long.tsv", show_col_types = FALSE) %>%
+  filter(name %in% c("KIAA0753_1", "TMEM87A_1"), rep == "Rep 2") %>%
+  group_by(rep, name) %>%
+  mutate(counts_rel = counts_norm / sum(counts_norm)) %>%
+  ungroup()
+
+panel_b <- gates_hist %>%
+  ggplot(aes(factor(sample), counts_rel, fill = name)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c(KIAA0753_1 = "#AD343E", TMEM87A_1 = "#FFB400")) +
+  labs(x = "Gate de fluorescencia EGFP", y = "Cuentas relativas", fill = "Promotor") +
+  theme_pubclean()
+
+ggsave(file.path(out_dir, "panel_b_histograma_gates_ejemplo.jpg"), panel_b, width = 9, height = 6.75, units = "in")
 
 # --- Panel C: correlacion library vs citometria (media) -------------------
 
@@ -83,67 +103,4 @@ panel_c <- density_mean %>%
 
 ggsave(file.path(out_dir, "panel_c_correlacion_media.jpg"), panel_c, width = 9, height = 6.75, units = "in")
 
-# --- Panel B: densidad de EGFP, 2 promotores de ejemplo -------------------
-
-panel_b <- df %>%
-  filter(name %in% c("KIAA0753_1", "TMEM87A_1")) %>%
-  ggplot(aes(Comp_FL2_A, fill = name, group = name)) +
-  geom_density(alpha = 0.6) +
-  scale_x_log10(limits = c(1, 1000)) +
-  theme_pubr() +
-  labs(x = "Señal de fluorescencia de EGFP", y = "Densidad", fill = "Promotor", alpha = NULL) +
-  scale_fill_manual(values = c(KIAA0753_1 = "#AD343E", TMEM87A_1 = "#FFB400"))
-
-ggsave(file.path(out_dir, "panel_b_densidad_ejemplo.jpg"), panel_b, width = 9, height = 6.75, units = "in")
-
-# --- Extra: densidad de EGFP para los 8 promotores individuales -----------
-
-panel_extra <- df %>%
-  filter(name != "Control") %>%
-  ggplot() +
-  geom_density(mapping = aes(Comp_FL2_A, col = name)) +
-  scale_x_log10() +
-  facet_wrap(~name) +
-  geom_density(data = df %>% filter(name == "Control") %>% select(-name), mapping = aes(Comp_FL2_A), col = "grey") +
-  xlab("Señal de EGFP\n(unidades de fluorescencia relativa)") +
-  ylab("Densidad") +
-  theme_pubclean() +
-  theme(legend.position = "none")
-
-ggsave(file.path(out_dir, "extra_densidad_individual.jpg"), panel_extra, width = 9, height = 6.75, units = "in")
-
-# --- Panel A: histogramas de reconstruccion de distribuciones, por gate ---
-# Portado de transcriptional_library/Analysis/scripts/stable_validation.qmd
-# (ultimo chunk: gates_df %>% ... %>% ggplot(aes(sample, counts_rel,
-# fill=name)) + geom_col() + facet_wrap(~name+rep)). Construido enteramente
-# desde data/processed/data_long.tsv (counts_norm por gate/replica/seq_id,
-# ver R/01_activity_stats/build_activity_stats.R) - no requiere ninguna
-# excepcion, a diferencia de gates_counts.tsv del original.
-
-gates_hist <- read_tsv("data/processed/data_long.tsv", show_col_types = FALSE) %>%
-  filter(name %in% c("KIAA0753_1", "TMEM87A_1")) %>%
-  group_by(rep, name) %>%
-  mutate(counts_rel = counts_norm / sum(counts_norm)) %>%
-  ungroup()
-
-# Panel A1: solo KIAA0753_1, ambas replicas (diferenciadas por alpha)
-panel_a_kiaa <- gates_hist %>%
-  filter(name == "KIAA0753_1") %>%
-  ggplot(aes(sample, counts_rel, alpha = rep, group = rep)) +
-  geom_col(fill = "#AD343E", position = "dodge") +
-  scale_alpha_manual(values = c("Rep 1" = 0.5, "Rep 2" = 1)) +
-  labs(x = "Gate de fluorescencia EGFP", y = "Cuentas relativas", alpha = "Réplica", title = "KIAA0753_1") +
-  theme_pubclean()
-ggsave(file.path(out_dir, "panel_a_histograma_KIAA0753.jpg"), panel_a_kiaa, width = 9, height = 6.75, units = "in")
-
-# Panel A2: ambos promotores, solo replica 2 (como el slide de referencia)
-panel_a_ambos <- gates_hist %>%
-  filter(rep == "Rep 2") %>%
-  ggplot(aes(sample, counts_rel, fill = name)) +
-  geom_col(position = "dodge") +
-  scale_fill_manual(values = c(KIAA0753_1 = "#AD343E", TMEM87A_1 = "#FFB400")) +
-  labs(x = "Gate de fluorescencia EGFP", y = "Cuentas relativas", fill = "Promotor") +
-  theme_pubclean()
-ggsave(file.path(out_dir, "panel_a_histograma_ambos_rep2.jpg"), panel_a_ambos, width = 9, height = 6.75, units = "in")
-
-message("Paneles A, B, C y el extra guardados en ", out_dir, ".")
+message("Paneles A, B y C guardados en ", out_dir, ".")

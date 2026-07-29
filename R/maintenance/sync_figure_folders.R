@@ -16,7 +16,7 @@ mapping <- read_csv("docs/mapping_figuras.csv", show_col_types = FALSE)
 existing <- list.dirs("figures", recursive = FALSE, full.names = FALSE)
 
 for (slug in mapping$slug) {
-  current <- existing[str_detect(existing, paste0("^([A-Za-z0-9]+_)?", slug, "$"))]
+  current <- existing[str_detect(existing, paste0("^([A-Za-z0-9.]+_)?", slug, "$"))]
   if (length(current) == 0) next
   if (length(current) > 1) {
     warning("Multiple folders match slug '", slug, "': ", paste(current, collapse = ", "), " - skipping")

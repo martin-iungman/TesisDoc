@@ -301,3 +301,26 @@ feature_groups <- tribble(
   "Enhancers a 50kb", "endo",
   "Sin módulo cis-regulatorio", "endo"
 )
+
+# Carga y parsea los .cells.csv (export FlowJo) de la validacion por
+# citometria de 8 promotores individuales + 2 controles (Control="US",
+# Strong) - compartido por R1.5 (densidad_promotores_individuales) y R1.6
+# (distribuciones_expresion). El orden del vector de nombres tiene que
+# coincidir con el orden en que unique(df$prom_name) devuelve los
+# short_name - fragil pero heredado tal cual de
+# transcriptional_library/Tesis/tesis.R.
+load_citometry_stable_validation <- function(path_citometry_stable_validation) {
+  files <- list.files(path_citometry_stable_validation, pattern = ".cells", full.names = TRUE, recursive = TRUE)
+  prom_name <- files %>%
+    str_remove("^.+Tables/(lvs-)?") %>%
+    str_remove("_Data .+$")
+  df <- map2(files, prom_name, ~ read_csv(.x, show_col_types = FALSE) %>% mutate(sample_name = .y)) %>% list_rbind()
+  names(df) <- str_replace_all(names(df), "-", "_")
+  df$prom_name <- str_remove(df$sample_name, " -.+$")
+
+  name_df <- tibble(
+    short_name = unique(df$prom_name),
+    name = c("BTG1_1", "ETS1_1", "KIAA0753_1", "LSM1_1", "METAP2_1", "PPP1R14B_3", "TMEM87A_1", "ZKSCAN2_1", "Control", "Strong")
+  )
+  inner_join(name_df, df, by = c("short_name" = "prom_name"))
+}
