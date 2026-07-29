@@ -25,6 +25,17 @@ translib_analysis <- "../transcriptional_library/Analysis/Tables"
 # per-sample-per-promoter counts aggregation.
 path_sample_cage_activity <- file.path(translib_analysis, "sample_CAGE_activity.tsv")
 
+# Same underlying data as path_sample_cage_activity above (per-sample
+# FANTOM5 CAGE counts per promoter, columns name/counts/sample/libsize),
+# split into tissue (38MB) and primary_cell (83MB) instead of one
+# combined file - used for R4.2/R4.3/R4.4 (transcriptional_library/
+# Analysis/scripts/final_github.R "Tissue specificity" section: mean/max
+# endogenous activity across samples, tissue-specificity boxplots).
+# Extends the same authorized exception, not a new one. PENDING: same
+# raw-data rebuild as path_sample_cage_activity.
+path_tissue_cage_activity <- file.path(translib_analysis, "tissue_CAGE_activity.tsv")
+path_primary_cell_cage_activity <- file.path(translib_analysis, "primary_cell_CAGE_activity.tsv")
+
 # CAGEr-derived promoter shape (interquantile width) per promoter (1.8MB).
 # PENDING: locate/rebuild the raw CAGEr shape-calling pipeline.
 path_shape_merged <- file.path(translib_analysis, "shape_merged.tsv")
