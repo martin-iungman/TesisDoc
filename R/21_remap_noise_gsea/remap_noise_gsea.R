@@ -47,10 +47,7 @@ stats_highconf <- read_tsv("data/processed/activity_stats_highconf.tsv", show_co
 prom_df <- read_tsv("data/processed/prom_df.tsv", show_col_types = FALSE) %>% filter(type == "promoter")
 data <- inner_join(stats_highconf, prom_df, by = c("seq_id", "name"))
 
-data <- add_mean_sw_bins(data) %>%
-  group_by(rep, mean_sw) %>%
-  mutate(var_rank_sw = row_number(var)) %>%
-  ungroup()
+data <- add_noise_rank(data)
 
 binary_df <- remap_hits %>%
   distinct(seq_id, TF) %>%

@@ -59,6 +59,21 @@ tf_scatter <- function(df, feature, titulo) {
     theme_bw(base_size = 16)
 }
 
+# Rango de varianza (ruido) dentro de cada bin de actividad media
+# (mean_sw, ver add_mean_sw_bins), por replica. add_noise_rank() hace
+# ambos pasos juntos - usado por todo R3 (ruido) para construir
+# var_rank_sw desde cero, incluida la re-binning de subconjuntos (ej.
+# solo promotores no-CGI en R3.4).
+add_var_rank_sw <- function(df) {
+  df %>%
+    group_by(rep, mean_sw) %>%
+    mutate(var_rank_sw = row_number(var)) %>%
+    ungroup()
+}
+add_noise_rank <- function(df) {
+  add_mean_sw_bins(df) %>% add_var_rank_sw()
+}
+
 # ROC curve (por umbral de rango) de una feature booleana contra
 # var_rank_sw (rango de varianza dentro de cada bin de actividad media -
 # ver add_mean_sw_bins), para testear si una feature de secuencia predice

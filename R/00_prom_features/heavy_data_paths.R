@@ -47,3 +47,17 @@ path_remap_nr <- file.path(translib, "External_data/remap2022_nr_macs2_hg38_v1_0
 # regeneration script (raw instrument data).
 # path_citometry_stable_validation <- "data/external/Citometry_Stable_validation"
 path_citometry_stable_validation <- file.path(translib, "Experimental_data/Citometry/Stable_validation/Sample Group - 1/Tables")
+
+# ChIP-Atlas peaks intersected with the library, one row per raw peak
+# (5.5GB, 157M rows) - see R/00_prom_features/build_chipatlas_hits.R,
+# which aggregates it via streaming awk into
+# data/external/allPeaks_chipatlas_counted.tsv instead of loading it
+# into R directly.
+# path_chipatlas_peaks_raw <- "data/external/allPeaks_light.hg38.50_lib_unique.tsv"
+path_chipatlas_peaks_raw <- file.path(translib, "External_data/allPeaks_light.hg38.50_lib_unique.tsv")
+
+# ChIP-Atlas experiment metadata (11MB): experiment ID, genome, antigen
+# class (group, e.g. "Histone"), antigen (feature, e.g. "H3K4me3"), cell
+# type class, cell type. Small enough to read directly, not heavy, but
+# kept here alongside path_chipatlas_peaks_raw for the same pipeline.
+path_chipatlas_explist <- file.path(translib, "External_data/experimentList_chipatlas.tab")
