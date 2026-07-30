@@ -222,24 +222,27 @@ Análisis de enriquecimiento funcional de la unión de TFs
 **Resultados**  
 Estimación masiva de las propiedades transcripcionales de promotores basales humanos
 
-- Barplot N prom por replica \+ comparacion con splicing22 y otras seq \+ library bias  
-- Mean replicate \+ spike-in  
-- 1B-C-D (validacion)
+- representatividad por replica venn  
+- sesgo representatividad: venn presort 2022 \+ gc bias (bars y violin)  
+- spike-in  
+- densidad individual \+ densidad ejemplo \+ histograma ejemplo \+ correlacion medias validacion  
+- correlacion medias (pre y post filtro) \+ venn final replicas \+ var corr replicas
 
 Efectos de la secuencia promotor sobre la fuerza transcripcional
 
-- figura explicativa clara sobre metodologia \+ CpG \+ TATA \+ NFYA   
-- \+ SP1/2 \+ NFYA   
--   
+- CpG \+ TATA  
 - summary seq  
-- tissue sp \+ ?? \+summary endo  
+- summary endo \+ tissue sp?  
+- SP1/2 \+ NFYA (subdividido en 2 figuras)  
+- remap activity \+ gsea rna pol \+ remap act low  
 - integrador?
 
 Efectos de la secuencia promotor sobre el ruido transcripcional
 
-- 3A-B \+TATA2(S6B)  
-- summary (3C)  
-- S6C \+ 3D-E (GSEA MLL1)
+- scatter ruido \+ auc: cgi \+ tata (separado por expresion)  
+- summary ruido  
+- remap ruido \+ mll1 gsea  
+- chipatlas \+ h3k4me3 \+h3k4me3 noCGI
 
 La relevancia de la secuencia del promotor basal en el contexto endogeno
 
@@ -547,13 +550,13 @@ En segunda instancia cada par Principal-Secundario fue clasificado en base a la 
 
 Estimación masiva de las propiedades transcripcionales de promotores basales humanos
 
-Una vez obtenidos los datos de secuenciación, en sus dos réplicas, el primer paso fue el alineamiento de las lecturas obtenidas con las secuencias de la *library*. Como se ha mencionado previamente, una preocupación a lo largo del proceso experimental fue evitar un cuello de botella que implique que, al analizar los datos, las lecturas observadas correspondieran todas a un subgrupo pequeño de secuencias de la *library*. Afortunadamente, este no fue el caso, y contamos con lecturas, en al menos una réplica, del 80,9% de las secuencias, y el 67,3% en ambas réplicas (Fig. R1 venn) . 
+Una vez obtenidos los datos de secuenciación, en sus dos réplicas, el primer paso fue el alineamiento de las lecturas obtenidas con las secuencias de la *library*. Como se ha mencionado previamente, una preocupación a lo largo del proceso experimental fue evitar un cuello de botella que implique que, al analizar los datos, las lecturas observadas correspondieran todas a un subgrupo pequeño de las  secuencias totales. Afortunadamente, este no fue el caso, y contamos con lecturas del 80,9% de las secuencias, en al menos una réplica, y del 67,3%, en ambas réplicas (Fig. R1 venn) . 
 
 Fig. R1.1 venn  rep1-rep2-tot.library
 
-Si bien los análisis a realizar posteriormente serán todos a nivel comparativo entre las secuencias de las que podemos extraer datos confiablemente, nos planteamos la posibilidad de que haya, más allá de un cuello de botella aleatorio, un sesgo en la representatividad de las secuencias en las células. Comprender este aspecto nos serviría tanto para poder dimensionar las limitaciones en la extrapolación de los datos a la totalidad de los promotores anotados en humanos, así como para identificar puntos clave a mejorar en la metodología experimental a futuro. Con este objetivo, tomamos datos de un experimento previo realizado en el laboratorio de la Dra, Fiszbein, utilizando la misma *library,* con los adaptadores ya ligados, y en el que el proceso fue idéntico al ya expuesto, generando células HEK293T-A2 con una variante del reportero integrado. En dicho ensayo, se realizó una secuenciación de los promotores en dichas células previo a cualquier *sorting* celular o filtro por expresión. Encontramos una fuerte asociación entre los promotores seleccionados en ambos ensayos (OR \= 13.7, p \< 2.2e-16, *Fisher’s exact test*) (Fig. R2A venn\_presort). Esto indicaría que la incorporación de una secuencia a las células en el ensayo previo aumenta drásticamente la probabilidad de ser detectado en el ensayo actual, sugiriendo un sesgo común. Ante esto, surgen dos hipótesis: o bien hay un diferencia de partida en la representatividad de las secuencias, o alguno/s de los pasos experimentales presentan un sesgo sistemático.
+Si bien los análisis a realizar posteriormente serán todos a nivel comparativo entre las secuencias de las que podemos extraer datos confiablemente, nos planteamos la posibilidad de que haya, más allá de un cuello de botella aleatorio, un sesgo en la representatividad de las secuencias en las células. Comprender este aspecto nos serviría tanto para poder dimensionar las limitaciones en la extrapolación de los datos a la totalidad de los promotores anotados en humanos, así como para identificar puntos clave a mejorar en la metodología experimental a futuro. Con este objetivo, tomamos datos de un experimento previo realizado en el laboratorio de la Dra. Fiszbein con el reportero fluorescente bicromático (Fig. M1A), en el cual utilizó la misma *library* con los adaptadores ya ligados, y con un proceso idéntico al ya expuesto, generó células HEK293T-A2 con una variante del reportero integrado. En dicho ensayo, a diferencia del nuestro, se realizó una secuenciación de los promotores en dichas células previo a cualquier *sorting* celular o filtro por expresión. Encontramos una fuerte asociación entre los promotores seleccionados en ambos ensayos (OR \= 13.7, p \< 2.2e-16, *Fisher’s exact test*) (Fig. R2A venn\_presort). Esto indicaría que la incorporación de una secuencia a las células en el ensayo previo aumenta drásticamente la probabilidad de ser detectado en el ensayo actual, sugiriendo un sesgo común. Ante esto, surgen dos hipótesis: o bien hay un diferencia de partida en la representatividad de las secuencias, o alguno/s de los pasos experimentales presentan un sesgo sistemático.
 
-Una posibilidad en este último sentido es el contenido de G y C en la secuencia, que podría haber generado pequeños cambios de eficiencia en la amplificación de los promotores por PCR, por ejemplo. Evidentemente, las secuencias no observadas en nuestros resultados, tienen valores de contenido G+C más extremos, en ambos sentidos (Fig. R2B gc\_bias\_violin). A su vez, este patrón se repite si se tiene en cuenta la distribución en el contenido de G+C en todas las lecturas: al comparar con la distribución hipotética e ideal en la que todos los promotores tuvieran igual representatividad en los resultados, se evidencia una depleción en promotores de alto y bajo contenido de G+C (Fig. R2C gc\_bias\_violin). Si bien en las amplificaciones por PCR se utilizó un *kit* que ha sido probado como eficiente para proporciones extremas de AT y GC en los amplicones, las eficiencias para dichos casos podrían diferir, evidenciando, luego de muchos procesos amplificadores, el patrón que observamos. Una posible solución para ensayos futuros podría ser la combinación de productos de PCR con protocolos optimizados para distintas proporciones de AT/GC. De cualquier manera, este sesgo, si bien limita el universo que podrá ser abordado en el presente trabajo, no afecta los resultados internos del mismo.
+Una hipótesis en este último sentido es que el contenido de G y C en la secuencia podría tener asociado pequeños cambios de eficiencia en la amplificación de los promotores por PCR. Evidentemente, las secuencias no observadas en nuestros resultados, tienen valores de contenido G+C más extremos, en ambos sentidos (Fig. R2B gc\_bias\_violin). A su vez, este patrón se repite si se tiene en cuenta la distribución en el contenido de G+C en todas las lecturas: al comparar con la distribución hipotética e ideal en la que todos los promotores tuvieran igual representatividad en los resultados, se evidencia una depleción en promotores de alto y bajo contenido de G+C (Fig. R2C gc\_bias\_violin). Si bien en las amplificaciones por PCR se utilizó un *kit* que ha sido probado como eficiente para proporciones extremas de AT y GC en los amplicones, las eficiencias para dichos casos podrían diferir, evidenciando, luego de muchos procesos amplificadores, el patrón que observamos. Una posible solución para ensayos futuros podría ser la combinación de productos de PCR con protocolos optimizados para distintas proporciones de AT/GC. De cualquier manera, este sesgo, si bien limita el universo que podrá ser abordado en el presente trabajo, no afecta los resultados internos del mismo.
 
 Fig. R2 Sesgo de representatividad
 
@@ -561,7 +564,11 @@ Dado que una parte esencial del análisis implica la comparación precisa entre 
 
 Fig. R3. Spike-in
 
-A partir de los datos de secuenciación obtenidos, en sus dos réplicas, y luego de los ya mencionados controles y procesamiento de los datos, se logró la reconstrucción de las distribuciones subyacentes de expresión asociadas a cada uno de las secuencias regulatorias. Esto se traduce visualmente en histogramas indicando la frecuencia de lecturas normalizadas con que se observó un cierto promotor en cada fracción de células (Fig. R4A \- aka 1B histo). Fue posible con estos datos obtener la media y la dispersión de los conteos, indicadores de actividad promotora y ruido transcripcional respectivamente. Para evaluar el grado de concordancia entre las distribuciones discretas reconstruidas y las distribuciones subyacentes, se seleccionaron una serie de secuencias de la *library* para replicar el procedimiento experimental pero con promotores individuales aislados. En estos casos, se generaron líneas celulares estables con el reportero integrado y regulado por cada una de dichas secuencias, a las que se le midió la fluorescencia de EGFP en cada célula por citometría de flujo (Fig. R4B \- aka 1C densities), con tres réplicas técnicas. Esto permite comparar la correlación entre la media calculada a partir de los datos discretizados y los continuos, observando la esperada asociación positiva (Fig. R4C \- aka 1D). A nivel ruido, las métricas no son lo suficientemente robustas como para permitir una buena determinación a nivel individual de los promotores y replicar esta prueba de consistencia.
+A partir de los datos de secuenciación obtenidos, en sus dos réplicas, y luego de los ya mencionados controles y procesamiento de los datos, se logró la reconstrucción de las distribuciones subyacentes de expresión asociadas a cada uno de las secuencias regulatorias. Esto se traduce visualmente en histogramas indicando la frecuencia de lecturas normalizadas con que se observó un cierto promotor en cada fracción de células (Fig R1.4). Fue posible con estos datos obtener la media y la dispersión de los conteos, indicadores de actividad promotora y ruido transcripcional respectivamente (Tabla 3, Anexo).
+
+Para evaluar el grado de concordancia entre las distribuciones discretas reconstruidas y las distribuciones subyacentes, se seleccionaron una serie de secuencias de la *library* para replicar el procedimiento experimental pero con promotores individuales aislados. En estos casos, se generaron líneas celulares estables con el reportero integrado y regulado por cada una de dichas secuencias, a las que se le midió la fluorescencia de EGFP en cada célula por citometría de flujo (Fig. R1.5), con tres réplicas técnicas. 
+
+La cuantificación en este trabajo habría sido más precisa posiblemente si hubiéramos podido comparar la distribución de todos los promotores por citometría de flujo, sin la necesidad de fraccionar y secuenciar, que generan una métrica más indirecta y discretizada, tal como se puede observar en la Fig. R1.6A. Sin embargo, la masividad de los promotores a evaluar, entre otros factores, fueron un claro freno a esta metodología, por lo que las comparaciones entre las distribuciones medidas tienen un formato ejemplificado en la Fig. R1.6B. Pero contar con un cierto número de secuencias evaluadas por citometría, permite evaluar la consistencia de nuestra métrica de actividad: en la Fig. R1.6C se observa la asociación obtenida entre dichas métricas en el contexto de medición específica (por citometría) y masiva (por fraccionamiento y secuenciación). La correlación positiva, afortunadamente, es consistente con lo esperado. A nivel ruido, sin embargo, las métricas no son lo suficientemente robustas como para permitir una buena determinación a nivel individual de los promotores y replicar esta prueba de consistencia.
 
 Fig. R4 \- Distribuciones
 
