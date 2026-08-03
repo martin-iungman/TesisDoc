@@ -2,18 +2,13 @@
 
 Por hacer:
 
-- Pipeline gral a español  
 - Potencia: todo  
-- Esquema de density (creo que ya tengo y solo haria falta pasar a español)  
 - M2C como figura aparte?  
-- M5 (qpcr): agrandar textos  
 - M6: editar para indicar calles  
-- Anexo Primers y secuencias: falta index de secuenciacion usado y primer qPCR EGFP   
+-   
 - M9C (heatmap cage): modificar por el del review. modificar leyenda, texto y discutir sobre el upstream  
-- M9B: agrandar texto  
-- Caracterización de los promotores: reorganizar en subsecciones  
-- M10 agrandar texto  
-- M11A agrandar texto  
+-   
+-   
 - Nueva figura sobre shape y tissue specificity??  
 - Seccion coocurrencia  
 - Tabla de features con criterio de dicotomia  
@@ -23,10 +18,8 @@ Por hacer:
 
 - Los datos de validacion de ruido y replicabiliad que dan feos… los incluyo???  
 - R2C: cambiar el theme  
-- R6: tienen distinto x label. hay problema con el x text. texto de violin muy chico. Reemplazar el TRUE \- FALSE  
+-   
 - Leyenda R6  
-- Incluir CCAAT en R6  
-- Plot para NFY y SP? Pre y post review?   
 - Leyenda R7 y R8
 
 Para ir tachando Fig y textos que ya estan (draft)  
