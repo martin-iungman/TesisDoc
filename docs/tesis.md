@@ -258,6 +258,109 @@ Influencia de la multiplicidad de promotores por gen sobre las caracteristica tr
 
 **Discusión**
 
+# Esqueleto intro
+
+**0- Orden y azar en la materia viva**   
+2da ley de la termodinamica: entropia. Universo tiende al desorden  
+Schordinger 1944: la vida parece resistir esa tendencia, y su respuesta es que lo hace generando orden de dos maneras distintas — la estadística (orden-desde-desorden) y la "nueva", basada en un código estable y heredable (orden-desde-orden), que él predijo sin conocer aún la estructura del ADN.   
+Ese código estable no actúa por sí solo — se ejecuta mediante química de colisiones al azar, difusión, encuentros probabilísticos entre moléculas. El programa es determinista; su ejecución, no.   
+Traer a Monod para reformular esto en términos evolutivos: el azar molecular no es ruido a eliminar sino materia prima sobre la que actúa la necesidad   
+Traer a Waddington para el otro extremo: cuando el azar amenaza la fidelidad del desarrollo, la evolución también puede construir robustez/canalización para amortiguarlo.   
+Wagner — esa misma robustez, lejos de ser solo protección, es lo que permite explorar y acumular variación silenciosa, y eventualmente innovar.   
+La arquitectura del promotor basal y su ruido transcripcional intrínseco son, en este marco, un caso concreto y medible de esa tensión general: orden codificado, ejecución estocástica, robustez que no es pasiva sino que habilita innovación regulatoria (nuevos promotores, nuevos usos tisulares). 
+
+**1- Del genotipo al fenotipo regulatorio**   
+Objetivo central de la genómica: cómo la secuencia de ADN determina la expresión génica y el fenotipo  
+La transcripción como paso regulatorio clave en eucariotas  
+Cuánto del comportamiento regulatorio de un gen está "escrito" en su secuencia, independientemente del contexto? (introducción a la pregunta, no abordaje completo)  
+Adelantar que esta tesis aborda dos fenotipos regulatorios distintos (actividad y ruido) y que ambos son parte de esta misma pregunta de "lectura" de la secuencia.
+
+**2- Más allá del enhancer: el rol regulatorio del promotor basal**   
+Core promoter: región que recluta RNAPII para iniciar la transcripción  
+Definición operacional y elementos de secuencia (TATA-box, Inr, DPE, BRE), PIC y factores generales  
+El paradigma histórico enhancer-céntrico: los enhancers como responsables de controlar el output transcripcional  
+Evidencia reciente que lo cuestiona: la secuencia del promotor sola puede ser predictiva de actividad  
+Autonomía transcripcional como propiedad general de los promotores humanos, medida de forma no sesgada a nivel genómico   
+El promotor también selecciona qué enhancers vecinos pueden regularlo — no es solo receptor pasivo de señales 
+
+**3- Diversidad arquitectónica de promotores: robustez versus especificidad**   
+Promotores focused vs. dispersed/broad, y su implicancia evolutiva en robustez a variación genética  
+Asociación housekeeping vs TATA-less/GC-rich/CpG islands/TSS disperso, y tejido-específico vs TATA-box/TSS focused   
+*R*obustez y estabilidad vs. capacidad de respuesta precisa, como dos soluciones evolutivas a distintas demandas regulatorias  
+Islas CpG y su asociación con alta actividad/autonomía (motivos GC-box, efecto sobre posicionamiento nucleosomal)  
+Nucleosomas y marcas de histonas (H3K4me3) como contexto de cromatina asociado a estas arquitecturas  
+*Plantear:* ¿la cromatina establece el régimen transcripcional o es un reflejo de un estado ya definido por la secuencia?
+
+**4\. Un gen, varios promotores** 
+
+* La mayoría de los genes humanos tienen múltiples promotores alternativos  
+* Origen de promotores alternativos: enhancers, elementos retrovirales endógenos, splicing-mediated activation  
+* Plantear la pregunta de economía evolutiva: si ya existe un promotor funcional, ¿qué ventaja da mantener promotores "de repuesto"?  
+* Necesidad de un abordaje promotor-céntrico en vez de gen-céntrico  
+* *I*dea de promotor principal vs. secundario y el fenómeno de tissue-switching, como pistas de que la multiplicidad podría ser plasticidad y no simple redundancia
+
+**5- Ruido transcripcional. El componente estocástico de la transcripción** 
+
+Definición: componente de variabilidad célula a célula específico de cada gen   
+Bursting transcripcional como mecanismo subyacente, ligado a switches de estado del promotor   
+Explicar el modelo de bursting (on/off, frecuencia vs. tamaño de burst) para dar base mecanística a la pregunta de desacople media-varianza  
+Base genética heredable del ruido, sujeta a selección natural  
+¿puede un promotor ser muy activo pero poco ruidoso, o alta actividad y alto ruido van necesariamente ligados? (adelantar el caso TATA como ejemplo de acoplamiento)  
+Relevancia en robustez biológica y desarrollo (determinación de destino celular) Antecedentes en levadura (nucleosomas, sitios de unión a TF) y en mamíferos vía scRNA-seq  
+Limitación central de scRNA-seq: no separa el efecto del promotor de otras señales genéticas/epigenéticas, ni discrimina promotores alternativos
+
+**6- Abordajes experimentales para el estudio del promotor basal** 
+
+Qué es un MPRA y por qué permite desacoplar secuencia de contexto genómico/epigenético (vuelve a la pregunta de la seccion 3\)  
+Variantes existentes (episomales, STARR-seq, SuRE, lentiMPRA) y sus limitaciones frente a un sistema de integración en locus único  
+Conectar con la meta-pregunta de predictibilidad: ¿se puede predecir el comportamiento regulatorio de un promotor solo mirando su secuencia? (y reconectar con seccion 1\)  
+Modelos como Xpresso o PUFFIN intentan predecir comportamiento regulatorio desde una secuencia.   
+Y para que nos sirve todo esto?
+
+**7-**   
+**hipotesis, objetivos generales y especificos**  
+**descripcion breve de metodologia**  
+**hilo de secciones de resultados**
+
+# Prologo
+
+**0- Orden, azar e innovación en la materia viva**
+
+Todo sistema físico aislado tiende, con el tiempo, hacia el desorden. Esta es quizás la ley más inapelable de la física: la entropía de un sistema cerrado nunca disminuye. Y sin embargo, la vida parece desafiar cotidianamente esa tendencia. Un organismo construye y mantiene estructuras extraordinariamente ordenadas —células, tejidos, patrones de desarrollo que se repiten con precisión generación tras generación— en un universo que, en conjunto, se desordena. ¿Cómo es posible?
+
+Erwin Schrödinger se hizo esta pregunta en *¿Qué es la vida?* (1944), un pequeño libro que terminaría influyendo decisivamente en el nacimiento de la biología molecular. Su respuesta distingue dos maneras de producir orden. La primera es estadística: así como el desorden emerge del comportamiento promedio de un número enorme de partículas, el orden también puede emerger de esa misma vía, por simple regularidad estadística a gran escala —lo que Schrödinger llama *"order from disorder"*—. Pero argumenta que esta vía es insuficiente para explicar la asombrosa regularidad de los fenómenos hereditarios, que involucran relativamente pocas moléculas por célula. Debía existir, entonces, un segundo mecanismo: un orden que no emerge del promedio, sino que está directamente codificado —*"order from order"*—, sostenido por lo que Schrödinger imaginó como un "cristal aperiódico": una molécula estable, capaz de portar una enorme cantidad de información precisamente porque no es periódica, y de transmitirla con fidelidad de generación en generación. Escribía esto casi una década antes de que Watson y Crick describieran la estructura del ADN.
+
+Pero identificar el ADN como este "cristal aperiódico" no resuelve la paradoja: apenas la desplaza a una escala menor. Porque ese código estable, heredado y replicado con extraordinaria fidelidad, no actúa en el vacío. Se ejecuta a través de la química, y la química, a escala molecular, es fundamentalmente estocástica. Las moléculas se encuentran por difusión y colisión al azar; los factores de transcripción exploran el núcleo celular en una caminata browniana hasta encontrar, o no, su sitio de unión; la polimerasa inicia la transcripción en eventos discretos e impredecibles a nivel individual. El programa genético es determinista; su lectura, molécula por molécula, célula por célula, no lo es. El orden que Schrödinger explicó a nivel del código, entonces, convive con un segundo nivel —el de su ejecución— donde el desorden que él mismo había dejado atrás vuelve a aparecer.
+
+Jacques Monod, en *El azar y la necesidad* (1970), no vio en esta convivencia un defecto a corregir sino una condición productiva. Las variaciones que alimentan la evolución —mutaciones, pero también, podríamos agregar hoy, la variabilidad estocástica en la expresión de un gen— surgen del puro azar molecular, y es únicamente la selección natural, la "necesidad", la que opera después sobre esa variación, reteniendo lo que funciona. El azar, lejos de amenazar al orden biológico, es la condición de posibilidad de su novedad.
+
+Pero si ese azar molecular fuera completamente libre, el desarrollo de un organismo —que depende de que miles de decisiones celulares ocurran de manera coordinada y reproducible— sería inviable. Conrad Waddington capturó el límite de esa libertad con la metáfora del paisaje epigenético: el desarrollo transcurre como una bola rodando por un paisaje de valles y colinas, y aunque pequeñas perturbaciones puedan desviar levemente su trayectoria, los valles —las trayectorias de desarrollo canalizadas— tienden a devolverla al mismo destino final. A esta capacidad de amortiguar la variación, ya sea genética o ambiental, sin alterar el fenotipo resultante, Waddington la llamó canalización, y hoy la entendemos como una forma particular de robustez biológica: el freno necesario para que el azar de Monod no desborde el desarrollo.
+
+Podría pensarse que ese freno es puramente conservador —un mecanismo que protege al organismo del cambio, y que por lo tanto se opone a la innovación evolutiva—. Andreas Wagner (*The Origins of Evolutionary Innovations*, 2011\) mostró que ocurre casi exactamente lo contrario. En sistemas biológicos tan diversos como el plegado de moléculas de RNA o las redes metabólicas, la robustez frente a la variación —genética o estocástica— no impide la exploración de nuevas soluciones fenotípicas: la habilita. Un sistema robusto puede acumular, de manera silenciosa y sin consecuencias fenotípicas inmediatas, una cantidad considerable de variación "críptica" en sus componentes subyacentes. Esa variación, invisible mientras el contexto no cambia, queda disponible para producir innovación el día en que el contexto sí cambia. La canalización de Waddington, entonces, no clausura la posibilidad de cambio que abrió Monod: la acumula en reserva.
+
+Hay, todavía, una última pieza necesaria: un lenguaje capaz de medir cuánta información contiene, en sí misma, una secuencia. Curiosamente, la palabra "entropía" reaparece un siglo después de Boltzmann en un contexto completamente distinto para ofrecer exactamente eso. Cuando Claude Shannon formalizó en 1948 una teoría matemática de la comunicación, necesitaba una medida de cuánta incertidumbre contiene una fuente de señales —o, en sentido inverso, cuánta información transmite un mensaje al resolver esa incertidumbre—. La fórmula a la que llegó es, salvo por una constante, formalmente idéntica a la entropía de Boltzmann, y no por casualidad adoptó el mismo nombre. Bajo esta idea, una secuencia de ADN puede leerse también como una fuente de información: un arreglo no aleatorio de bases cuyo grado de estructura —cuán lejos está de la equiprobabilidad— es, en principio, cuantificable, y del cual depende cuánto puede "saberse" de antemano sobre el proceso que esa secuencia dirige. 
+
+Estas cinco ideas convergen en un mismo escenario concreto y medible: el promotor basal de un gen. Un promotor es, en esencia, un fragmento acotado de secuencia que codifica un programa —cuándo, cuánto y con qué precisión debe iniciarse la transcripción de un gen— en el sentido en que Schrödinger hablaba de orden codificado, y en el sentido en que Shannon hablaba de una fuente informativa: cuanto más estructurada y menos arbitraria es esa secuencia, más predecible debería ser, en principio, el proceso que gobierna. Pero ese programa se ejecuta mediante encuentros moleculares estocásticos, célula por célula, en el sentido en que Monod hablaba de azar productivo. La *actividad* transcripcional que un promotor dirige es una medida de cuánto de esa información codificada logra efectivamente imponerse sobre el proceso. El *ruido* transcripcional que ese mismo promotor tolera o amplifica es una medida de cuánto de la ejecución azarosa se filtra, sin canalización de por medio, hasta el fenotipo celular, pese a la información contenida en la secuencia. Y la arquitectura particular de cada promotor —focalizada o dispersa, robusta o precisa, única o multiplicada en variantes alternativas dentro de un mismo gen— es, posiblemente, el resultado visible de una historia evolutiva que, como sugiere Wagner, no solo ha tenido que contener esta tensión entre orden y azar, sino que se ha valido de ella para innovar.
+
+Esta tesis parte de esa tensión general para hacerla, en las páginas que siguen, una pregunta molecular concreta y experimentalmente abordable: ¿qué elementos de la secuencia de un promotor basal humano determinan cuánto orden —actividad— y cuánto azar —ruido— produce su ejecución transcripcional, y qué nos dice esto sobre la lógica evolutiva de la regulación génica?
+
+# Intro
+
+**1- Del genotipo al fenotipo regulatorio** 
+
+*Objetivo central de la genómica: cómo la secuencia de ADN determina la expresión génica y el fenotipo*  
+*La transcripción como paso regulatorio clave en eucariotas*  
+*Cuánto del comportamiento regulatorio de un gen está "escrito" en su secuencia, independientemente del contexto? (introducción a la pregunta, no abordaje completo)*  
+*Adelantar que esta tesis aborda dos fenotipos regulatorios distintos (actividad y ruido) y que ambos son parte de esta misma pregunta de "lectura" de la secuencia.*
+
+Uno de los objetivos centrales de la genómica moderna es comprender cómo la secuencia de ADN determina la expresión de los genes y, en última instancia, el fenotipo de un organismo. En la enorme mayoría de los organismos eucariotas, la transcripción constituye el paso regulatorio primario de este proceso: es en la decisión de transcribir o no un gen, y en qué magnitud hacerlo, donde se define buena parte del destino de la información genética (Levine y Tjian, 2003; Ptashne y Gann, 1997). Esta decisión no ocurre de manera espontánea. Requiere el reclutamiento y ensamblado de la ARN Polimerasa II (RNAPII) sobre el ADN, en un proceso que depende de una región de secuencia acotada alrededor del sitio de inicio de la transcripción (*transcription start site*, TSS): el promotor basal o *core promoter* (Sainsbury et al., 2015).
+
+Durante buena parte del desarrollo de la biología molecular, los promotores basales fueron entendidos principalmente como plataformas de ensamblaje relativamente pasivas, cuya actividad dependía en gran medida de señales provistas por elementos regulatorios distales. En organismos metazoos en particular, se asumió durante décadas que eran los enhancers —y no los promotores— los principales responsables de determinar cuánto, cuándo y en qué tipo celular se transcribe un gen (Bulger y Groudine, 2011). Bajo esta perspectiva, el promotor cumplía una función más bien ejecutora: un sitio de aterrizaje para la maquinaria basal de transcripción, cuya propia secuencia aportaba relativamente poca información sobre el comportamiento regulatorio final del gen.
+
+Trabajos más recientes han puesto en cuestión esta jerarquía. Distintos estudios, basados en el diseño de bibliotecas masivas de secuencias promotoras sintéticas o aleatorias, mostraron que la secuencia del promotor basal, evaluada de manera aislada, puede ser sorprendentemente predictiva de su actividad transcripcional (de Boer et al., 2020; Kwasnieski et al., 2012; Agarwal y Shendure, 2020). En la misma línea, un mapeo genómico no sesgado de la actividad autónoma de promotores humanos —es decir, la capacidad de un fragmento de ADN de iniciar transcripción en ausencia de otros elementos regulatorios— encontró que esta autonomía es, de hecho, una propiedad común a la mayoría de los promotores humanos, y no una excepción restringida a un subconjunto particular (van Arensbergen et al., 2017). A esto se suma evidencia de que los propios promotores basales participan activamente en la selección de qué enhancers vecinos podrán regularlos, en lugar de responder de manera indiscriminada a cualquier señal distal disponible (Zabidi et al., 2015; Haberle y Stark, 2018). En conjunto, estos hallazgos sugieren que una porción sustancial del comportamiento regulatorio de un gen podría estar, en efecto, escrita directamente en la secuencia de su promotor basal.
+
+Esta reevaluación del rol del promotor no resuelve, sin embargo, una pregunta más amplia y todavía abierta: si tanta información regulatoria está efectivamente codificada en esta región relativamente corta de secuencia, ¿cuánto de la actividad y de la variabilidad de un gen —dos fenotipos regulatorios distintos, aunque estrechamente relacionados— puede explicarse exclusivamente a partir de las características intrínsecas del promotor, independientemente del contexto genómico en el que se encuentre? Responder esta pregunta requiere, en primer lugar, precisar qué constituye un promotor basal y qué elementos de secuencia lo definen.
+
 # Metodos Exp
 
 **Materiales y metodos experimentales:**  
