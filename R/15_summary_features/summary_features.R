@@ -33,31 +33,10 @@ tidy_data <- build_tidy_features(data, keep = "mean")
 vbles_split <- map(c("seq", "endo"), ~ feature_groups$feature[feature_groups$group == .x])
 
 # --- Wilcoxon: efecto de cada feature sobre la actividad media ----------
+# wilcox_effect_summary() en R/functions/plot_helpers.R (compartido con
+# R5.3, el mismo patron pero para las categorias de promotor alternativo).
 
-wilcox <- map(tidy_data %>% select(-rep, -contains("mean")), ~ coin::wilcox_test(formula = mean ~ .x | rep, data = tidy_data) %>% pvalue())
-wilcox <- tibble(feature = names(wilcox), pval = list_c(wilcox), pval_corr = p.adjust(pval, "BH", length(wilcox)))
-
-wilcox_by_rep <- function(rep_id) {
-  map(tidy_data %>% filter(rep == rep_id) %>% select(-mean, -rep), ~ coin::wilcox_test(formula = mean ~ .x, data = tidy_data %>% filter(rep == rep_id), conf.int = TRUE))
-}
-wilcox_rep1 <- wilcox_by_rep("Rep 1")
-wilcox_rep2 <- wilcox_by_rep("Rep 2")
-
-wilcox_df <- map2(
-  list(wilcox_rep1, wilcox_rep2), c("Rep 1", "Rep 2"),
-  ~ tibble(
-    feature = names(.x),
-    estimate = map(.x, ~ confint(.x)$estimate) %>% list_c(),
-    P2.5 = map(.x, ~ confint(.x)$conf.int[1]) %>% list_c(),
-    P97.5 = map(.x, ~ confint(.x)$conf.int[2]) %>% list_c(),
-    rep = .y
-  ) %>%
-    pivot_longer(c(starts_with("estimate"), starts_with("P2.5"), starts_with("P97.5")), names_to = "val", values_to = "estimate") %>%
-    arrange(desc(estimate)) %>%
-    mutate(feature = fct_inorder(feature))
-) %>%
-  list_rbind() %>%
-  left_join(wilcox, by = "feature")
+wilcox_df <- wilcox_effect_summary(tidy_data)
 
 # saved for R/09_coocurrencia (M12), which needs the significant/consistent
 # feature list without recomputing every Wilcoxon test.

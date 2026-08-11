@@ -92,6 +92,35 @@ add_noise_rank <- function(df) {
   add_mean_sw_bins(df) %>% add_var_rank_sw()
 }
 
+# Descompone el par (rank_reporter, rank_endo) en "nivel" (avg_rank,
+# promedio de ambos rangos normalizados 0-1 por replica - mejor proxy de
+# actividad real que cualquiera de los dos solo, promedia el ruido de
+# cada assay) y "discordancia con signo" (dif_signed = rr - re; positivo
+# = el reportero sobreestima respecto a la actividad endogena, negativo
+# = el reportero subestima - convencion elegida por el autor 2026-07-31,
+# antes era re - rr con el signo invertido).
+# avg_rank y dif_signed son ~ortogonales por construccion (cor~-0.02 en
+# estos datos) - analisis tipo Bland-Altman (mean-difference), evita el
+# confounding de controlar una feature/TF por uno solo de los dos rangos
+# (rank_reporter unicamente) al modelar la discordancia. Requiere `mean`
+# (actividad del reportero) y `max_tpm` (actividad endogena maxima,
+# FANTOM5 - ver R/00_prom_features/build_fantom_endo_activity_summary.R)
+# ya presentes en df. Usado por R4.6/R4.7 (rank_dif_lmm y derivados) -
+# ver R/27_rank_dif_lmm/rank_dif_lmm.R para la discusion completa de por
+# que reemplaza al diseño anterior (controlar solo por rank_reporter).
+add_rank_discordance <- function(df) {
+  df %>%
+    group_by(rep) %>%
+    mutate(
+      max_tpm = replace_na(max_tpm, 0),
+      rr = dense_rank(mean) / n(),
+      re = row_number(max_tpm) / n(),
+      avg_rank = (rr + re) / 2,
+      dif_signed = rr - re
+    ) %>%
+    ungroup()
+}
+
 # ROC curve (por umbral de rango) de una feature booleana contra
 # var_rank_sw (rango de varianza dentro de cada bin de actividad media -
 # ver add_mean_sw_bins), para testear si una feature de secuencia predice
@@ -323,4 +352,38 @@ load_citometry_stable_validation <- function(path_citometry_stable_validation) {
     name = c("BTG1_1", "ETS1_1", "KIAA0753_1", "LSM1_1", "METAP2_1", "PPP1R14B_3", "TMEM87A_1", "ZKSCAN2_1", "Control", "Strong")
   )
   inner_join(name_df, df, by = c("short_name" = "prom_name"))
+}
+
+# Efecto de cada feature booleana (columnas factor TRUE/FALSE) de
+# tidy_data sobre `mean` (actividad media): p-valor combinado (test de
+# Wilcoxon pareado por replica, coin::wilcox_test(mean~.x|rep), con
+# correccion BH) y tamano de efecto + IC95% por separado en cada
+# replica (coin::wilcox_test(mean~.x, conf.int=TRUE)). Usado por R7
+# (summary_features_secuencia) y R5.3 (promalt_summary, con "X main"/
+# "X" como las features booleanas en vez de features de secuencia).
+wilcox_effect_summary <- function(tidy_data) {
+  wilcox <- map(tidy_data %>% select(-rep, -contains("mean")), ~ coin::wilcox_test(formula = mean ~ .x | rep, data = tidy_data) %>% pvalue())
+  wilcox <- tibble(feature = names(wilcox), pval = list_c(wilcox), pval_corr = p.adjust(pval, "BH", length(wilcox)))
+
+  wilcox_by_rep <- function(rep_id) {
+    map(tidy_data %>% filter(rep == rep_id) %>% select(-mean, -rep), ~ coin::wilcox_test(formula = mean ~ .x, data = tidy_data %>% filter(rep == rep_id), conf.int = TRUE))
+  }
+  wilcox_rep1 <- wilcox_by_rep("Rep 1")
+  wilcox_rep2 <- wilcox_by_rep("Rep 2")
+
+  map2(
+    list(wilcox_rep1, wilcox_rep2), c("Rep 1", "Rep 2"),
+    ~ tibble(
+      feature = names(.x),
+      estimate = map(.x, ~ confint(.x)$estimate) %>% list_c(),
+      P2.5 = map(.x, ~ confint(.x)$conf.int[1]) %>% list_c(),
+      P97.5 = map(.x, ~ confint(.x)$conf.int[2]) %>% list_c(),
+      rep = .y
+    ) %>%
+      pivot_longer(c(starts_with("estimate"), starts_with("P2.5"), starts_with("P97.5")), names_to = "val", values_to = "estimate") %>%
+      arrange(desc(estimate)) %>%
+      mutate(feature = fct_inorder(feature))
+  ) %>%
+    list_rbind() %>%
+    left_join(wilcox, by = "feature")
 }
