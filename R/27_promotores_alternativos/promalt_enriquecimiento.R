@@ -80,16 +80,13 @@ enrichment_df <- map(feature_cols, function(f) {
 
 write_tsv(enrichment_df, file.path(out_dir, "promalt_enrichment.tsv"))
 
-# --- Heatmap: filas = categoria, columnas = features (clusterizadas) -----
+# --- Heatmap: filas = categoria, columnas = features (por log2fc de
+# Promotor secundario, de mas a menos enriquecido) -------------------------
 
 feature_order <- enrichment_df %>%
-  select(feature, categoria, log2fc) %>%
-  pivot_wider(names_from = categoria, values_from = log2fc) %>%
-  column_to_rownames("feature") %>%
-  as.matrix() %>%
-  dist() %>%
-  hclust() %>%
-  {.$labels[.$order]}
+  filter(categoria == "Promotor secundario") %>%
+  arrange(desc(log2fc)) %>%
+  pull(feature)
 
 categoria_order <- c("Sin promotores alternativos", "Promotor principal", "Promotor secundario")
 
