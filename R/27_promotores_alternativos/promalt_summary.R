@@ -41,15 +41,16 @@ slug <- "promalt_summary"
 out_dir <- fig_dir(slug)
 
 stats_highconf <- read_tsv("data/processed/activity_stats_highconf.tsv", show_col_types = FALSE)
-pairs_df <- read_tsv("data/processed/prom_alt_pairs.tsv", show_col_types = FALSE)
+pairs_df <- read_tsv("data/processed/prom_alt_pairs.tsv", show_col_types = FALSE) %>%
+  mutate(prom_alt = recode(prom_alt, switch = "Alternancia", correlated = "Correlacionado", independent = "Independiente"))
 
 # Un promotor Main puede tener varios secundarios de distinta clase (p.ej.
-# "switch main" para uno y "correlated main" para otro) - cada combinacion
-# se cuenta por separado, como en el original.
+# "Alternancia principal" para uno y "Correlacionado principal" para otro)
+# - cada combinacion se cuenta por separado, como en el original.
 promalt_pairs <- pairs_df %>%
   distinct(main_name, prom_alt) %>%
   rename(name = main_name) %>%
-  mutate(prom_alt = paste(prom_alt, "main")) %>%
+  mutate(prom_alt = paste(prom_alt, "principal")) %>%
   bind_rows(pairs_df %>% distinct(name, prom_alt))
 
 # --- Panel centro: efecto sobre la actividad (Wilcoxon) --------------------
@@ -70,14 +71,14 @@ panel_act <- wilcox_df %>%
   pivot_wider(names_from = val, values_from = estimate) %>%
   mutate(
     act = ifelse(sign(estimate) == 1, "Actividad alta", "Actividad baja"),
-    cat = str_remove(feature, " main"), cat2 = ifelse(str_detect(feature, "main"), "main", "sec")
+    cat = str_remove(feature, " principal"), cat2 = ifelse(str_detect(feature, "principal"), "main", "sec")
   ) %>%
   arrange(desc(cat), desc(rep), desc(cat2)) %>%
   ggplot(aes(x = estimate, y = fct_inorder(feature), group = fct_inorder(rep))) +
   geom_col(orientation = "y", position = "dodge", aes(fill = act, alpha = rep)) +
   scale_alpha_manual(values = c("Rep 1" = 1, "Rep 2" = 0.7)) +
   theme(text = element_text(size = 20), legend.position = "top") +
-  labs(fill = "Efecto", x = "Efecto sobre la actividad", y = "Features", alpha = "") +
+  labs(fill = "Efecto", x = "Efecto sobre la actividad", y = "Categoría", alpha = "") +
   geom_errorbarh(aes(xmax = P2.5, xmin = P97.5), position = position_dodge(1), height = 0.05, col = "#777777", linewidth = 1.5) +
   xlim(c(-0.3, 0.3)) +
   scale_fill_manual(values = c("Actividad alta" = "#D6741F", "Actividad baja" = "#7FB800")) +
@@ -113,16 +114,16 @@ auc_df <- map(repname, function(r) {
 
 panel_noise <- auc_df %>%
   mutate(
-    noise = ifelse(AUC > 0.5, "Ruido alto", "Ruido bajo"), cat = str_remove(feature, " main"),
-    a = ifelse(str_detect(feature, "independent"), 6, ifelse(str_detect(feature, "correlated"), 4, 2)),
-    b = ifelse(str_detect(feature, "main"), 1, 0), c = a + b
+    noise = ifelse(AUC > 0.5, "Ruido alto", "Ruido bajo"), cat = str_remove(feature, " principal"),
+    a = ifelse(str_detect(feature, "Independiente"), 6, ifelse(str_detect(feature, "Correlacionado"), 4, 2)),
+    b = ifelse(str_detect(feature, "principal"), 1, 0), c = a + b
   ) %>%
   arrange(c, desc(rep)) %>%
   ggplot(aes(x = AUC - 0.5, y = fct_inorder(feature), group = fct_inorder(rep))) +
   geom_col(orientation = "y", position = "dodge", aes(fill = noise, alpha = rep)) +
   scale_alpha_manual(values = c("Rep 1" = 1, "Rep 2" = 0.7)) +
   theme(text = element_text(size = 20), legend.position = "top") +
-  labs(fill = "Efecto", x = "AUC (efecto sobre el ruido)", y = "Features", alpha = "") +
+  labs(fill = "Efecto", x = "AUC (efecto sobre el ruido)", y = "Categoría", alpha = "") +
   scale_x_continuous(labels = function(x) x + 0.5) +
   geom_errorbarh(aes(xmax = abs(ci2.5) - 0.5, xmin = abs(ci97.5) - 0.5), position = position_dodge(1), height = 0.05, col = "#777777", linewidth = 1.5) +
   scale_fill_manual(values = c("Ruido alto" = "#D6741F", "Ruido bajo" = "#7FB800")) +

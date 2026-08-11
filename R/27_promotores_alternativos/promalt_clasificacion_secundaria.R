@@ -26,14 +26,15 @@ short_df <- pairs_df %>%
 
 p <- short_df %>%
   mutate(
-    with_switch_cases = ifelse(N_switch > 0, "Con casos de switch", "Sin casos de switch"),
-    prom_alt = factor(prom_alt, levels = c("independent", "correlated", "switch"))
+    with_switch_cases = ifelse(N_switch > 0, "Con casos de alternancia", "Sin casos de alternancia"),
+    prom_alt = recode(prom_alt, independent = "Independiente", correlated = "Correlacionado", switch = "Alternancia") %>%
+      factor(levels = c("Independiente", "Correlacionado", "Alternancia"))
   ) %>%
   ggplot(aes(cor_pearson, fill = prom_alt)) +
   facet_wrap(~with_switch_cases, nrow = 2) +
   geom_density(alpha = 0.75) +
   theme_pubclean() +
-  labs(x = "Correlación de Pearson entre la actividad\ndel par Secundario-Principal", fill = "Clase de\npromotor secundario") +
+  labs(x = "Correlación de Pearson entre la actividad\ndel par Secundario-Principal", y = "Densidad", fill = "Clase de\npromotor secundario") +
   scale_fill_manual(values = c("#48d6d9", "#14AFB2", "#216869"))
 ggsave(file.path(out_dir, "secondary_classification.jpg"), p, width = 9, height = 6.75, units = "in")
 

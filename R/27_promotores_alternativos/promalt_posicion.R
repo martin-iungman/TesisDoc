@@ -45,10 +45,10 @@ ordered_pair_proms <- pair_proms %>%
   left_join(lib %>% select(name, strand, start), by = "name") %>%
   left_join(lib %>% select(name, start), by = c("main_name" = "name"), suffix = c("", "_main")) %>%
   mutate(order_from_main = case_when(
-    strand == "+" & start < start_main ~ "Upstream",
-    strand == "+" & start >= start_main ~ "Downstream",
-    strand != "+" & start > start_main ~ "Upstream",
-    TRUE ~ "Downstream"
+    strand == "+" & start < start_main ~ "Río arriba",
+    strand == "+" & start >= start_main ~ "Río abajo",
+    strand != "+" & start > start_main ~ "Río arriba",
+    TRUE ~ "Río abajo"
   ))
 
 p_mean <- ggviolin(ordered_pair_proms,
@@ -57,7 +57,7 @@ p_mean <- ggviolin(ordered_pair_proms,
 )
 p_mean <- facet(p_mean, facet.by = "rep", ncol = 2)
 p_mean +
-  stat_compare_means(comparisons = list(c("Upstream", "Downstream")), label = "p.signif", method = "wilcox.test", na.rm = TRUE) +
+  stat_compare_means(comparisons = list(c("Río arriba", "Río abajo")), label = "p.signif", method = "wilcox.test", na.rm = TRUE) +
   theme_pubclean() +
   labs(y = "Actividad media transcripcional", x = "Posición relativa al promotor principal", fill = NULL) +
   theme(text = element_text(size = 15)) +
@@ -70,7 +70,7 @@ p_noise <- ggviolin(ordered_pair_proms,
 )
 p_noise <- facet(p_noise, facet.by = "rep", ncol = 2)
 p_noise +
-  stat_compare_means(comparisons = list(c("Upstream", "Downstream")), label = "p.signif", method = "wilcox.test", na.rm = TRUE) +
+  stat_compare_means(comparisons = list(c("Río arriba", "Río abajo")), label = "p.signif", method = "wilcox.test", na.rm = TRUE) +
   theme_pubclean() +
   labs(y = "Ruido transcripcional (rango de varianza)", x = "Posición relativa al promotor principal", fill = NULL) +
   theme(text = element_text(size = 15))

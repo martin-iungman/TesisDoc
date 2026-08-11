@@ -71,7 +71,7 @@ pairwise_density <- function(true_dif_col, main_col, alt_col, titulo, xlab) {
   bind_rows(observed, permuted) %>%
     ggplot(aes(value, fill = dif, linetype = rep)) +
     geom_density(alpha = 0.5) +
-    labs(x = xlab, fill = "", linetype = "Réplica") +
+    labs(x = xlab, y = "Densidad", fill = "", linetype = "Réplica") +
     scale_fill_manual(values = c("Observado" = "#3D518C", "Permutado" = "#14AFB2")) +
     theme_pubclean() +
     ggtitle(titulo)
