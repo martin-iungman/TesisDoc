@@ -5,12 +5,14 @@
 # promotores alternativos, mismo agrupamiento que R5.1/R5.2). Matriz
 # rectangular: filas = categoria, columnas = features. Cada celda es el
 # log2 fold-enrichment de la prevalencia del feature DENTRO de esa
-# categoria respecto a su prevalencia general en el conjunto de
-# promotores clasificados (normalizacion por columna - cada feature
+# categoria respecto a su prevalencia en las OTRAS DOS categorias (no en
+# el pool de las 3 juntas - normalizacion por columna, cada feature
 # contra su propia tasa basal, ya que features raros como TATA-box y
 # comunes como Islas CpG no son comparables en escala absoluta).
 # Significancia por test exacto de Fisher (categoria vs. resto, feature
-# presente vs. ausente), corregido por Benjamini-Hochberg.
+# presente vs. ausente), corregido por Benjamini-Hochberg - mismo
+# contraste "grupo vs. resto" que el log2fc, para que ambos sean
+# consistentes entre si.
 #
 # No es una figura del paper - agregada a pedido del autor, numero
 # provisorio (mismo criterio que el resto de R3/R4/R5 antes de
@@ -56,19 +58,24 @@ feature_cols <- setdiff(names(tidy_data), c("seq_id", "prom_alt_cat"))
 # se descarta (ver commit anterior, promalt_coocurrencia.R).
 feature_cols <- setdiff(feature_cols, "No detectado (FANTOM5)")
 
-# --- Enriquecimiento (log2 fold-change vs. prevalencia general) + Fisher --
+# --- Enriquecimiento (log2 fold-change vs. el resto) + Fisher -------------
+# El baseline es la prevalencia en los OTROS dos grupos (no en el pool de
+# los 3 juntos), para que el log2fc y el test de Fisher midan exactamente
+# el mismo contraste (grupo vs. resto) - de lo contrario el propio grupo
+# infla su baseline y se subestima su enriquecimiento, mas cuanto mas
+# grande sea ese grupo relativo a los otros dos.
 
 enrichment_cell <- function(df, feature, categoria) {
   x <- as.logical(df[[feature]])
   in_group <- df$prom_alt_cat == categoria
-  overall_prop <- mean(x, na.rm = TRUE)
+  rest_prop <- mean(x[!in_group], na.rm = TRUE)
   group_prop <- mean(x[in_group], na.rm = TRUE)
   tab <- table(in_group, x)
   pval <- if (all(dim(tab) == c(2, 2))) fisher.test(tab)$p.value else NA_real_
   tibble(
     feature = feature, categoria = categoria,
-    log2fc = log2(group_prop / overall_prop),
-    group_prop = group_prop, overall_prop = overall_prop, pval = pval
+    log2fc = log2(group_prop / rest_prop),
+    group_prop = group_prop, rest_prop = rest_prop, pval = pval
   )
 }
 
