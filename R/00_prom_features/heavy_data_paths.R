@@ -73,3 +73,19 @@ path_fantom5_hela_raw <- list.files(
 )
 path_fantom5_tissue_ontology <- file.path(translib, "External_data/FANTOM5/tissue_ontology_FANTOM5.xlsx")
 path_fantom5_tissue_dir <- file.path(translib, "External_data/FANTOM5/hg38_tissue")
+
+# ElemeNT / CORE_EPDnew (Sloutskin et al.) core promoter element calls
+# (TATA, Inr, DPE, MTE, BRE, etc.), por promotor via EPDnew - exploratorio
+# (R/discordancia_reportero_endogeno/2_dif_signed_bland_altman/
+# element_core_promoter.R), no forma parte de prom_df/build_prom_features.R.
+path_element_epd <- file.path(translib, "External_data/CORE_EPDnew_Aug2023.xlsx")
+
+# PRO-cap bigWig (HEK293, ENCODE), 2 replicas x plus/minus strand (~20MB c/u)
+# - usado para clasificar orientacion del promotor (unidireccional vs.
+# bidireccional), ver R/00_prom_features/build_promoter_orientation.R.
+# Portado de transcriptional_library/Analysis/scripts/promoter_orientation.R.
+# (la carpeta en disco se llama "PRO-seq" pero el dato es PRO-cap).
+path_procap_plus_r1 <- file.path(translib, "External_data/PRO-seq/ENCFF305ZQS_plus_rep1.bigWig")
+path_procap_minus_r1 <- file.path(translib, "External_data/PRO-seq/ENCFF757CGN__minus_rep1.bigWig")
+path_procap_plus_r2 <- file.path(translib, "External_data/PRO-seq/ENCFF762BKL_plus_rep2.bigWig")
+path_procap_minus_r2 <- file.path(translib, "External_data/PRO-seq/ENCFF367WUV_minus_rep2.bigWig")

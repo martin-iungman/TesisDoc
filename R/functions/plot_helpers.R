@@ -235,7 +235,12 @@ build_tidy_features <- function(data, keep) {
       `Alta actividad en HEK293` = hek_tpm > median(data$hek_tpm[data$hek_tpm > 0], na.rm = TRUE),
       `Sin módulo cis-regulatorio` = N_TF_CRM == 0,
       `Alta accesibilidad de cromatina (DNase-seq)` = (cut_number(mean_dnase, n = 3) %>% as.numeric()) == 3,
-      across(starts_with("enh"), ~ .x > 0)
+      across(starts_with("enh"), ~ .x > 0),
+      `Promotor unidireccional` = case_when(
+        orientacion == "unidireccional" ~ TRUE,
+        orientacion == "bidireccional" ~ FALSE,
+        TRUE ~ NA
+      )
     ) %>%
     rename(
       `TATA-box` = TATA_EPD,
@@ -268,7 +273,8 @@ build_tidy_features <- function(data, keep) {
       `Alta especificidad tisular`, `Baja especificidad tisular`,
       `Promotores angostos`, `Promotores anchos`,
       `Alta actividad en HEK293`, `Alta accesibilidad de cromatina (DNase-seq)`,
-      `Enhancers a 50kb`, `Sin módulo cis-regulatorio`
+      `Enhancers a 50kb`, `Sin módulo cis-regulatorio`,
+      `Promotor unidireccional`
     ) %>%
     mutate(
       across(c(where(is.numeric), -all_of(keep)), as.logical),
@@ -279,15 +285,26 @@ build_tidy_features <- function(data, keep) {
 }
 
 # Barras de AUC-0.5 por feature/TF, coloreadas por sentido del efecto
-# sobre el ruido (ruido alto/bajo), filtradas a las que tienen IC que no
-# cruza 0.5 y el mismo sentido en ambas replicas. Usado por R3.2
-# (features curadas, show_labels=TRUE), R3.3 (TFs de ReMap,
-# show_labels=FALSE, show_errorbars=FALSE - demasiados para etiquetar o
-# mostrar IC, igual que remap_act.jpg en R2.6) y R3.4.
+# sobre el ruido (ruido alto/bajo), filtradas a las que son significativas
+# con el mismo sentido en ambas replicas. Usado por R3.2 (features
+# curadas, show_labels=TRUE), R3.3 (TFs de ReMap, show_labels=FALSE,
+# show_errorbars=FALSE - demasiados para etiquetar o mostrar IC, igual
+# que remap_act.jpg en R2.6) y R3.4.
+# Dos criterios de significancia soportados segun las columnas de
+# auc_df: si trae `pval_corr` (p-valor de Wald via varianza de DeLong,
+# corregido por BH - ver R3.2/ruido_summary.R, resync 2026-09-30) se usa
+# pval_corr<0.05; si no (R3.3/R3.4, que todavia no migraron) se usa el
+# criterio viejo de IC (delong) que no cruza 0.5 - equivalentes en
+# esencia (mismo SE de DeLong), pero el de p-valor permite corregir por
+# tests multiples.
 plot_noise_auc_summary <- function(auc_df, show_labels = TRUE, show_errorbars = TRUE, base_size = 20) {
-  p <- auc_df %>%
+  auc_df_signif <- if ("pval_corr" %in% names(auc_df)) {
+    auc_df %>% filter(pval_corr < 0.05)
+  } else {
+    auc_df %>% filter((ci2.5 > 0.5 & ci97.5 > 0.5) | (ci2.5 < 0.5 & ci97.5 < 0.5))
+  }
+  p <- auc_df_signif %>%
     mutate(noise = ifelse(AUC > 0.5, "Ruido alto", "Ruido bajo")) %>%
-    filter((ci2.5 > 0.5 & ci97.5 > 0.5) | (ci2.5 < 0.5 & ci97.5 < 0.5)) %>%
     group_by(feature) %>%
     mutate(n_dir = length(unique(noise))) %>%
     filter(n_dir == 1, n() == 2) %>%
@@ -328,7 +345,8 @@ feature_groups <- tribble(
   "Alta actividad en HEK293", "endo",
   "Alta accesibilidad de cromatina (DNase-seq)", "endo",
   "Enhancers a 50kb", "endo",
-  "Sin módulo cis-regulatorio", "endo"
+  "Sin módulo cis-regulatorio", "endo",
+  "Promotor unidireccional", "endo"
 )
 
 # Carga y parsea los .cells.csv (export FlowJo) de la validacion por
@@ -415,7 +433,12 @@ build_cooccurrence_features <- function(prom_df) {
       `Alta actividad en HEK293` = hek_tpm > median(prom_df$hek_tpm[prom_df$hek_tpm > 0], na.rm = TRUE),
       `Sin módulo cis-regulatorio` = N_TF_CRM == 0,
       `Alta accesibilidad de cromatina (DNase-seq)` = (cut_number(mean_dnase, n = 3) %>% as.numeric()) == 3,
-      across(starts_with("enh"), ~ .x > 0)
+      across(starts_with("enh"), ~ .x > 0),
+      `Promotor unidireccional` = case_when(
+        orientacion == "unidireccional" ~ TRUE,
+        orientacion == "bidireccional" ~ FALSE,
+        TRUE ~ NA
+      )
     ) %>%
     rename(
       `TATA-box` = TATA_EPD,
@@ -448,7 +471,8 @@ build_cooccurrence_features <- function(prom_df) {
       `Alta especificidad tisular`, `Baja especificidad tisular`,
       `Promotores angostos`, `Promotores anchos`,
       `Alta actividad en HEK293`, `Alta accesibilidad de cromatina (DNase-seq)`,
-      `Enhancers a 50kb`, `Sin módulo cis-regulatorio`
+      `Enhancers a 50kb`, `Sin módulo cis-regulatorio`,
+      `Promotor unidireccional`
     )
 }
 
@@ -457,6 +481,24 @@ build_cooccurrence_features <- function(prom_df) {
 # M14 y R5.7 para co-ocurrencia entre features booleanas del promotor
 # (incluida la categoria de promotor alternativo en R5.7).
 cooccurrence_phi_matrix <- function(feat_mat) cor(feat_mat, use = "pairwise.complete.obs")
+
+# Variante de cooccurrence_phi_matrix() SOLO para calcular el orden del
+# clustering jerarquico (ver plot_cooccurrence_phi() / mismo patron que
+# cooccurrence_lift_matrix(..., mask_zero=FALSE)): a veces cor() da NA en
+# una celda puntual porque, dentro del subconjunto de filas donde ese par
+# especifico tiene ambas columnas no-NA, una de las dos queda con
+# varianza cero (ej. sesion 2026-09-30: "No detectado (FANTOM5)", "Alta
+# especificidad tisular", "Baja especificidad tisular"). Como
+# cooccurrence_cluster_levels() descarta del clustering CUALQUIER feature
+# con al menos una celda NA, una sola celda asi tira afuera a toda la
+# feature. Se imputan esas celdas puntuales a 0 (sin evidencia de
+# asociacion) solo para definir el orden - el heatmap real se sigue
+# pintando con cooccurrence_phi_matrix() sin imputar (NA queda gris).
+cooccurrence_phi_matrix_for_clustering <- function(feat_mat) {
+  m <- cooccurrence_phi_matrix(feat_mat)
+  m[is.na(m)] <- 0
+  m
+}
 
 cooccurrence_jaccard_matrix <- function(feat_mat) {
   m <- matrix(NA, nrow = ncol(feat_mat), ncol = ncol(feat_mat), dimnames = list(colnames(feat_mat), colnames(feat_mat)))
@@ -472,6 +514,69 @@ cooccurrence_jaccard_matrix <- function(feat_mat) {
   m
 }
 
+# Coeficiente de overlap (Szymkiewicz-Simpson): |A∩B| / min(|A|,|B|), en
+# vez de la union (Jaccard). A diferencia de Jaccard, no penaliza cuando
+# un conjunto chico esta casi totalmente contenido en uno mucho mas
+# grande (ej. TATA-box practicamente un subconjunto de "Promotores
+# angostos", pero Jaccard da bajo por la asimetria de tamanios - ver
+# sesion 2026-09-30, M15/coocurrencia_motivos).
+cooccurrence_overlap_matrix <- function(feat_mat) {
+  m <- matrix(NA, nrow = ncol(feat_mat), ncol = ncol(feat_mat), dimnames = list(colnames(feat_mat), colnames(feat_mat)))
+  for (i in seq_len(ncol(feat_mat))) {
+    for (j in seq_len(ncol(feat_mat))) {
+      a <- feat_mat[, i]
+      b <- feat_mat[, j]
+      intersection <- sum(a == 1 & b == 1, na.rm = TRUE)
+      min_size <- min(sum(a == 1, na.rm = TRUE), sum(b == 1, na.rm = TRUE))
+      m[i, j] <- if (min_size == 0) NA else intersection / min_size
+    }
+  }
+  m
+}
+
+# Lift/enriquecimiento (observado/esperado bajo independencia):
+# P(A∩B) / (P(A)*P(B)). Simetrico (a diferencia del overlap), pero NO
+# tiene el "techo" de phi cuando las prevalencias estan lejos de 50/50 -
+# aporta informacion que phi no muestra para relaciones fuertes entre
+# features raras (ver sesion 2026-09-30, M15/coocurrencia_motivos: ej.
+# LTR+Insertado en humanos da lift=15x pero phi=0.16, mientras que
+# Baja especificidad tisular+Alta accesibilidad da phi=0.51 pero
+# lift=1.9x - el orden por cada metrica es bien distinto, Spearman~0.74
+# entre las dos). Correccion de Haldane-Anscombe (pseudocount EPS=0.5 en
+# las 4 celdas de la tabla 2x2) para pares con interseccion real >0 pero
+# chica (evita inestabilidad numerica); para pares con interseccion real
+# EXACTAMENTE 0 (mutuamente excluyentes, ej. subtipos de TE) NO se usa
+# pseudocount - el lift "gris" (NA) en vez de un valor cerca de 0 pero
+# artificialmente inflado/opacando la escala de color del resto (ver
+# sesion 2026-09-30, feedback del autor).
+# mask_zero=TRUE (default, para pintar el heatmap): pares con interseccion
+# real 0 quedan en NA/gris, sin pseudocount. mask_zero=FALSE (para calcular
+# el orden del clustering unicamente - ver plot_cooccurrence_lift()): usa
+# el pseudocount tambien en esos pares, matriz completa sin NA, para que
+# esas features no queden afuera del clustering jerarquico.
+cooccurrence_lift_matrix <- function(feat_mat, eps = 0.5, mask_zero = TRUE) {
+  m <- matrix(NA, nrow = ncol(feat_mat), ncol = ncol(feat_mat), dimnames = list(colnames(feat_mat), colnames(feat_mat)))
+  for (i in seq_len(ncol(feat_mat))) {
+    for (j in seq_len(ncol(feat_mat))) {
+      a <- feat_mat[, i]
+      b <- feat_mat[, j]
+      ok <- !is.na(a) & !is.na(b)
+      n11_raw <- sum(a[ok] == 1 & b[ok] == 1)
+      if (n11_raw == 0 && mask_zero) next # deja NA (gris) - sin pseudocount para no distorsionar la escala
+      n10 <- sum(a[ok] == 1 & b[ok] == 0) + eps
+      n01 <- sum(a[ok] == 0 & b[ok] == 1) + eps
+      n00 <- sum(a[ok] == 0 & b[ok] == 0) + eps
+      n11 <- n11_raw + eps
+      n_tot <- n11 + n10 + n01 + n00
+      pa <- (n11 + n10) / n_tot
+      pb <- (n11 + n01) / n_tot
+      pab <- n11 / n_tot
+      m[i, j] <- if (pa == 0 || pb == 0) NA else pab / (pa * pb)
+    }
+  }
+  m
+}
+
 cooccurrence_cluster_levels <- function(mat) {
   has_na <- colSums(is.na(mat)) > 0
   complete <- mat[!has_na, !has_na]
@@ -479,8 +584,13 @@ cooccurrence_cluster_levels <- function(mat) {
   c(colnames(complete)[clust_order], colnames(mat)[has_na])
 }
 
-cooccurrence_tidy_matrix <- function(mat, value_name) {
-  levels <- cooccurrence_cluster_levels(mat)
+# levels=NULL (default): orden de clustering calculado sobre la misma
+# matriz que se va a pintar (comportamiento original). Si se pasa un
+# vector de niveles ya calculado (ej. desde una matriz sin enmascarar,
+# ver plot_cooccurrence_lift()), se usa ese orden en vez de recalcularlo -
+# permite desacoplar "con que datos clusterizo" de "que pinto".
+cooccurrence_tidy_matrix <- function(mat, value_name, levels = NULL) {
+  if (is.null(levels)) levels <- cooccurrence_cluster_levels(mat)
   mat %>%
     as_tibble(rownames = "feature1") %>%
     pivot_longer(-feature1, names_to = "feature2", values_to = value_name) %>%
@@ -488,7 +598,8 @@ cooccurrence_tidy_matrix <- function(mat, value_name) {
 }
 
 plot_cooccurrence_phi <- function(feat_mat, titulo = "Co-ocurrencia de features del promotor (coeficiente phi)") {
-  cooccurrence_tidy_matrix(cooccurrence_phi_matrix(feat_mat), "phi") %>%
+  levels <- cooccurrence_cluster_levels(cooccurrence_phi_matrix_for_clustering(feat_mat))
+  cooccurrence_tidy_matrix(cooccurrence_phi_matrix(feat_mat), "phi", levels = levels) %>%
     ggplot(aes(x = feature2, y = feature1, fill = phi)) +
     geom_tile(color = "white", linewidth = 0.3) +
     scale_fill_gradient2(low = "#2166ac", mid = "white", high = "#d6604d", midpoint = 0, limits = c(-1, 1), name = "Coeficiente\nphi") +
@@ -513,4 +624,57 @@ plot_cooccurrence_jaccard <- function(feat_mat, titulo = "Co-ocurrencia de featu
       axis.title = element_blank(), panel.grid = element_blank(), legend.position = "right"
     ) +
     labs(title = titulo)
+}
+
+plot_cooccurrence_overlap <- function(feat_mat, titulo = "Co-ocurrencia de features del promotor (coeficiente de overlap)") {
+  cooccurrence_tidy_matrix(cooccurrence_overlap_matrix(feat_mat), "overlap") %>%
+    ggplot(aes(x = feature2, y = feature1, fill = overlap)) +
+    geom_tile(color = "white", linewidth = 0.3) +
+    scale_fill_gradient(low = "white", high = "#d6604d", limits = c(0, 1), na.value = "grey80", name = "Coeficiente\nde overlap") +
+    coord_fixed() +
+    theme_minimal(base_size = 11) +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 8), axis.text.y = element_text(size = 8),
+      axis.title = element_blank(), panel.grid = element_blank(), legend.position = "right"
+    ) +
+    labs(title = titulo)
+}
+
+plot_cooccurrence_lift <- function(feat_mat, titulo = "Co-ocurrencia de features del promotor (log2 lift)") {
+  # el orden de clustering se calcula sobre la matriz COMPLETA (con
+  # pseudocount tambien en pares de interseccion 0), para que esos pares
+  # (ej. subtipos de TE mutuamente excluyentes) no queden afuera del
+  # clustering jerarquico solo por estar enmascarados en el heatmap
+  levels <- cooccurrence_cluster_levels(log2(cooccurrence_lift_matrix(feat_mat, mask_zero = FALSE)))
+  lift_mat <- cooccurrence_lift_matrix(feat_mat)
+  log2_lift_mat <- log2(lift_mat)
+  lim <- max(abs(log2_lift_mat), na.rm = TRUE)
+  cooccurrence_tidy_matrix(log2_lift_mat, "log2_lift", levels = levels) %>%
+    ggplot(aes(x = feature2, y = feature1, fill = log2_lift)) +
+    geom_tile(color = "white", linewidth = 0.3) +
+    scale_fill_gradient2(low = "#2166ac", mid = "white", high = "#d6604d", midpoint = 0, limits = c(-lim, lim), na.value = "grey80", name = "log2\n(lift)") +
+    coord_fixed() +
+    theme_minimal(base_size = 11) +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 8), axis.text.y = element_text(size = 8),
+      axis.title = element_blank(), panel.grid = element_blank(), legend.position = "right"
+    ) +
+    labs(title = titulo)
+}
+
+# Frecuencia de cada feature booleana de feat_mat sobre SU PROPIO universo
+# (promotores no-NA para esa columna especifica, que varia entre
+# features - ej. "Promotor unidireccional" solo esta definido para los
+# promotores con senal suficiente, MIN_SENSE, ver R/28_orientacion_
+# promotor). Reusa count_bar_labeled(): barra clara = universo (n no-NA),
+# barra oscura = n con feature=TRUE, ordenadas por frecuencia.
+plot_feature_frequency <- function(feat_mat, titulo = "Frecuencia de cada feature (barra clara = universo no-NA)") {
+  freq_df <- tibble(
+    feature = colnames(feat_mat),
+    n_universo = colSums(!is.na(feat_mat)),
+    n_true = colSums(feat_mat == 1, na.rm = TRUE)
+  ) %>%
+    mutate(feature = fct_reorder(feature, n_true / n_universo))
+  count_bar_labeled(freq_df, x = feature, n = n_true, total = n_universo, base_size = 12, coord_flip = TRUE) +
+    labs(title = titulo, x = NULL, y = "Promotores (n)")
 }

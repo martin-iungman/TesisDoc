@@ -77,9 +77,25 @@ feature_labels_en <- c(
   "LINE" = "LINE", "SINE" = "SINE", "LTR" = "LTR"
 )
 
+# Unidirectional promoter (PRO-seq Orientation Index) - not yet in
+# data/processed/prom_df.tsv (TesisDoc), read from transcriptional_library/
+# Analysis/Tables/prom_df.tsv instead (see prom_df_features.R, same
+# session). not_detected/NA orientation stays NA here (na.rm=TRUE in
+# enrichment_cell()/table()'s default NA-drop handle the exclusion).
+orientation_df <- read_tsv("../transcriptional_library/Analysis/Tables/prom_df.tsv", show_col_types = FALSE) %>%
+  select(seq_id, orientation) %>%
+  distinct() %>%
+  mutate(`Unidirectional promoter` = case_when(
+    orientation == "unidirectional" ~ TRUE,
+    orientation == "bidirectional" ~ FALSE,
+    TRUE ~ NA
+  )) %>%
+  select(-orientation)
+
 tidy_data <- build_cooccurrence_features(prom_df) %>%
   select(-`No detectado (FANTOM5)`) %>% # constante en este subconjunto, ver promalt_enriquecimiento.R
   rename(!!!set_names(names(feature_labels_en), feature_labels_en)) %>%
+  left_join(orientation_df, by = "seq_id") %>%
   inner_join(promalt_cat, by = "seq_id")
 
 feature_cols <- setdiff(names(tidy_data), c("seq_id", "prom_alt_cat"))
