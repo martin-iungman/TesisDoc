@@ -648,11 +648,29 @@ donde, en este caso, *pi* y *qi* son las proporciones acumuladas de los grupos d
 
 La forma de los promotores se calculó a partir de la combinación de todas las muestras de FANTOM5 analizadas (células primarias y tejidos). En este caso, también se utilizó el paquete *CAGEr* y se aplicó una normalización de *power-law*. Los *clusters* de TSS se obtuvieron mediante el método *distclu*, con una distancia máxima entre TSSs de 5 y un mínimo de 10 *counts* por TSS. Se utilizó el ancho intercuantílico (0.05-0.95) como *proxy* de la forma. Los valores se dividieron en terciles de ancho, conservando el primer y tercer tercil como promotores focalizados y anchos, respectivamente. En caso de que se obtuvieran múltiples *clusters* de TSS para una misma región promotora, solo se utilizó aquel que solapaba con la posición establecida por la EPD.
 
+Fig M13. Especificidad tisular y forma
+
+La direccionalidad transcripcional de cada promotor se determinó mediante el índice de orientación (*Orientation Index*, OI), siguiendo la definición de Core et al. (96). Esta métrica se basa en datos de PRO-cap (*Precision Run-On sequencing* con selección por cap), una técnica que captura, a resolución de base, el extremo 5' de transcriptos nacientes unidos a ARN polimerasa II activamente comprometida. A diferencia de las técnicas basadas en ARNm maduro, PRO-cap detecta directamente el sitio de inicio de la transcripción en ambas hebras del ADN de forma simultánea — lo que la vuelve especialmente apropiada para cuantificar la transcripción divergente/bidireccional que ocurre en la región núcleo-depletada de muchos promotores, al permitir medir por separado la señal en sentido y en antisentido respecto del TSS anotado.
+
+Se utilizaron datos de PRO-cap en células HEK293 de ENCODE (dos réplicas técnicas; archivos bigWig de hebra plus ENCFF305ZQS y ENCFF762BKL; hebra minus ENCFF757CGN y ENCFF367WUV). Para cada uno de los 20851 promotores de la library, se extrajo la señal de PRO-cap en dos ventanas de 250pb específicas de hebra: una ventana en sentido (downstream del TSS, en la hebra del promotor) y otra en antisentido (upstream del TSS, en la hebra opuesta) — asignación que se invierte según la hebra del promotor. Las réplicas se combinaron sumando su señal antes de calcular el OI, definido como:
+
+OI \= 2 × max(Rp+ε, Rm+ε) / (Rp+Rm+2ε) − 1
+
+donde Rp y Rm son la señal en sentido y antisentido respectivamente, y ε=1 es un pseudoconteo. Los promotores con señal sentido insuficiente (Rp\<10, Fig. M14A) se marcaron como no clasificados (5624 de los 20851 promotores). Entre los restantes, los que alcanzaron OI≥0,9 se clasificaron como unidireccionales y el resto como bidireccionales (Fig. M14B), mismo umbral utilizado por Core et al. — resultando en 3228 promotores unidireccionales y 11999 bidireccionales (Fig. M14C). La validez de esta clasificación se confirmó comparando el perfil de señal de PRO-cap alrededor del TSS entre ambas clases (Fig. M14D): los promotores unidireccionales muestran una señal en antisentido marcadamente menor que los bidireccionales, consistente con la definición del índice.
+
+Fig. M14 orientacion
+
 Coocurrencia de las características de los promotores basales
 
-Las características de los promotores, tanto aquellas basadas en la secuencia como aquellas que surgen de estudiarlos en sus contextos endógenos, no son completamente independientes entre sí (Fig. M12). Esto implica que frecuentemente, sea complejo poder asignar a un efecto observado, una característica particular, con confianza de que no se trate de un efecto confusor de otra característica con alto grado de coocurrencia. Si bien esto se puede resolver en ciertos casos con una estratificación por a potencial característica confusora, en los casos más extremos de co-presencia, esta tarea resulta prácticamente imposible y es un limitante en este tipo de enfoques experimentales, basados en secuencias naturales.  
+Las características de los promotores, tanto aquellas basadas en la secuencia como aquellas que surgen de estudiarlos en sus contextos endógenos, no son completamente independientes entre sí. Esto implica que frecuentemente, sea complejo poder asignar a un efecto observado, una característica particular, con confianza de que no se trate de un efecto confusor de otra característica con alto grado de coocurrencia. Si bien esto se puede resolver en ciertos casos con una estratificación por la potencial característica confusora, en los casos más extremos de co-presencia, esta tarea resulta prácticamente imposible y es un limitante en este tipo de enfoques experimentales, basados en secuencias naturales.
 
-Fig. M12 co-ocurrencia
+Para cada característica se reporta primero su frecuencia sobre su propio universo de promotores (Fig. M15A), dado que varias de ellas solo están definidas para un subconjunto de la *library* (p. ej. la especificidad tisular requiere actividad detectable en FANTOM5, o la orientación transcripcional requiere señal de PRO-cap suficiente). Sobre ese universo, caracterizamos las relaciones entre pares de features con dos métricas complementarias (Fig. M15B-C): el coeficiente phi, correlación de Pearson sobre variables binarias que contempla tanto la co-presencia como la co-ausencia de cada par; y el log2(enriquecimiento) (razón entre la co-ocurrencia observada y la esperada bajo independencia, P(A∩B)/(P(A)·P(B))). En términos simples, el phi responde "¿estas dos características suben y bajan juntas a lo largo de toda la población de promotores, más de lo esperado por azar?", ponderando tanto los casos en que ambas están presentes como aquellos en que ambas están ausentes; el enriquecimiento, en cambio, responde directamente "¿cuántas veces más frecuente es encontrar esta combinación puntual de lo que esperaríamos si las dos características fueran independientes?". Por eso el phi es más informativo para características de prevalencia moderada que co-varían de forma difusa en toda la población, mientras que el enriquecimiento no tiene techo cuando las prevalencias están lejos de 50/50 y resulta más sensible para detectar asociaciones puntuales fuertes entre características poco frecuentes, que el phi tiende a subestimar.
+
+Para realizar un agrupamiento jerárquico que permita ordenar las caracteristicas según sus patrones de similitud, se implementó una corrección por *pseudocounts*, dado que hay ciertas características mutuamente excluyentes entre sí por definición y que permite estabilizar el enriquecimiento en pares de baja co-ocurrencia. Graficamente, para no afectar las escalas de color, los pares sin ninguna co-ocurrencia observada se representaron en gris. 
+
+Fig. M15 co-ocurrencia
+
+El agrupamiento jerárquico, consistente entre phi y el enriquecimiento, resalta un *cluster* amplio de características asociadas a promotores *housekeeping*: baja especificidad tisular, alta accesibilidad de cromatina, alta actividad endógena en HEK293, promotores anchos, islas CpG, alto contenido G+C y motivo GC-box co-ocurren sistemáticamente entre sí (phi hasta 0,51), aunque su enriquecimiento sobre el azar es moderado (enriquecimiento 1,3-2,1×) al tratarse, en conjunto, de características relativamente frecuentes. El lift, al no tener techo para características raras, revela además un cluster que phi solo esboza débilmente: los promotores derivados de inserciones LTR específicas de humano muestran un enriquecimiento muy fuerte por carecer de módulo cis-regulatorio anotado y no detectarse en las muestras analizadas de FANTOM5 (enriquecimiento entre 4× y 15× en los pares de este grupo, con phi correspondientemente bajo, 0,02-0,20), sugiriendo que se trata de secuencias genómicamente recientes y regulatoriamente poco caracterizadas. Un grupo adicional asocia al motivo TATA-box con la forma angosta del promotor y la alta especificidad tisular, consistente con la asociación conocida entre promotores focalizados y motivos de posicionamiento preciso. 
 
 Algoritmos de predicción de la actividad promotora basados en la secuencia
 
@@ -681,27 +699,51 @@ La estimación del ruido y su asociación con las características de los promot
 
 En sistemas biológicos, la media y la varianza de la expresión génica están intrínsecamente correlacionadas: los promotores con mayor expresión media tienden también a exhibir mayor varianza absoluta. Esta relación (conocida como ruido proporcional o efecto de Fano) impide comparar directamente el nivel de ruido entre promotores sin antes controlar por su nivel de expresión. Si no se desacopla esta asociación, cualquier característica que influya sobre la media aparecerá artificialmente como moduladora del ruido, generando asociaciones espurias.
 
-#### **Estrategia de desacoplamiento: ranking intra-bin**
+**Estrategia de desacoplamiento: ranking intra-bin**
 
 Para eliminar este confundidor, se adoptó el siguiente procedimiento:
 
-1. **Agrupamiento por media (*binning*):** los promotores se ordenaron según su expresión media y se distribuyeron en *bins* de 100 promotores cada uno. Dentro de cada bin, los promotores comparten un rango similar de expresión media, de modo que las diferencias de varianza observadas no pueden atribuirse a diferencias en la media.  
-2. **Asignación de *rank* de varianza intra-bin:** dentro de cada bin, los promotores se ordenaron por su varianza y se les asignó un valor de *rank* (rango percentil). Este ranking relativo —no el valor absoluto de varianza— es la variable continua resultante del desacoplamiento. Valores altos de rank indican promotores con mayor ruido *de lo esperado para su nivel de expresión*; valores bajos indican promotores más silenciosos de lo esperado.
+1. Agrupamiento por media (binning): los promotores se ordenaron según su expresión media y se distribuyeron en bins de 100 promotores cada uno. Dentro de cada bin, los promotores comparten un rango similar de expresión media, de modo que las diferencias de varianza observadas no pueden atribuirse a diferencias en la media.  
+2. Asignación de rank de varianza intra-bin: dentro de cada bin, los promotores se ordenaron por su varianza y se les asignó un valor de rank (rango percentil). Este ranking relativo —no el valor absoluto de varianza— es la variable continua resultante del desacoplamiento. Valores altos de rank indican promotores con mayor ruido de lo esperado para su nivel de expresión; valores bajos indican promotores más silenciosos de lo esperado.
 
-#### **Evaluación de la relevancia de características: AUC-ROC**
+**Evaluación de la relevancia de características: AUC-ROC**
 
 Una vez obtenido el rank de varianza desacoplado, se evaluó si las características de los promotores (secuencia, estructura, factores de transcripción, etc.) se asocian con este ruido residual. Para ello se empleó el área bajo la curva ROC (AUC-ROC) (32), una métrica que mide la capacidad discriminatoria de una variable continua para separar dos grupos, de forma independiente al umbral de clasificación elegido.
 
 El procedimiento fue el siguiente:
 
-* Para cada característica de interés, los promotores se dividieron en dos grupos: aquellos que poseen la característica (*presencia*) y aquellos que no la poseen (*ausencia*).  
-* El rank de varianza intra-bin actuó como variable de puntuación (*score*) para clasificar los promotores entre los dos grupos.  
+* Para cada característica de interés, los promotores se dividieron en dos grupos: aquellos que poseen la característica (presencia) y aquellos que no la poseen (ausencia).  
+* El rank de varianza intra-bin actuó como variable de puntuación (score) para clasificar los promotores entre los dos grupos.  
 * Se construyó la curva ROC evaluando, para cada posible umbral del rank (valores 1 a 100), la sensibilidad (proporción de promotores con la característica que superan el umbral) y la especificidad (proporción de promotores sin la característica que no lo superan). La curva ROC representa la sensibilidad en función de 1 − especificidad al barrer todos los umbrales posibles.  
-* El AUC-ROC resume esta curva en un único valor: 0.5 indica que la característica no discrimina mejor que el azar; valores superiores a 0.5 indican que la presencia de la característica se asocia con mayor ruido relativo; valores inferiores a 0.5 indican asociación con menor ruido relativo. Los análisis se realizaron con el paquete `pROC` v1.18.5 en R.
+* El AUC-ROC resume esta curva en un único valor: 0.5 indica que la característica no discrimina mejor que el azar; valores superiores a 0.5 indican que la presencia de la característica se asocia con mayor ruido relativo; valores inferiores a 0.5 indican asociación con menor ruido relativo. Los análisis se realizaron con el paquete pROC v1.18.5 en R.
 
-#### **Estimación de la incertidumbre: *bootstrapping***
+**Estimación de la incertidumbre y significancia: método de DeLong**
 
-Para cuantificar la incertidumbre del AUC estimado y descartar asociaciones no significativas, se realizaron 1.000 remuestreos con reposición (*bootstrapping*). En cada remuestreo se recalculó el AUC, generando una distribución empírica que permitió construir intervalos de confianza del 95%.
+Para estimar la incertidumbre del AUC y determinar qué asociaciones son estadísticamente significativas, se utilizó el método de DeLong (DeLong & Clarke-Pearson 1988), que explota el hecho de que el AUC es matemáticamente equivalente al estadístico U de Mann-Whitney (la probabilidad de que un promotor elegido al azar del grupo con la característica tenga un rank de varianza mayor que uno elegido al azar del grupo sin ella). A partir de esta equivalencia, DeLong deriva una fórmula cerrada y asintótica para la varianza del AUC, sin necesidad de remuestreo. Con esa varianza se calcularon intervalos de confianza del 95% y un p-valor (test de Wald contra el valor nulo de 0.5), que se corrigió por comparaciones múltiples con el método de Benjamini-Hochberg (FDR). Las características cuyo p-valor corregido superó 0.05 en alguna de las dos réplicas, o que mostraron sentido de efecto opuesto entre réplicas, fueron descartadas por no presentar un efecto consistente y significativo sobre el ruido transcripcional.
+
+En sistemas biológicos, la media y la varianza de la expresión génica están intrínsecamente correlacionadas: los promotores con mayor expresión media tienden también a exhibir mayor varianza absoluta. Esta relación (conocida como ruido proporcional o efecto de Fano) impide comparar directamente el nivel de ruido entre promotores sin antes controlar por su nivel de expresión. Si no se desacopla esta asociación, cualquier característica que influya sobre la media aparecerá artificialmente como moduladora del ruido, generando asociaciones espurias.
+
+#### Estrategia de desacoplamiento: ranking intra-bin
+
+Para eliminar este confundidor, se adoptó el siguiente procedimiento:
+
+1. Agrupamiento por media (binning): los promotores se ordenaron según su expresión media y se distribuyeron en bins de 100 promotores cada uno. Dentro de cada bin, los promotores comparten un rango similar de expresión media, de modo que las diferencias de varianza observadas no pueden atribuirse a diferencias en la media.  
+2. Asignación de rank de varianza intra-bin: dentro de cada bin, los promotores se ordenaron por su varianza y se les asignó un valor de rank (rango percentil). Este ranking relativo —no el valor absoluto de varianza— es la variable continua resultante del desacoplamiento. Valores altos de rank indican promotores con mayor ruido de lo esperado para su nivel de expresión; valores bajos indican promotores más silenciosos de lo esperado.
+
+#### Evaluación de la relevancia de características: AUC-ROC
+
+Una vez obtenido el rank de varianza desacoplado, se evaluó si las características de los promotores (secuencia, estructura, factores de transcripción, etc.) se asocian con este ruido residual. Para ello se empleó el área bajo la curva ROC (AUC-ROC) (32), una métrica que mide la capacidad discriminatoria de una variable continua para separar dos grupos, de forma independiente al umbral de clasificación elegido.
+
+El procedimiento fue el siguiente:
+
+* Para cada característica de interés, los promotores se dividieron en dos grupos: aquellos que poseen la característica (presencia) y aquellos que no la poseen (ausencia).  
+* El rank de varianza intra-bin actuó como variable de puntuación (score) para clasificar los promotores entre los dos grupos.  
+* Se construyó la curva ROC evaluando, para cada posible umbral del rank (valores 1 a 100), la sensibilidad (proporción de promotores con la característica que superan el umbral) y la especificidad (proporción de promotores sin la característica que no lo superan). La curva ROC representa la sensibilidad en función de 1 − especificidad al barrer todos los umbrales posibles.  
+* El AUC-ROC resume esta curva en un único valor: 0.5 indica que la característica no discrimina mejor que el azar; valores superiores a 0.5 indican que la presencia de la característica se asocia con mayor ruido relativo; valores inferiores a 0.5 indican asociación con menor ruido relativo. Los análisis se realizaron con el paquete pROC v1.18.5 en R.
+
+#### Estimación de la incertidumbre: bootstrapping
+
+Para cuantificar la incertidumbre del AUC estimado y descartar asociaciones no significativas, se realizaron 1.000 remuestreos con reposición (bootstrapping). En cada remuestreo se recalculó el AUC, generando una distribución empírica que permitió construir intervalos de confianza del 95%.
 
 Las características cuyo intervalo de confianza incluye el valor 0.5 en alguna de las réplicas fueron descartadas, ya que no pueden distinguirse de una clasificación aleatoria y, por tanto, no presentan un efecto significativo sobre el ruido transcripcional.
 
@@ -783,15 +825,15 @@ La mayoría de los TF presentan una asociación positiva con la actividad del pr
 
 [^1]:   Esta misma lógica fue llevada, mucho más recientemente, a una formulación cuantitativa por el físico Jeremy England, quien propuso que los sistemas de materia sometidos a un flujo externo de energía tienden, con el tiempo, a reorganizarse de manera que absorben y disipan esa energía cada vez más eficazmente —un fenómeno que llamó adaptación disipativa (England, 2015). Bajo esta lente, la aparición de estructuras capaces de sostener orden lejos del equilibrio, como las que caracterizan a la vida, dejaría de ser una rareza estadística para volverse, en cierto sentido, una tendencia esperable de la física de los sistemas dirigidos por energía. 
 
-[^2]:  https://diagnostics.medgenome.com/research-service/
+[^2]:  https\://diagnostics.medgenome.com/research-service/
 
-[^3]:  https://www.bioinformatics.babraham.ac.uk/projects/fastqc/
+[^3]:  https\://www\.bioinformatics.babraham.ac.uk/projects/fastqc/
 
-[^4]:  https://epd.expasy.org/epd/
+[^4]:  https\://epd.expasy.org/epd/
 
-[^5]:  https://www.repeatmasker.org/
+[^5]:  https\://www\.repeatmasker.org/
 
-[^6]:  https://bioconductor.org/packages/release/bioc/html/Biostrings.html
+[^6]:  https\://bioconductor.org/packages/release/bioc/html/Biostrings.html
 
 [^7]:  Las bases subrayadas refieren a la posición del TSS anotado
 
