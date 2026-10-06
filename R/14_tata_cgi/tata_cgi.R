@@ -1,5 +1,5 @@
 # tata_cgi_actividad = Fig. R6 (ver docs/mapping_figuras.csv)
-# Efecto de la presencia de TATA-box, islas CpG y CCAAT-box sobre la
+# Efecto de la presencia de TATA-box, islas CpG, CCAAT-box y GC-box sobre la
 # actividad media, agrupando promotores en bins de 100 segun su rank de
 # actividad.
 #
@@ -91,5 +91,13 @@ ggsave(file.path(out_dir, "ccaat_scatter.jpg"), panel_ccaat_scatter, width = 12,
 
 ggsave(file.path(out_dir, "ccaat_violin_rep1.jpg"), violin_by_motif(data, "Rep 1", "CCAAT_EPD", "CCAAT-box"), width = 9, height = 6.75, units = "in")
 ggsave(file.path(out_dir, "ccaat_violin_rep2.jpg"), violin_by_motif(data, "Rep 2", "CCAAT_EPD", "CCAAT-box"), width = 9, height = 6.75, units = "in")
+
+# --- GC-box ---------------------------------------------------------------
+
+panel_gcbox_scatter <- motif_scatter(data, "GCbox_EPD", "Proporción de promotores\ncon GC-box", "GC-box")
+ggsave(file.path(out_dir, "gcbox_scatter.jpg"), panel_gcbox_scatter, width = 12, height = 6.75, units = "in")
+
+ggsave(file.path(out_dir, "gcbox_violin_rep1.jpg"), violin_by_motif(data, "Rep 1", "GCbox_EPD", "GC-box"), width = 9, height = 6.75, units = "in")
+ggsave(file.path(out_dir, "gcbox_violin_rep2.jpg"), violin_by_motif(data, "Rep 2", "GCbox_EPD", "GC-box"), width = 9, height = 6.75, units = "in")
 
 message("Figuras guardadas en ", out_dir)
