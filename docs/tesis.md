@@ -1,330 +1,86 @@
-# To do
+![][image1]
 
-Por hacer:
+UNIVERSIDAD DE BUENOS AIRES 
 
-- Potencia: todo  
-- M2C como figura aparte?  
-- M6: editar para indicar calles  
--   
-- M9C (heatmap cage): modificar por el del review. modificar leyenda, texto y discutir sobre el upstream  
--   
--   
-- Nueva figura sobre shape y tissue specificity??  
-- Seccion coocurrencia  
-- Tabla de features con criterio de dicotomia  
-- M12 pasar a español  
-- MyM: PUFFIN. Pensar si poner figura, armar texto  
-- Revisar texto ROC-AUC. Hacer alguna figura explicativa?
+Facultad de Ciencias Exactas y Naturales 
 
-- Los datos de validacion de ruido y replicabiliad que dan feos… los incluyo???  
-- R2C: cambiar el theme  
--   
-- Leyenda R6  
-- Leyenda R7 y R8
+Departamento de Fisiologia y Biologia Molecular y Celular 
 
-Para ir tachando Fig y textos que ya estan (draft)  
-Ref:  
-Cerrado 100%  
-Listo figura pero falta leyenda  
-Tengo los elementos de la figura pero falta trabajo (por ej, pasar a español)  
-Revisar mas adelante (por ahora ok)  
-Falta referenciar y/o explicar la figura  
-Iniciado
+**El impacto de los promotores basales en la fuerza y ruido transcripcional de los genes humanos**
 
-**Materiales y metodos experimentales:**  
-Descripción general
-
-- Pipeline
-
-Construcción de los plasmidos conteniendo la library de promotores
-
-- Esquema vector  
-- micro cmv-wt y cmv-strong   
-- PCR\_GA\_all\_prom\_cloning\_control 
-
-	Cultivo celular y transfección  
-	Citometría de flujo y sorting
-
-- Potencia??  
-- Esquema de density con los gates
-
-	Control por spike-in de celulas
-
-	Co-extraccion de ADN/ARN y RT-qPCR de EGFP
-
-- qPCR   
-- IMAGEN PCR\_loxP\_gates\_ctl
+Tesis presentada para optar al título de Doctor de la Universidad de Buenos Aires  en el área de Biología 
 
-Secuenciacion de amplicones  
-	Anexo Primers y secuencias
+Lic. Martín Iungman
 
-**Metodología bioinformática:**  
-	Procesamiento de los datos de secuenciacion
+Director de tesis: Dr. Ignacio E. Schor 
 
-- Pipeline preprocessing  
-- S1A (sample effort) \+ S6A (bimodal)
+Consejero de Estudios: Dr. Nicolás Frankel 
 
-	Caracterización de la library
+Lugar de trabajo: Instituto de Fisiología, Biología Molecular y Neurociencias  (IFIBYNE, UBA-CONICET)  
 
-- General: Esquema promotores y enhancer 252pb con posicion del TSS y primers \+ acompañado por el heatmap de CAGE \+ barplot seq types   
-- Motivos: cont GC \+ EPD barplot  \+ CGI+ INR  
-- Evo: phyloP \+ young;  
-- tissue specificity \+ shape??  
-- coocurrence?  
-- PUFFIN??
+Buenos Aires, 2026
 
+# Resumen {#resumen}
 
-Asociacion de las características del promotor con actividad y ruido transcripcional  
-	Clasificación de promotores alternativos
+Cuánto del comportamiento regulatorio de un gen está escrito en su propia secuencia es una pregunta central para la biología molecular y la genética. Aunque el promotor basal juega naturalmente un rol importante en la respuesta, se desconoce en qué medida su secuencia y arquitectura determinan las propiedades transcripcionales del gen, tanto el nivel de transcripción (actividad) como su variabilidad entre células (ruido), independientemente del contexto genómico. En esta tesis desarrollamos un ensayo reportero masivo en paralelo (MPRA) que permitió medir ambas propiedades en miles de promotores basales humanos. Cerca de 24.000 secuencias, centradas en sitios de inicio de la transcripción anotados, se integraron en copia única en un mismo sitio del genoma de células HEK293T, controlando la expresión de la proteína EGFP. Mediante separación celular por fluorescencia y secuenciación paralela masiva reconstruimos la distribución de expresión de más de 12.000 promotores. Los motivos clásicos del promotor basal y las islas CpG se asociaron a mayor actividad, mientras que los elementos transponibles, los TSS no canónicos y la falta de conservación funcional se asociaron a menor actividad. La actividad autónoma correlacionó con el uso endógeno del promotor, con mayor fuerza en promotores *housekeeping* que en tejido-específicos, más dependientes de elementos regulatorios distales. Los promotores con TATA-box resultaron más ruidosos, y aquellos con islas CpG, ricos en GC o de inicio disperso, menos ruidosos; el bajo ruido se asoció además a la unión de los complejos MLL1/2 y a la marca H3K4me3, incluso en ausencia de islas CpG. En genes con promotores alternativos, los secundarios fueron en general menos activos y más ruidosos que los principales, salvo los que actúan como principales en algunos tejidos. En conjunto, estos resultados muestran que actividad y ruido están en buena medida codificados en la secuencia del promotor basal, y sugieren que los promotores de origen reciente parten de un estado funcional subóptimo que puede en algunos casos refinarse por acción de la selección natural. 
 
-**Resultados**  
-Estimación masiva de las propiedades transcripcionales de promotores basales humanos
+**Palabras clave:** promotor basal, ruido transcripcional, MPRA, regulación génica, promotores alternativos
 
-- N prom por replica   
--  comparacion con splicing22 \+ library bias  
-- spike-in   
--  Mean replicate   
-- 1B-C-D (validacion)
+# Abstract {#abstract}
 
-Efectos de la secuencia promotor sobre la fuerza transcripcional
+How much of a gene's regulatory behaviour is written in its own sequence is a central question in molecular biology and genetics. Although the core promoter naturally plays a role in the answer, it remains unclear to what extent its sequence determines the gene’s transcriptional properties, including both the level of transcription (activity) and its cell-to-cell variability (noise), independently of genomic context. In this thesis, we developed a single-locus Massively Parallel Reporter Assay (MPRA) that allowed us to measure both properties across thousands of human core promoters. Nearly 24,000 sequences, centred on annotated transcription start sites, were integrated as single copies into the same genomic site of HEK293T cells, driving EGFP protein expression. Through fluorescence-activated cell sorting and massive parallel sequencing, we reconstructed the expression distribution of more than 12,000 promoters. Classic core promoter motifs and CpG islands were associated with higher activity, whereas transposable elements, non-canonical TSSs and lack of functional conservation were associated with lower activity. Autonomous activity correlated with endogenous promoter usage, more strongly for housekeeping than for tissue-specific promoters, which rely more on distal regulatory elements. TATA-box promoters were noisier, while CpG-island, GC-rich and broad promoters were less noisy; low noise was also associated with binding of the MLL1/2 complexes and with H3K4me3, even in the absence of CpG islands. In genes with alternative promoters, secondary promoters were generally less active and noisier than main ones, except for those acting as main promoters in some tissues. Together, these results show that activity and noise are largely encoded in the core promoter sequence, and suggest that recently originated promoters start from a suboptimal functional state that can in some cases be refined by the action of natural selection. 
 
-- figura explicativa clara sobre metodologia ??  
--  CpG \+ TATA \+CCAAT  
--  NFYA \+ SP1/2  
-- summary seq  
-- tissue sp \+ ?? \+ summary endo  
-- integrador?
+**Key words:** core promoter, transcriptional noise, MPRA, gene regulation, alternative promoters
 
-Efectos de la secuencia promotor sobre el ruido transcripcional
+# Índice {#índice}
 
-- 3A-B \+TATA2(S6B)  
-- summary (3C)  
-- S6C \+ 3D-E (GSEA MLL1)
+[**Resumen	2**](#resumen)
 
-La relevancia de la secuencia del promotor basal en el contexto endogeno
+[**Abstract	3**](#abstract)
 
-- 2E \+ S4A (hela \- hek etc)  
-- S2(A-B, gsea pol)  
-- 2F S4B (housekeeping y predictibilidad)  
-- 2G \+ S5 (puffin)  
-- sure?  
-- xpresso?  
-- podria sumar (en alguna) tissue sp y ruido
+[**Índice	4**](#índice)
 
-Influencia de la multiplicidad de promotores por gen sobre las caracteristica transcripcionales
+[**Introducción	5**](#introducción)
 
-- 4A-B  
-- estratificacion por tissue specificity  
-- caracterizacion (?)  
-- S7A \+ promoter similarity (o esto va a otra seccion? veremos que tan largo queda)  
-- clasificacion: esquemas fig4C \+ S7B  
-- caracterizacion (?)  
-- 4C \+ ruido?
+[Orden, azar e innovación en la materia viva	5](#orden,-azar-e-innovación-en-la-materia-viva)
 
-# Primer punteo
+[Del genotipo al fenotipo regulatorio	8](#del-genotipo-al-fenotipo-regulatorio)
 
-Además de las figuras del paper, que podria sumar?
+[Más allá del enhancer: el rol regulatorio del promotor basal	9](#más-allá-del-enhancer:-el-rol-regulatorio-del-promotor-basal)
 
-- análisis de potencia del experimento?  
-- similitud de promotores  
-- ~~downstream y upstream~~  
-- caracterización de promotores alternativos  
-- análisis integrador (que da feo)  
-- ~~transient validation~~  
-- pcr control loxp  
-- alguna foto de microscopía  
-- comparación con splicing 2022  
-- library bias  
-- overlapped promoters  
-- **analizar un poco casos cancer y enhancer?**  
-- sumar algunas caracteristicas extra de genes?  
-- xpresso  
-- sure?
+[Diversidad arquitectónica de promotores: robustez y especificidad	11](#diversidad-arquitectónica-de-promotores:-robustez-y-especificidad)
 
-# Organizacion
+[Un gen, varios promotores	13](#un-gen,-varios-promotores)
 
-**Introducción**
+[Ruido transcripcional. El componente estocástico de la transcripción	14](#ruido-transcripcional.-el-componente-estocástico-de-la-transcripción)
 
-**Materiales y metodos**
+[Abordajes experimentales para el estudio del promotor basal	16](#abordajes-experimentales-para-el-estudio-del-promotor-basal)
 
-**Experimentales:**  
-	Descripción general del enfoque
+[**Objetivos	19**](#objetivos)
 
-- Pipeline
+[**Materiales y métodos experimentales	20**](#materiales-y-métodos-experimentales)
 
-Construcción de los plásmidos reporteros conteniendo la library de promotores basales
+[Lógica del ensayo	20](#lógica-del-ensayo)
 
-- Esquema vector \+ microscopía  
-- PCR control integración
+[Construcción de los plásmidos reporteros conteniendo la library de promotores basales	21](#construcción-de-los-plásmidos-reporteros-conteniendo-la-library-de-promotores-basales)
 
-	Cultivo celular y transfección  
-	Citometría de flujo y clasificación de células
+[Cultivo celular y transfección	22](#cultivo-celular-y-transfección)
 
-- Potencia??  
-- Esquema de density con los gates
+[Citometría de flujo y sorting	23](#citometría-de-flujo-y-sorting)
 
-	Control por spike-in de celulas  
-	Co-extraccion de ADN/ARN y secuenciación de amplicones  
-	RT-qPCR de EGFP
+[Controles de spike-in basados en células	24](#controles-de-spike-in-basados-en-células)
 
-- qPCR   
-- PCR loxp (cel no transfectadas)
+[Co-extracción de ADN/ARN  y RT-qPCR de EGFP	24](#co-extracción-de-adn/arn-y-rt-qpcr-de-egfp)
 
-	Anexo Primers y secuencias
+[Secuenciación de amplicones (Amp-seq)	25](#secuenciación-de-amplicones-\(amp-seq\))
 
-**Metodología bioinformática:**  
-**Procesamiento de datos y cuantificación de la actividad promotora**  
-	Procesamiento de los datos de secuenciacion
+[Secuencias de interés y primers utilizados	27](#secuencias-de-interés-y-primers-utilizados)
 
-- Pipeline preprocessing  
-- sample effort \+ bimodal 
+# 
 
-	**Caracterización de la library**  
-	Composicion y diseño de la library
+# Introducción {#introducción}
 
-- type \+ esquema lib \+ heatmap cage
-
-Elementos de secuencia del promotor basal
-
-- epd+cgi+tss+gc
-
-	Patrones de conservación de los promotores basales
-
-- young 2015 \+ phylop
-
-Patrones de actividad endógena de los promotores
-
-- tissue sp \+ shape
-
-Coocurrencia de las características de los promotores basales
-
-- coocurrencia
-
-	Algoritmos de predicción de la actividad promotora basados en la secuencia
-
-- esquema puffin
-
-	Análisis de datos masivos de ChIP-seq  
-**Evaluación del efecto de las características del promotor sobre los patrones transcripcionales medidos**  
-	Asociacion de las características del promotor con la actividad transcripcional  
-	Asociacion de las características del promotor con el ruido transcripcional  
-Análisis de enriquecimiento funcional de la unión de TFs  
-**Promotores alternativos**  
-	Clasificación de promotores alternativos
-
-**Resultados**  
-Estimación masiva de las propiedades transcripcionales de promotores basales humanos
-
-- representatividad por replica venn  
-- sesgo representatividad: venn presort 2022 \+ gc bias (bars y violin)  
-- spike-in  
-- densidad individual \+ densidad ejemplo \+ histograma ejemplo \+ correlacion medias validacion  
-- correlacion medias (pre y post filtro) \+ venn final replicas \+ var corr replicas
-
-Efectos de la secuencia promotor sobre la fuerza transcripcional
-
-- CpG \+ TATA  
-- summary seq  
-- summary endo \+ tissue sp?  
-- SP1/2 \+ NFYA (subdividido en 2 figuras)  
-- remap activity \+ gsea rna pol \+ remap act low  
-- integrador?
-
-Efectos de la secuencia promotor sobre el ruido transcripcional
-
-- scatter ruido \+ auc: cgi \+ tata (separado por expresion)  
-- summary ruido  
-- remap ruido \+ mll1 gsea  
-- chipatlas \+ h3k4me3 \+h3k4me3 noCGI
-
-La relevancia de la secuencia del promotor basal en el contexto endogeno
-
-- 2E \+ S4A (hela \- hek etc)  
-- S2(A-B, gsea pol)  
-- 2F S4B (housekeeping y predictibilidad)  
-- 2G \+ S5 (puffin)  
-- sure  
-- xpresso  
-- podria sumar (en alguna) tissue sp y ruido
-
-Influencia de la multiplicidad de promotores por gen sobre las caracteristica transcripcionales
-
-- 4A-B  
-- caracterizacion (?)  
-- S7A \+promoter similarity (o esto va a otra seccion? veremos que tan largo queda)  
-- clasificacion: esquemas fig4C \+ S7B  
-- caracterizacion (?)  
-- 4C \+ ruido?
-
-**Discusión**
-
-# Esqueleto intro
-
-**0- Orden y azar en la materia viva**   
-2da ley de la termodinamica: entropia. Universo tiende al desorden  
-Schordinger 1944: la vida parece resistir esa tendencia, y su respuesta es que lo hace generando orden de dos maneras distintas — la estadística (orden-desde-desorden) y la "nueva", basada en un código estable y heredable (orden-desde-orden), que él predijo sin conocer aún la estructura del ADN.   
-Ese código estable no actúa por sí solo — se ejecuta mediante química de colisiones al azar, difusión, encuentros probabilísticos entre moléculas. El programa es determinista; su ejecución, no.   
-Traer a Monod para reformular esto en términos evolutivos: el azar molecular no es ruido a eliminar sino materia prima sobre la que actúa la necesidad   
-Traer a Waddington para el otro extremo: cuando el azar amenaza la fidelidad del desarrollo, la evolución también puede construir robustez/canalización para amortiguarlo.   
-Wagner — esa misma robustez, lejos de ser solo protección, es lo que permite explorar y acumular variación silenciosa, y eventualmente innovar.   
-La arquitectura del promotor basal y su ruido transcripcional intrínseco son, en este marco, un caso concreto y medible de esa tensión general: orden codificado, ejecución estocástica, robustez que no es pasiva sino que habilita innovación regulatoria (nuevos promotores, nuevos usos tisulares). 
-
-**1- Del genotipo al fenotipo regulatorio**   
-Objetivo central de la genómica: cómo la secuencia de ADN determina la expresión génica y el fenotipo  
-La transcripción como paso regulatorio clave en eucariotas  
-Cuánto del comportamiento regulatorio de un gen está "escrito" en su secuencia, independientemente del contexto? (introducción a la pregunta, no abordaje completo)  
-Adelantar que esta tesis aborda dos fenotipos regulatorios distintos (actividad y ruido) y que ambos son parte de esta misma pregunta de "lectura" de la secuencia.
-
-**2- Más allá del enhancer: el rol regulatorio del promotor basal**   
-Core promoter: región que recluta RNAPII para iniciar la transcripción  
-Definición operacional y elementos de secuencia (TATA-box, Inr, DPE, BRE), PIC y factores generales  
-El paradigma histórico enhancer-céntrico: los enhancers como responsables de controlar el output transcripcional  
-Evidencia reciente que lo cuestiona: la secuencia del promotor sola puede ser predictiva de actividad  
-Autonomía transcripcional como propiedad general de los promotores humanos, medida de forma no sesgada a nivel genómico   
-El promotor también selecciona qué enhancers vecinos pueden regularlo — no es solo receptor pasivo de señales 
-
-**3- Diversidad arquitectónica de promotores: robustez versus especificidad**   
-Promotores focused vs. dispersed/broad, y su implicancia evolutiva en robustez a variación genética  
-Asociación housekeeping vs TATA-less/GC-rich/CpG islands/TSS disperso, y tejido-específico vs TATA-box/TSS focused   
-*R*obustez y estabilidad vs. capacidad de respuesta precisa, como dos soluciones evolutivas a distintas demandas regulatorias  
-Islas CpG y su asociación con alta actividad/autonomía (motivos GC-box, efecto sobre posicionamiento nucleosomal)  
-Nucleosomas y marcas de histonas (H3K4me3) como contexto de cromatina asociado a estas arquitecturas  
-*Plantear:* ¿la cromatina establece el régimen transcripcional o es un reflejo de un estado ya definido por la secuencia?
-
-**4\. Un gen, varios promotores** 
-
-* La mayoría de los genes humanos tienen múltiples promotores alternativos  
-* Origen de promotores alternativos: enhancers, elementos retrovirales endógenos, splicing-mediated activation  
-* Plantear la pregunta de economía evolutiva: si ya existe un promotor funcional, ¿qué ventaja da mantener promotores "de repuesto"?  
-* Necesidad de un abordaje promotor-céntrico en vez de gen-céntrico  
-* *I*dea de promotor principal vs. secundario y el fenómeno de tissue-switching, como pistas de que la multiplicidad podría ser plasticidad y no simple redundancia
-
-**5- Ruido transcripcional. El componente estocástico de la transcripción** 
-
-Definición: componente de variabilidad célula a célula específico de cada gen   
-Bursting transcripcional como mecanismo subyacente, ligado a switches de estado del promotor   
-Explicar el modelo de bursting (on/off, frecuencia vs. tamaño de burst) para dar base mecanística a la pregunta de desacople media-varianza  
-Base genética heredable del ruido, sujeta a selección natural  
-¿puede un promotor ser muy activo pero poco ruidoso, o alta actividad y alto ruido van necesariamente ligados? (adelantar el caso TATA como ejemplo de acoplamiento)  
-Relevancia en robustez biológica y desarrollo (determinación de destino celular) Antecedentes en levadura (nucleosomas, sitios de unión a TF) y en mamíferos vía scRNA-seq  
-Limitación central de scRNA-seq: no separa el efecto del promotor de otras señales genéticas/epigenéticas, ni discrimina promotores alternativos
-
-**6- Abordajes experimentales para el estudio del promotor basal** 
-
-Qué es un MPRA y por qué permite desacoplar secuencia de contexto genómico/epigenético (vuelve a la pregunta de la seccion 3\)  
-Variantes existentes (episomales, STARR-seq, SuRE, lentiMPRA) y sus limitaciones frente a un sistema de integración en locus único  
-Conectar con la meta-pregunta de predictibilidad: ¿se puede predecir el comportamiento regulatorio de un promotor solo mirando su secuencia? (y reconectar con seccion 1\)  
-Modelos como Xpresso o PUFFIN intentan predecir comportamiento regulatorio desde una secuencia.   
-Y para que nos sirve todo esto?
-
-**7-**   
-**hipotesis, objetivos generales y especificos**  
-**descripcion breve de metodologia**  
-**hilo de secciones de resultados**
-
-# Prologo
-
-**Orden, azar e innovación en la materia viva**
+## Orden, azar e innovación en la materia viva {#orden,-azar-e-innovación-en-la-materia-viva}
 
 Un cristal de sal y un huracán son, en un sentido físico preciso, dos maneras distintas de producir orden. El cristal alcanza su estructura minimizando energía libre, cerca del equilibrio termodinámico: una vez formado, no necesita nada del exterior para persistir. El huracán, en cambio, es una estructura disipativa, en el sentido que le dio Ilya Prigogine: existe únicamente mientras un flujo continuo de energía lo atraviesa, y se disuelve en el aire quieto apenas ese flujo se interrumpe. La vida, con toda su complejidad, pertenece inequívocamente a la segunda familia. Ningún organismo alcanza jamás el equilibrio con su entorno mientras vive, y sostiene su organización interna a fuerza de un metabolismo que nunca se detiene. Al final de cuentas, para casi cualquier célula, el equilibrio termodinámico equivale a la muerte. Esto no contradice la ley más inapelable de la física, según la cual la entropía de un sistema cerrado nunca disminuye: la vida no es una excepción a esa ley, sino una de sus consecuencias más elaboradas, orden que se paga constantemente con entropía exportada al entorno.[^1]
 
@@ -346,11 +102,9 @@ Todas estas ideas convergen en un mismo escenario concreto y medible: el promoto
 
 Esta tesis parte de esa tensión general para hacerla, en las páginas que siguen, una pregunta molecular concreta y experimentalmente abordable: ¿qué elementos de la secuencia de un promotor basal humano determinan cuánto se ejecuta ese programa, y cuán al azar ocurre cada uno de esos eventos de ejecución, y qué nos dice esto sobre la lógica evolutiva de la regulación génica? ¿Cómo tensiona la evolución, en cada promotor, la información con el caos, la robustez con la posibilidad de cambiar?
 
-# Intro
+## Del genotipo al fenotipo regulatorio  {#del-genotipo-al-fenotipo-regulatorio}
 
-**1- Del genotipo al fenotipo regulatorio** 
-
-Explicar cómo la información contenida en el genotipo se traduce en las características observables de un organismo —su fenotipo— es una de las preguntas fundacionales de la genética, presente desde que Wilhelm Johannsen acuñó ambos términos a comienzos del siglo XX para distinguir la constitución hereditaria de un organismo de su manifestación observable (Johannsen, 1911\). Durante buena parte del siglo XX, esta pregunta se abordó casi exclusivamente a través de la secuencia codificante: qué proteína produce un gen, y cómo las variantes en esa secuencia alteran su función. Sin embargo, el advenimiento de la genómica funcional y de los estudios de asociación de genoma completo (GWAS) reveló un panorama considerablemente más complejo. La gran mayoría de las variantes genéticas asociadas a enfermedades y rasgos complejos en humanos no se localiza en regiones codificantes, sino que se concentra en el ADN regulatorio no codificante (Maurano et al., 2012\). Este hallazgo desplazó buena parte del interés de la genética funcional desde la pregunta de qué hace una proteína hacia una pregunta distinta, y en muchos sentidos más difícil: qué determina cuánto, cuándo y en qué célula se expresa un gen.
+Explicar cómo la información contenida en el genotipo se traduce en las características observables de un organismo —su fenotipo— es una de las preguntas fundacionales de la genética, presente desde que Wilhelm Johannsen acuñó ambos términos a comienzos del siglo XX para distinguir la constitución hereditaria de un organismo de su manifestación observable (Johannsen, 1911). Durante buena parte del siglo XX, esta pregunta se abordó casi exclusivamente a través de la secuencia codificante: qué proteína produce un gen, y cómo las variantes en esa secuencia alteran su función. Sin embargo, el advenimiento de la genómica funcional y de los estudios de asociación de genoma completo (GWAS) reveló un panorama considerablemente más complejo. La gran mayoría de las variantes genéticas asociadas a enfermedades y rasgos complejos en humanos no se localiza en regiones codificantes, sino que se concentra en el ADN regulatorio no codificante (Maurano et al., 2012). Este hallazgo desplazó buena parte del interés de la genética funcional desde la pregunta de qué hace una proteína hacia una pregunta distinta, y en muchos sentidos más difícil: qué determina cuánto, cuándo y en qué célula se expresa un gen.
 
 Un objetivo central de la genómica moderna es, entonces, comprender cómo la secuencia de ADN determina la expresión génica y, a través de ella, el fenotipo. En la enorme mayoría de los organismos eucariotas, la transcripción constituye el paso regulatorio primario de este proceso: es en la decisión de transcribir o no un gen, y en qué magnitud hacerlo, donde se define buena parte del destino de la información genética [(Levine and Tjian 2003; Ptashne and Gann 1997\)](https://www.zotero.org/google-docs/?7537cx). Esta decisión no ocurre de manera espontánea. Requiere el reclutamiento y ensamblado de la ARN Polimerasa II (RNAPII) sobre el ADN, en un proceso que depende de una región de secuencia acotada alrededor del sitio de inicio de la transcripción (*transcription start site*, TSS): el promotor basal o *core promoter* (Sainsbury et al., 2015).
 
@@ -360,23 +114,23 @@ Trabajos más recientes han puesto en cuestión esta jerarquía. Distintos estud
 
 Esta reevaluación del rol del promotor no resuelve, sin embargo, una pregunta más amplia y todavía abierta: si tanta información regulatoria está efectivamente codificada en esta región relativamente corta de secuencia, ¿cuánto del comportamiento regulatorio de un gen está, en efecto, "escrito" en ella, independientemente del contexto genómico en el que se encuentre? Esta tesis aborda esa pregunta a través de dos fenotipos regulatorios distintos, aunque estrechamente relacionados entre sí: la *actividad* transcripcional que un promotor es capaz de dirigir, y el *ruido*, o variabilidad célula a célula, que esa misma actividad conlleva. Ambos pueden entenderse como dos maneras diferentes pero complementarias de "leer" cuánta información regulatoria contiene la secuencia de un promotor basal. Responder esta pregunta requiere, en primer lugar, precisar qué constituye un promotor basal y qué elementos de secuencia lo definen. 
 
-**2- Más allá del enhancer: el rol regulatorio del promotor basal**
+## Más allá del enhancer: el rol regulatorio del promotor basal {#más-allá-del-enhancer:-el-rol-regulatorio-del-promotor-basal}
 
-El promotor basal, o *core promoter*, es la región de ADN que rodea el sitio de inicio de la transcripción y que recluta directamente a la ARN Polimerasa II para dar comienzo a este proceso. Conviene aclarar, antes de avanzar, que cualquier definición de esta región es necesariamente operacional y no una categoría natural con límites fijos. Distintos autores la delimitan de formas ligeramente distintas según el criterio metodológico empleado (footprint de unión de TFIID, mapeo funcional por deleción, ventana de distancia al TSS), y no existe un elemento de secuencia universal que permita trazar un borde inequívoco (**Smale y Kadonaga, 2003**; **Kadonaga, 2012**). En la práctica, suele considerarse el tramo comprendido entre aproximadamente 35 y 40 pares de bases hacia arriba y hacia abajo del TSS, pero esa cifra es una convención útil, no una frontera biológica estricta.
+El promotor basal, o *core promoter*, es la región de ADN que rodea el sitio de inicio de la transcripción y que recluta directamente a la ARN Polimerasa II para dar comienzo a este proceso. Conviene aclarar, antes de avanzar, que cualquier definición de esta región es necesariamente operacional y no una categoría natural con límites fijos. Distintos autores la delimitan de formas ligeramente distintas según el criterio metodológico empleado (footprint de unión de TFIID, mapeo funcional por deleción, ventana de distancia al TSS), y no existe un elemento de secuencia universal que permita trazar un borde inequívoco (Smale y Kadonaga, 2003; Kadonaga, 2012). En la práctica, suele considerarse el tramo comprendido entre aproximadamente 35 y 40 pares de bases hacia arriba y hacia abajo del TSS, pero esa cifra es una convención útil, no una frontera biológica estricta.
 
-Dentro de esa región ocurre el ensamblado del complejo de preiniciación (*preinitiation complex*, PIC). El modelo mejor descripto, obtenido en gran medida a partir de reconstituciones in vitro, propone un orden aproximadamente jerárquico: el factor general TFIID, a través de su subunidad TBP y de un conjunto de proteínas asociadas (TAFs), reconoce primero los elementos de secuencia del promotor; TFIIA estabiliza esta unión; TFIIB actúa como puente hacia el complejo formado por la RNAPII y TFIIF; y finalmente se suman TFIIE y TFIIH, completando el PIC. TFIIH cumple un rol particular, ya que su actividad helicasa desenrolla localmente el ADN alrededor del TSS, y su actividad quinasa fosforila el dominio carboxilo-terminal de la RNAPII, un paso necesario para que la polimerasa escape del promotor e inicie la elongación [(Sainsbury et al. 2015\)](https://www.zotero.org/google-docs/?UXieby). Vale aclarar que este esquema describe un caso relativamente canónico, y no un mecanismo único ni fijo: existen complejos TFIID de composición alternativa, factores específicos de ciertos promotores o tipos celulares que pueden reemplazar a componentes considerados generales (como TBP), y evidencia de que el orden real de ensamblado en la célula no siempre reproduce con exactitud la secuencia observada en sistemas reconstituidos (**Cramer, 2019**). La maquinaria basal de transcripción, en otras palabras, admite variantes.
+Dentro de esa región ocurre el ensamblado del complejo de preiniciación (*preinitiation complex*, PIC). El modelo mejor descripto, obtenido en gran medida a partir de reconstituciones in vitro, propone un orden aproximadamente jerárquico: el factor general TFIID, a través de su subunidad TBP y de un conjunto de proteínas asociadas (TAFs), reconoce primero los elementos de secuencia del promotor; TFIIA estabiliza esta unión; TFIIB actúa como puente hacia el complejo formado por la RNAPII y TFIIF; y finalmente se suman TFIIE y TFIIH, completando el PIC. TFIIH cumple un rol particular, ya que su actividad helicasa desenrolla localmente el ADN alrededor del TSS, y su actividad quinasa fosforila el dominio carboxilo-terminal de la RNAPII, un paso necesario para que la polimerasa escape del promotor e inicie la elongación [(Sainsbury et al. 2015\)](https://www.zotero.org/google-docs/?UXieby). Vale aclarar que este esquema describe un caso relativamente canónico, y no un mecanismo único ni fijo: existen complejos TFIID de composición alternativa, factores específicos de ciertos promotores o tipos celulares que pueden reemplazar a componentes considerados generales (como TBP), y evidencia de que el orden real de ensamblado en la célula no siempre reproduce con exactitud la secuencia observada en sistemas reconstituidos (Cramer, 2019). La maquinaria basal de transcripción, en otras palabras, admite variantes.
 
-Buena parte de este ensamblado depende, además, de qué elementos de secuencia estén presentes en el promotor, y ningún elemento por sí solo alcanza para explicarlo. La caja TATA, reconocida directamente por TBP, se ubica típicamente entre 25 y 30 pares de bases antes del TSS y es uno de los elementos mejor caracterizados, aunque está presente en apenas una fracción minoritaria de los promotores humanos **(Smale y Kadonaga, 2003\)**. El iniciador (*Inr*) abarca el propio sitio de inicio y admite dos niveles de definición: una versión mínima, que solo requiere una pirimidina en la posición −1 y una purina en la posición \+1 (Py-Pu), y una versión más estricta, reconstruida a partir de datos genómicos de alta resolución, que identifica un consenso más completo (BBCABW) en promotores con un único sitio de inicio bien definido (**Vo ngoc et al., 2017**). Ese mismo trabajo mostró que los promotores con un Inr consenso tienden a carecer de caja TATA, y que su presencia no está particularmente asociada a la de islas CpG. A estos se suman el elemento de reconocimiento de TFIIB (*BRE*), adyacente a un subconjunto de cajas TATA, y el elemento promotor *downstream* (*DPE*), que requiere de un Inr para funcionar y es especialmente frecuente en promotores sin caja TATA **(Smale y Kadonaga, 2003; Kadonaga, 2012\)**.
+Buena parte de este ensamblado depende, además, de qué elementos de secuencia estén presentes en el promotor, y ningún elemento por sí solo alcanza para explicarlo. La caja TATA, reconocida directamente por TBP, se ubica típicamente entre 25 y 30 pares de bases antes del TSS y es uno de los elementos mejor caracterizados, aunque está presente en apenas una fracción minoritaria de los promotores humanos (Smale y Kadonaga, 2003). El iniciador (*Inr*) abarca el propio sitio de inicio y admite dos niveles de definición: una versión mínima, que solo requiere una pirimidina en la posición −1 y una purina en la posición \+1 (Py-Pu), y una versión más estricta, reconstruida a partir de datos genómicos de alta resolución, que identifica un consenso más completo (BBCABW) en promotores con un único sitio de inicio bien definido (Vo ngoc et al., 2017). Ese mismo trabajo mostró que los promotores con un Inr consenso tienden a carecer de caja TATA, y que su presencia no está particularmente asociada a la de islas CpG. A estos se suman el elemento de reconocimiento de TFIIB (*BRE*), adyacente a un subconjunto de cajas TATA, y el elemento promotor *downstream* (*DPE*), que requiere de un Inr para funcionar y es especialmente frecuente en promotores sin caja TATA (Smale y Kadonaga, 2003; Kadonaga, 2012).
 
 Otros dos elementos frecuentes son la caja CCAAT, reconocida por el factor trimérico NF-Y, y la caja GC, reconocida principalmente por proteínas de la familia Sp (Sp1, Sp2, Sp3). Ambos suelen coexistir en un mismo promotor con mayor frecuencia de la esperada por azar, y su presencia está fuertemente asociada a la ausencia de caja TATA. La caja GC, en particular, suele encontrarse en contextos ricos en dinucleótidos CG, es decir, en o cerca de islas CpG.
 
-Como se planteó antes, el promotor basal fue entendido durante décadas como una plataforma más bien pasiva, cuya activación dependía casi por completo de señales aportadas por enhancers distales. Bajo este modelo, conocido como el *enhanceosoma*, la especificidad de un programa transcripcional residía en la combinación particular de factores de transcripción que se ensamblaban sobre un enhancer, mientras que el promotor cumplía una función mayormente indiferenciada de recepción de esa señal (**Spitz y Furlong, 2012**) . La evidencia reunida en los últimos años, de que la secuencia del promotor por sí sola puede predecir buena parte de su actividad transcripcional, obliga a matizar esta idea.
+Como se planteó antes, el promotor basal fue entendido durante décadas como una plataforma más bien pasiva, cuya activación dependía casi por completo de señales aportadas por enhancers distales. Bajo este modelo, conocido como el *enhanceosoma*, la especificidad de un programa transcripcional residía en la combinación particular de factores de transcripción que se ensamblaban sobre un enhancer, mientras que el promotor cumplía una función mayormente indiferenciada de recepción de esa señal (Spitz y Furlong, 2012\) . La evidencia reunida en los últimos años, de que la secuencia del promotor por sí sola puede predecir buena parte de su actividad transcripcional, obliga a matizar esta idea.
 
 Quizás el hallazgo más contundente en esta dirección es que los propios promotores basales no responden de manera indiferenciada a cualquier enhancer disponible, sino que existe una compatibilidad selectiva entre ciertos tipos de promotores y ciertos tipos de enhancers. Un estudio en *Drosophila* mostró que los promotores asociados a genes *housekeeping* y los promotores asociados a genes de desarrollo responden preferentemente a enhancers de su misma categoría, y que esta preferencia depende de elementos de secuencia específicos dentro del propio *core promoter*, y no solo de la identidad del enhancer [(Zabidi et al. 2015\)](https://www.zotero.org/google-docs/?1V9hGE). En la misma línea, un análisis más amplio de secuencias de promotores eucariotas propuso que la diversidad de elementos del *core promoter* codifica, en la práctica, distintas gramáticas regulatorias, cada una compatible con un conjunto particular de mecanismos de activación [(Haberle and Stark 2018\)](https://www.zotero.org/google-docs/?DQcd37). El promotor, entonces, no solo puede generar actividad transcripcional de manera autónoma: también parece participar activamente en decidir qué señales regulatorias externas está dispuesto a aceptar.
 
 Esta evidencia reposiciona al promotor basal como un actor con información propia, y no como un simple ejecutor de decisiones tomadas en otro lugar del genoma. Pero también deja planteada una pregunta que todavía no fue respondida: si la arquitectura del promotor determina tanto su nivel de actividad como su compatibilidad con distintos enhancers, ¿determina también su comportamiento estocástico, es decir, cuán variable es esa actividad de una célula a otra? Para abordar esta pregunta hace falta, primero, entender por qué no todos los promotores tienen la misma arquitectura, y qué lógica evolutiva podría explicar esa diversidad.
 
-**3- Diversidad arquitectónica de promotores: robustez y especificidad**
+## Diversidad arquitectónica de promotores: robustez y especificidad {#diversidad-arquitectónica-de-promotores:-robustez-y-especificidad}
 
 No todos los promotores inician la transcripción de la misma manera. Un mapeo genómico de sitios de inicio de transcripción en mamíferos, realizado mediante la técnica de CAGE (*cap analysis of gene expression*), mostró que los promotores pueden agruparse en dos grandes clases según su arquitectura: promotores angostos o focalizados, donde la transcripción comienza en una posición única o en un grupo estrecho de posiciones vecinas, y promotores anchos o dispersos, donde el inicio se distribuye entre múltiples posiciones alternativas a lo largo de una ventana más amplia [(Carninci et al. 2006\)](https://www.zotero.org/google-docs/?la9W6Q). Esta distinción, conocida como la "forma" (*shape*) del promotor, suele cuantificarse con una medida de entropía análoga a la que Shannon propuso para cuantificar la incertidumbre de una fuente de información: cuanto más repartida está la probabilidad de inicio entre distintas posiciones, mayor es la entropía, y más disperso es el promotor.
 
@@ -384,7 +138,7 @@ La forma de un promotor no es independiente del tipo de gen al que pertenece. Lo
 
 Esta asociación sugiere una lógica de diseño evolutivo relativamente intuitiva. Un gen housekeeping necesita mantener un nivel de expresión estable en prácticamente cualquier contexto celular, y para eso puede beneficiarse de una arquitectura robusta, tolerante a variación, aunque menos precisa. Un gen regulado de forma específica, en cambio, necesita poder activarse (o no) con precisión en el momento y el tejido correctos, algo que se logra mejor con un sitio de inicio único y bien definido, aun a costa de una mayor fragilidad frente a mutaciones. Robustez y especificidad, en este sentido, parecen operar como dos soluciones distintas a dos demandas regulatorias distintas, más que como una jerarquía de arquitecturas "buenas" y "malas".
 
-Esta arquitectura no ocurre en el vacío, sino embebida en un contexto de cromatina particular. Las islas CpG (regiones cortas, ricas en GC y en dinucleótidos CG, que escapan a la metilación característica del resto del genoma) tienden a desestabilizar la ocupación de nucleosomas y a favorecer un estado de cromatina permisivo para la transcripción, lo cual explica en parte por qué los promotores que las contienen suelen ser transcripcionalmente más activos y autónomos (Deaton y Bird, 2011\). Este mismo contexto de cromatina, evaluado de manera más general, distingue a los genes según su capacidad de responder a cambios de condición: en levadura, los promotores con un nucleosoma bien posicionado inmediatamente antes del sitio de inicio muestran mayor plasticidad transcripcional frente a distintos estímulos, mientras que aquellos con una región libre de nucleosomas amplia y estable en esa misma posición tienden a mostrar una expresión más constitutiva. Ambas estrategias, además, se asocian a niveles distintos de ruido transcripcional (Tirosh y Barkai, 2008).
+Esta arquitectura no ocurre en el vacío, sino embebida en un contexto de cromatina particular. Las islas CpG (regiones cortas, ricas en GC y en dinucleótidos CG, que escapan a la metilación característica del resto del genoma) tienden a desestabilizar la ocupación de nucleosomas y a favorecer un estado de cromatina permisivo para la transcripción, lo cual explica en parte por qué los promotores que las contienen suelen ser transcripcionalmente más activos y autónomos (Deaton y Bird, 2011). Este mismo contexto de cromatina, evaluado de manera más general, distingue a los genes según su capacidad de responder a cambios de condición: en levadura, los promotores con un nucleosoma bien posicionado inmediatamente antes del sitio de inicio muestran mayor plasticidad transcripcional frente a distintos estímulos, mientras que aquellos con una región libre de nucleosomas amplia y estable en esa misma posición tienden a mostrar una expresión más constitutiva. Ambas estrategias, además, se asocian a niveles distintos de ruido transcripcional (Tirosh y Barkai, 2008).
 
 Entre las marcas de cromatina asociadas a este contexto, la trimetilación de la lisina 4 de la histona H3 (H3K4me3) ocupa un lugar particular. Se trata de una de las marcas más consistentemente enriquecidas en los sitios de inicio de transcripción activos, presente en la gran mayoría de los promotores humanos con actividad detectable, independientemente del nivel de expresión del gen (Guenther et al., 2007). Su relación con la maquinaria basal no es solo correlativa: TAF3, una de las subunidades de TFIID, reconoce directamente a H3K4me3 y contribuye a anclar el complejo de preiniciación sobre el promotor, lo que sugiere que esta marca no solo acompaña a los promotores activos, sino que participa activamente en su reconocimiento por parte de la maquinaria de transcripción (Vermeulen et al., 2007). H3K4me3 tiende además a coincidir con la presencia de islas CpG, reforzando el mismo entorno de cromatina permisivo ya descripto.
 
@@ -392,7 +146,7 @@ Esta última pregunta no es un detalle menor. Un estudio en *Drosophila* mostró
 
 Queda, sin embargo, una pregunta sin resolver: si la arquitectura de secuencia predice tanto la actividad como (al menos en parte) el ruido de un promotor, ¿lo hace de manera directa, o actúa a través del contexto de cromatina que esa misma secuencia genera a su alrededor? Distinguir estas dos posibilidades requiere herramientas capaces de aislar la secuencia del promotor de su contexto genómico habitual, algo que retomamos más adelante. Antes de eso, sin embargo, conviene atender a otra fuente de complejidad que la descripción hecha hasta acá pasó por alto: la mayoría de los genes no tiene un único promotor, sino varios.
 
-**4- Un gen, varios promotores**
+## Un gen, varios promotores {#un-gen,-varios-promotores}
 
 Hasta acá describimos al promotor basal como si cada gen tuviera uno solo. En la práctica, en vertebrados, esa es la excepción y no la regla: la mayoría de los genes humanos poseen múltiples promotores alternativos, capaces de iniciar la transcripción de distintas isoformas de un mismo gen desde posiciones genómicas diferentes [(Carninci et al. 2006\)](https://www.zotero.org/google-docs/?HlPeiL). Esta multiplicidad no es un fenómeno marginal ni exclusivo de un puñado de genes particulares, sino una característica extendida del genoma humano, lo cual complica cualquier intento de describir la regulación transcripcional gen por gen, como si cada uno tuviera un único punto de entrada a la transcripción.
 
@@ -404,9 +158,9 @@ Esta pregunta tiene, además, una consecuencia práctica ineludible para cualqui
 
 Algo de esta lógica de plasticidad ya empieza a insinuarse en la relación entre promotores dentro de un mismo gen. Cuando un gen tiene varios promotores, suele haber uno que domina la expresión en la mayoría de los tejidos, el promotor principal, y otro u otros que contribuyen de manera minoritaria, los promotores secundarios. Pero esta jerarquía no es fija: en ciertos tejidos, un promotor normalmente secundario puede convertirse en el promotor dominante, desplazando al principal, en lo que suele describirse como un patrón de *tissue-switching*. La existencia de este fenómeno sugiere que, al menos para un subconjunto de genes, la multiplicidad de promotores no es simplemente un excedente regulatorio tolerado por la evolución, sino un mecanismo activo que permite a un gen adaptar su programa de expresión según el contexto celular, sin necesidad de rediseñar su regulación desde cero.
 
-**5- Ruido transcripcional. El componente estocástico de la transcripción**
+## Ruido transcripcional. El componente estocástico de la transcripción {#ruido-transcripcional.-el-componente-estocástico-de-la-transcripción}
 
-Incluso dentro de una población de células genéticamente idénticas, del mismo tipo y en el mismo ambiente, el nivel de expresión de un gen dado puede variar considerablemente de una célula a otra. Esta variabilidad no es un artefacto técnico ni un error de medición: es, en gran medida, una propiedad genuina del proceso biológico. Elowitz y colaboradores, en uno de los trabajos fundacionales del campo, distinguieron dos componentes de esta variabilidad usando un sistema de doble reportero fluorescente en *Escherichia coli*: el **ruido extrínseco**, que afecta simultáneamente a muchos o todos los genes de una célula (por diferencias en el microambiente, el estado del ciclo celular o la capacidad general de expresión de esa célula en particular), y el **ruido intrínseco**, específico de cada gen, que depende de sus propios mecanismos moleculares de expresión y ocurre incluso cuando esos factores más generales se mantienen constantes [(Elowitz 2002\)](https://www.zotero.org/google-docs/?mfvRS1). Esta tesis se ocupa exclusivamente del segundo: el ruido transcripcional intrínseco, atribuible a la identidad y el comportamiento de un promotor particular.
+Incluso dentro de una población de células genéticamente idénticas, del mismo tipo y en el mismo ambiente, el nivel de expresión de un gen dado puede variar considerablemente de una célula a otra. Esta variabilidad no es un artefacto técnico ni un error de medición: es, en gran medida, una propiedad genuina del proceso biológico. Elowitz y colaboradores, en uno de los trabajos fundacionales del campo, distinguieron dos componentes de esta variabilidad usando un sistema de doble reportero fluorescente en *Escherichia coli*: el ruido extrínseco, que afecta simultáneamente a muchos o todos los genes de una célula (por diferencias en el microambiente, el estado del ciclo celular o la capacidad general de expresión de esa célula en particular), y el ruido intrínseco, específico de cada gen, que depende de sus propios mecanismos moleculares de expresión y ocurre incluso cuando esos factores más generales se mantienen constantes [(Elowitz 2002\)](https://www.zotero.org/google-docs/?mfvRS1). Esta tesis se ocupa exclusivamente del segundo: el ruido transcripcional intrínseco, atribuible a la identidad y el comportamiento de un promotor particular.
 
 El origen mecanístico de este ruido intrínseco está bien establecido: la transcripción no ocurre de manera continua, sino en pulsos discretos, conocidos como ráfagas o *bursts*, separados por períodos de inactividad. Este comportamiento se ha observado de manera consistente en organismos tan distintos como bacterias, levaduras y células de mamíferos [(Raser and O’Shea 2004\)](https://www.zotero.org/google-docs/?SRRA3X). El modelo más simple para describirlo asume que el promotor alterna entre un estado activo, capaz de iniciar transcripción, y uno inactivo, y que esta dinámica puede caracterizarse mediante dos parámetros: el tamaño medio de cada ráfaga (cuánto ARN se produce durante el período activo) y su frecuencia (cuán seguido ocurre ese período). Ambos parámetros afectan de manera distinta al fenotipo observable: aumentar el tamaño de las ráfagas incrementa el nivel medio de expresión sin modificar demasiado el ruido, mientras que aumentar su frecuencia incrementa el nivel medio y, al mismo tiempo, reduce el ruido, ya que un mayor número de eventos independientes por unidad de tiempo tiende a promediarse con mayor precisión [(Dar et al. 2012; Hornung et al. 2012\)](https://www.zotero.org/google-docs/?taOBYc). La actividad y el ruido de un promotor, entonces, no son magnitudes independientes entre sí: comparten un origen mecanístico común en la dinámica de estas ráfagas, aunque no varíen necesariamente juntas ni en la misma dirección.
 
@@ -422,17 +176,17 @@ Este enfoque, sin embargo, tiene limitaciones importantes. La medición de scRNA
 
 Superar estas limitaciones requiere un abordaje distinto: uno que permita medir la actividad y el ruido de un promotor aislándolo de su contexto genómico habitual, y que además preserve la posibilidad de estudiar cada promotor alternativo de un gen por separado.
 
-**6- Abordajes experimentales para el estudio del promotor basal**
+## Abordajes experimentales para el estudio del promotor basal {#abordajes-experimentales-para-el-estudio-del-promotor-basal}
 
 Buena parte de la evidencia discutida hasta acá (la capacidad predictiva de la secuencia del promotor, su asociación con arquitecturas particulares, su relación con el ruido) proviene de datos observacionales: genomas humanos tal como son, con sus promotores insertos en su contexto genómico habitual. Esta clase de evidencia es poderosa para detectar asociaciones, pero limitada para establecer causalidad, ya que la secuencia de un promotor y su contexto genómico (cromatina, elementos regulatorios vecinos, el propio gen al que pertenece) no varían de manera independiente en la naturaleza. Para preguntar si una característica de secuencia *causa* un determinado nivel de actividad o de ruido, y no simplemente lo acompaña, hace falta poder variar la secuencia mientras se mantiene fijo todo lo demás.
 
-Antes de describir cómo se mide la actividad de un promotor aislado de su contexto, conviene precisar cómo se mide su actividad *en* ese contexto, es decir, su uso endógeno. La técnica más extendida con este fin es CAGE (*Cap Analysis of Gene Expression*), que aprovecha la estructura *cap* presente en el extremo 5' de todo ARN mensajero maduro como ancla para secuenciar específicamente los primeros 25 a 27 pares de bases de cada transcripto. Al mapear estas lecturas cortas contra el genoma, es posible identificar la posición exacta del sitio de inicio de la transcripción con resolución de un nucleótido, y cuantificar la frecuencia de uso de cada uno a partir del número de lecturas que se originan en él (**Kanamori-Katayama et al., 2011**; **Takahashi et al., 2012**). Esta técnica fue la base del consorcio FANTOM, cuyo mapeo sistemático de promotores en decenas de tipos celulares y tejidos humanos constituye, hasta la fecha, el catálogo de referencia más utilizado en el campo [(The FANTOM Consortium and the RIKEN PMI and CLST (DGT) 2014\)](https://www.zotero.org/google-docs/?pYqt39). RAMPAGE, una variante posterior, incorpora secuenciación de a pares para exigir que cada lectura provenga de un ADNc verdaderamente completo en su extremo 5', mejorando la especificidad de la identificación de TSS a costa de un protocolo algo más laborioso (**Batut y Gingeras, 2013**). Un enfoque distinto, PRO-cap, no secuencia el ARN maduro sino que marca y captura directamente el extremo 5' del ARN naciente asociado a moléculas de RNAPII activamente comprometidas con la transcripción, lo cual permite detectar eventos de inicio incluso cuando el transcripto resultante es inestable y nunca llega a acumularse lo suficiente para ser detectado por CAGE (**Kwak et al., 2013**). Estas tres técnicas, y otras derivadas de ellas, miden en definitiva lo mismo desde ángulos distintos: cuánto se usa un promotor en su locus natural, rodeado de todo su contexto genómico y regulatorio habitual. Esto las distingue conceptualmente de los MPRA, que miden la actividad de una secuencia de promotor aislada de ese contexto.
+Antes de describir cómo se mide la actividad de un promotor aislado de su contexto, conviene precisar cómo se mide su actividad *en* ese contexto, es decir, su uso endógeno. La técnica más extendida con este fin es CAGE (*Cap Analysis of Gene Expression*), que aprovecha la estructura *cap* presente en el extremo 5' de todo ARN mensajero maduro como ancla para secuenciar específicamente los primeros 25 a 27 pares de bases de cada transcripto. Al mapear estas lecturas cortas contra el genoma, es posible identificar la posición exacta del sitio de inicio de la transcripción con resolución de un nucleótido, y cuantificar la frecuencia de uso de cada uno a partir del número de lecturas que se originan en él (Kanamori-Katayama et al., 2011; Takahashi et al., 2012). Esta técnica fue la base del consorcio FANTOM, cuyo mapeo sistemático de promotores en decenas de tipos celulares y tejidos humanos constituye, hasta la fecha, el catálogo de referencia más utilizado en el campo [(The FANTOM Consortium and the RIKEN PMI and CLST (DGT) 2014\)](https://www.zotero.org/google-docs/?pYqt39). RAMPAGE, una variante posterior, incorpora secuenciación de a pares para exigir que cada lectura provenga de un ADNc verdaderamente completo en su extremo 5', mejorando la especificidad de la identificación de TSS a costa de un protocolo algo más laborioso (Batut y Gingeras, 2013). Un enfoque distinto, PRO-cap, no secuencia el ARN maduro sino que marca y captura directamente el extremo 5' del ARN naciente asociado a moléculas de RNAPII activamente comprometidas con la transcripción, lo cual permite detectar eventos de inicio incluso cuando el transcripto resultante es inestable y nunca llega a acumularse lo suficiente para ser detectado por CAGE (Kwak et al., 2013). Estas tres técnicas, y otras derivadas de ellas, miden en definitiva lo mismo desde ángulos distintos: cuánto se usa un promotor en su locus natural, rodeado de todo su contexto genómico y regulatorio habitual. Esto las distingue conceptualmente de los MPRA, que miden la actividad de una secuencia de promotor aislada de ese contexto.
 
-Los ensayos reporteros masivamente paralelos (*Massively Parallel Reporter Assays*, MPRA) fueron desarrollados con este objetivo. La idea general es sintetizar o clonar miles de secuencias candidatas, colocarlas en un contexto reportero común (típicamente, dirigiendo la expresión de un gen fácilmente cuantificable) e inferir la actividad de cada una a partir de la abundancia relativa de sus transcriptos, identificados mediante secuenciación masiva (**Melnikov et al., 2012**; **Patwardhan et al., 2012**). Este diseño permite evaluar, en un único experimento, el efecto de miles de variantes de secuencia sobre la actividad transcripcional, algo impensado con ensayos reporteros tradicionales de a uno por vez.
+Los ensayos reporteros masivamente paralelos (*Massively Parallel Reporter Assays*, MPRA) fueron desarrollados con este objetivo. La idea general es sintetizar o clonar miles de secuencias candidatas, colocarlas en un contexto reportero común (típicamente, dirigiendo la expresión de un gen fácilmente cuantificable) e inferir la actividad de cada una a partir de la abundancia relativa de sus transcriptos, identificados mediante secuenciación masiva (Melnikov et al., 2012; Patwardhan et al., 2012). Este diseño permite evaluar, en un único experimento, el efecto de miles de variantes de secuencia sobre la actividad transcripcional, algo impensado con ensayos reporteros tradicionales de a uno por vez.
 
-Existen distintas variantes de este enfoque, cada una con sus propios compromisos. STARR-seq, una de las más utilizadas para el estudio de enhancers, invierte el diseño clásico: en lugar de colocar la secuencia candidata corriente arriba del gen reportero, la coloca dentro de la región no traducida 3', aprovechando que muchos enhancers pueden actuar sobre su propio ARN mensajero y auto-transcribirse; esto permite ensayar fragmentos de ADN genómico fragmentado al azar, sin necesidad de síntesis dirigida, escalando el enfoque a genomas completos (**Arnold et al., 2013**). Tanto los MPRA clásicos como STARR-seq comparten, sin embargo, una limitación importante en su forma original: son ensayos episomales, es decir, las secuencias candidatas se introducen en la célula como parte de un plásmido que no se integra al genoma, y por lo tanto no adopta el empaquetamiento de cromatina característico del ADN genómico, y su número de copias por célula puede variar considerablemente y de forma no controlada.
+Existen distintas variantes de este enfoque, cada una con sus propios compromisos. STARR-seq, una de las más utilizadas para el estudio de enhancers, invierte el diseño clásico: en lugar de colocar la secuencia candidata corriente arriba del gen reportero, la coloca dentro de la región no traducida 3', aprovechando que muchos enhancers pueden actuar sobre su propio ARN mensajero y auto-transcribirse; esto permite ensayar fragmentos de ADN genómico fragmentado al azar, sin necesidad de síntesis dirigida, escalando el enfoque a genomas completos (Arnold et al., 2013). Tanto los MPRA clásicos como STARR-seq comparten, sin embargo, una limitación importante en su forma original: son ensayos episomales, es decir, las secuencias candidatas se introducen en la célula como parte de un plásmido que no se integra al genoma, y por lo tanto no adopta el empaquetamiento de cromatina característico del ADN genómico, y su número de copias por célula puede variar considerablemente y de forma no controlada.
 
-Distintas estrategias intentaron resolver esta limitación integrando las construcciones al genoma. El desarrollo de lentiMPRA, que emplea vectores lentivirales para insertar cada secuencia candidata en el genoma de manera estable, mostró una correlación considerablemente mayor con anotaciones regulatorias basadas en cromatina endógena que su contraparte episomal, evaluada con la misma biblioteca de secuencias (**Inoue et al., 2017**; **Gordon et al., 2020**). Sin embargo, incluso en este caso, cada célula de la población recibe la construcción en un sitio de integración distinto y aleatorio del genoma, lo que introduce variabilidad adicional asociada al contexto cromatínico particular de cada sitio de inserción, un factor que resulta especialmente problemático si lo que se busca medir es, precisamente, cuánta variabilidad genera la propia secuencia del promotor.
+Distintas estrategias intentaron resolver esta limitación integrando las construcciones al genoma. El desarrollo de lentiMPRA, que emplea vectores lentivirales para insertar cada secuencia candidata en el genoma de manera estable, mostró una correlación considerablemente mayor con anotaciones regulatorias basadas en cromatina endógena que su contraparte episomal, evaluada con la misma biblioteca de secuencias (Inoue et al., 2017; Gordon et al., 2020). Sin embargo, incluso en este caso, cada célula de la población recibe la construcción en un sitio de integración distinto y aleatorio del genoma, lo que introduce variabilidad adicional asociada al contexto cromatínico particular de cada sitio de inserción, un factor que resulta especialmente problemático si lo que se busca medir es, precisamente, cuánta variabilidad genera la propia secuencia del promotor.
 
 Un enfoque distinto, más cercano al que se sigue en esta tesis, consiste en integrar cada secuencia candidata en un único locus genómico predefinido, idéntico para toda la biblioteca, eliminando por completo la variabilidad de número de copias y de contexto de inserción entre secuencias. Bajo este diseño, cualquier diferencia observada entre promotores puede atribuirse, con mayor confianza, a la secuencia misma y no al lugar del genoma donde terminó integrada. Un antecedente influyente en esta línea utilizó justamente un ensayo de integración basado en recombinasas para mapear la actividad autónoma de fragmentos aleatorios de ADN a lo largo de todo el genoma humano, encontrando que la capacidad de iniciar transcripción de manera independiente del contexto es una propiedad extendida, y no excepcional [(Van Arensbergen et al. 2017\)](https://www.zotero.org/google-docs/?3LlGi8).
 
@@ -440,22 +194,34 @@ En paralelo al desarrollo de estas herramientas experimentales, ha crecido un ca
 
 Con estas herramientas es posible, entonces, retomar de manera experimental las preguntas que quedaron planteadas en las secciones anteriores: qué elementos de secuencia determinan la actividad y el ruido de un promotor, si esa determinación ocurre de manera directa o mediada por el contexto de cromatina que la propia secuencia genera, y si la multiplicidad de promotores de un gen refleja plasticidad regulatoria o simple redundancia. Los objetivos concretos de esta tesis, que se desprenden de estas preguntas, se detallan a continuación.
 
-# Objetivos
+# Objetivos {#objetivos}
 
-# Metodos Exp
+**Objetivo general**
 
-**Materiales y metodos experimentales:**  
-Descripción general del enfoque
+A través de un ensayo capaz de medir la actividad intrínseca de los promotores basales naturales humanos, determinar en qué medida la actividad y el ruido transcripcional de los promotores humanos están codificados en la secuencia del promotor basal, independientemente de su contexto genómico, e identificar los elementos de secuencia y arquitectura que los determinan.
 
-Con el fin de cuantificar las propiedades transcripcionales que se desprenden intrínsecamente de la secuencia del promotor basal, diseñamos un ensayo reportero masivo en paralelo (MPRA, por sus siglas en inglés) que permite evaluar simultáneamente la media y el ruido transcripcional, similar a las técnicas de sort-seq utilizadas principalmente en levaduras y bacterias [(Koberstein et al. 2021a; Peterman and Levine 2016; Sharon et al. 2012, 2014\)](https://www.zotero.org/google-docs/?sg2eUa). Utilizamos una *library* con 23908  secuencias de ADN de 252pb que, en su gran mayoría, comprenden un TSS anotado y su región flanqueante (235pb río arriba, 16pb río abajo), abarcando los elementos esenciales del promotor basal [(Agarwal and Shendure 2020; Van Arensbergen et al. 2017\)](https://www.zotero.org/google-docs/?pziuLE). La misma fue producida previamente por el grupo de la Dra. Fiszbein (Boston University), en cuyo laboratorio, y en colaboración con la Dra. Uriostegui-Arcos, realicé la totalidad de los experimentos de la presente tesis. Estas secuencias se clonaron en un plásmido reportero, río arriba de la secuencia codificante para EGFP. Mediante el uso de la técnica de intercambio de casete mediado por recombinasa (RMCE), generamos líneas estables de HEK293T, donde cada célula posee una copia única del constructo conteniendo al gen EGFP bajo control de un promotor de la *library*, todas en la misma posición del genoma. 
+**Objetivos específicos**
 
-Para obtener la distribución de niveles de expresión de cada promotor, las células se fraccionaron en siete poblaciones según la señal de fluorescencia de EGFP, se extrajo su ADN genómico (ADNg), y se analizó la abundancia de cada promotor en las distintas poblaciones mediante Amplicon-seq. A partir de estos datos, reconstruimos la distribución de la expresión de cada promotor para estimar su nivel de expresión media y la varianza asociada. El procedimiento se esquematiza en la Figura M1.
+1. Implementar un MPRA de integración en locus único, basado en *sort-seq*, que permita cuantificar en simultáneo la actividad media y el ruido transcripcional de miles de promotores basales humanos, y evaluar su reproducibilidad y representatividad.  
+2. Identificar las características de los promotores basales, tanto las propias de la secuencia como aquellas asociadas al contexto endógeno, que se asocian a su actividad transcripcional intrínseca.   
+3. Identificar las características de los promotores que se asocian al ruido transcripcional.   
+4. Comparar las propiedades transcripcionales de los promotores alternativos de un mismo gen y determinar su relación con su estatus regulatorio.
+
+# Materiales y métodos experimentales {#materiales-y-métodos-experimentales}
+
+## Lógica del ensayo {#lógica-del-ensayo}
+
+El objetivo de esta tesis es medir cuánto del comportamiento transcripcional de un gen está determinado por la secuencia de su promotor basal, independientemente del contexto en el que se encuentra. Ese comportamiento incluye tanto el nivel de expresión como su variabilidad entre células. Responder esta pregunta exige dos cosas. Primero, aislar la contribución de la secuencia: evaluar todos los promotores en un mismo entorno, de modo que las diferencias observadas no puedan atribuirse a la posición en el genoma, al número de copias ni a elementos regulatorios distales. Segundo, medir la expresión célula a célula y no solo en promedio, porque el ruido es una propiedad de la distribución de expresión y no de su media.
+
+Para cumplir ambos requisitos a escala genómica, diseñamos un ensayo reportero masivo en paralelo (MPRA) basado en la estrategia de *sort-seq*, usada principalmente en levaduras y bacterias [(Koberstein et al. 2021a; Peterman and Levine 2016; Sharon et al. 2012, 2014\)](https://www.zotero.org/google-docs/?lfojr9). En un *sort-seq*, una población de células, cada una con una variante distinta de un reportero, se separa en fracciones según su nivel de expresión. Luego se secuencia cada fracción para saber en cuáles aparece cada variante. Si un promotor está presente en muchas células, su abundancia relativa en cada fracción reconstruye su distribución de expresión. Esa distribución está discretizada, pero permite estimar tanto la media como la dispersión.
+
+En este caso, las células utilizadas son HEK293T-A2 y difieren en el promotor regulando al reportero fluorescente EGFP, sistema insertado en un loci específico del genoma. La *library* utilizada, producida previamente por el grupo de la Dra. Fiszbein (Boston University), consta de 23.908 secuencias de 252 pb. En su gran mayoría, cada secuencia comprende un TSS anotado y su región flanqueante (235 pb río arriba y 16 pb río abajo), que abarca los elementos esenciales del promotor basal [(Agarwal and Shendure 2020; Van Arensbergen et al. 2017\)](https://www.zotero.org/google-docs/?okN6dm). Su composición se detalla en “Caracterización de la *library* (Métodos computacionales)”. En ese laboratorio, y en colaboración con la Dra. Uriostegui-Arcos, realicé la totalidad de los experimentos de la presente tesis. 
 
 El procedimiento se realizó enteramente a partir de dos poblaciones distintas de células, generando dos réplicas independientes. Asimismo, para preservar la representatividad de la *library* y evitar cuellos de botella, los pasos de biología molecular y celular se ejecutaron con múltiples réplicas técnicas y volúmenes de trabajo superiores a los estándares.
 
 Fig. M1 (pipeline exp)
 
-Construcción de los plásmidos reporteros conteniendo la *library* de promotores basales
+## Construcción de los plásmidos reporteros conteniendo la *library* de promotores basales {#construcción-de-los-plásmidos-reporteros-conteniendo-la-library-de-promotores-basales}
 
 Los oligonucleótidos de cadena simple que conforman la *library* (cuya composición y detalle se especifican en la Sección Métodos Computacionales), se amplificaron inicialmente mediante PCR de extensión por solapamiento (*overlap extension PCR*) usando Platinum SuperFi II Master Mix (ThermoFisher, 12368010\) y los *primers* PromLib Forward y Reverse (ver Anexo Tabla 2\) durante 14 ciclos, seguidos de una purificación por columna (QIAGEN, 28104). 
 
@@ -471,7 +237,7 @@ Para comprobar la correcta inserción del promotor, se realizó un ensayo de *co
 
 Fig M3. PCR integracion
 
-Cultivo celular y transfección
+## Cultivo celular y transfección {#cultivo-celular-y-transfección}
 
 Se utilizaron las células HEK293T-A2 (34), que ya han sido caracterizadas y poseen un único locus para RMCE en su genoma. Las mismas se cultivaron en medio DMEM (Dulbecco’s Modified Eagle Medium) con alto contenido de glucosa y piruvato (Gibco, 11965118), suplementado con suero fetal bovino al 10% (Gibco, A31406-02). Las células se mantuvieron en incubadora humidificada a 37°C con 5% de CO2.
 
@@ -481,7 +247,7 @@ Para las transfecciones individuales de los plásmidos reporteros, se empleó el
 
 Las células se visualizaron en un microscopio ECHO Revolve (RVL-100M) con un objetivo de 20X.
 
-Citometría de flujo y *sorting*
+## Citometría de flujo y *sorting* {#citometría-de-flujo-y-sorting}
 
 Para el *sorting* de la *library* de promotores, se utilizó un equipo Beckman Coulter MoFlo Astrios de seis vías. Los datos de citometría de flujo se analizaron con FlowJo v10.10.0.
 
@@ -495,13 +261,13 @@ Se analizaron las células HEK293T-A2 transfectadas con la *library* hasta recol
 
 Fig M5. Figura gates
 
-Controles de *spike-in* basados en células
+## Controles de *spike-in* basados en células {#controles-de-spike-in-basados-en-células}
 
 Para evaluar posibles sesgos técnicos entre las distintas fracciones introducidas durante la manipulación de las muestras *post-sorting* (desde la extracción de ácidos nucleicos hasta la secuenciación), decidimos introducir moléculas identificables en cantidades conocidas (*spike-in*) a las mismas. La incorporación de *spike-in* es una práctica frecuente en análisis genómicos/transcriptómicos que implican la comparación cuantitativa precisa entre muestras procesadas por separado. Aunque el procedimiento estándar es el agregado de moléculas de ADN [(Koberstein et al. 2021b)](https://www.zotero.org/google-docs/?pnbLIz), ARN [(Jiang et al. 2011; Ziegenhain et al. 2022\)](https://www.zotero.org/google-docs/?jeAPCM) o células de otras especies [(Greulich et al. 2021\)](https://www.zotero.org/google-docs/?vTGunl), dadas las características del presente ensayo decidimos generar un control *spike-in* similar pero discernible al material con el que se iba a trabajar: células HEK293T-A2 con el reportero incorporado en el genoma. 
 
 Brevemente, se clonaron tres secuencias de aproximadamente el mismo tamaño y contenido de GC que las de la *library* (ver Anexo Tabla 2\) en el vector *backbone* y se co-transfectaron con el plásmido de expresión de la recombinasa Cre en células HEK293T-A2, para obtener líneas estables, en la forma descrita anteriormente. Se agregaron 30, 300 o 3000 células de cada línea de *spike-in* respectivamente en cada tubo de recolección de FACS, juntándolas con las células separadas por el *sorter*.
 
-Co-extraccion de ADN/ARN  y RT-qPCR de EGFP
+## Co-extracción de ADN/ARN  y RT-qPCR de EGFP {#co-extracción-de-adn/arn-y-rt-qpcr-de-egfp}
 
 ### 
 
@@ -525,11 +291,11 @@ Adicionalmente, se evaluó la posible persistencia de células no transfectadas 
 
 Fig. M7 IMAGEN PCR\_loxP\_gates\_ctl
 
-Secuenciación de amplicones (Amp-seq)
+## Secuenciación de amplicones (Amp-seq) {#secuenciación-de-amplicones-(amp-seq)}
 
 Para la secuenciación paralela masiva del ADNg de las distintas fracciones, se empleó un enfoque de PCR de dos pasos. Primero, se realizó una PCR primaria usando los *primers* PromLib Forward y Reverse (Tabla 1\) con *Platinum™ SuperFi II PCR Master Mix* (Thermo Fisher Scientific, Cat. No. 12-368-010), siguiendo las instrucciones del fabricante. Luego, se llevó a cabo una segunda PCR para incorporar las secuencias de los adaptadores de Illumina, manteniendo constante el *primer* *forward* con el índice i5 y usando un *primer* *reverse* con el índice i7 específico para cada muestra (ver Anexo Tabla 2), empleando nuevamente la *Platinum™ SuperFi II PCR Master Mix*. Los productos de la segunda PCR se purificaron mediante extracción de bandas del gel (QIAGEN, 28704\) y posteriormente se enviaron para la secuenciación de amplicones al servicio de secuenciación MedGenome[^2]. Las secuenciaciones se realizaron con una cobertura de 1000× utilizando lecturas *paired-end* de 150 pb en la plataforma *NovaSeq*. La incorporación de un índice i7 específico por muestra permite mezclar las muestras en una única corrida de secuenciación y evitar un posible *batch effect*. Sin embargo, cada réplica debió mantenerse en corridas en paralelo debido a la ausencia de más índices. 
 
-Secuencias de interes y primers utilizados
+## Secuencias de interés y primers utilizados {#secuencias-de-interés-y-primers-utilizados}
 
 | Nombre | Secuencia (5'→3') |
 | :---- | :---- |
@@ -552,7 +318,7 @@ Secuencias de interes y primers utilizados
 | LSM1\_1\_Forward | TACGAAGTTATATGGATCCATATGAGGTGGGTGTACCGG |
 | LSM1\_1\_Reverse | TGGAAGCTTAAGTTTAAACGCTAGGGTTCGGCAGCAGAAGG |
 
-Tabla1: Secuencia de los primers utilizados para los clonados de la *library* en el plásmido *backbone*, así como aquellos utilizados para amplificar los promotores específicos de la *library*. 
+Tabla 1: Secuencia de los primers utilizados para los clonados de la *library* en el plásmido *backbone*, así como aquellos utilizados para amplificar los promotores específicos de la *library*. 
 
 | Nombre | Secuencia (5'→3') |
 | :---- | :---- |
@@ -579,50 +345,51 @@ Tabla1: Secuencia de los primers utilizados para los clonados de la *library* en
 
 Tabla 2: Secuencia completa de los Spike-in generados e insertados, de los *primers* utilizados para el control de células con el plásmido integrado, para la qPCR y los adaptadores utilizados durante la secuenciación.
 
-# Metodos bioinfo
+# Materiales y métodos computacionales:
 
-**Materiales y métodos computacionales:**
+## Procesamiento de datos y cuantificación de la actividad promotora
 
-**Procesamiento de datos y cuantificación de la actividad promotora**  
-   
-Procesamiento de los datos de secuenciación
+ 
+
+### Procesamiento de los datos de secuenciación
 
 Las lecturas *paired-end* de *Illumina* se procesaron inicialmente con *cutadapt* [(Martin 2011\)](https://www.zotero.org/google-docs/?NIh8sF) para el filtrado por calidad y el recorte de *primers*, y posteriormente con *FASTP* para el recorte de colas de poli-G y de baja calidad [(Chen et al. 2018\)](https://www.zotero.org/google-docs/?aD8i9H) (Fig. M8). Se descartaron aquellas lecturas que carecían de superposición de *primers*. El alineamiento contra las secuencias *FASTA* de la *library* se realizó mediante *HISAT2* [(Kim et al. 2019\)](https://www.zotero.org/google-docs/?nJltqF). Únicamente se consideraron fragmentos con longitudes entre 230 y 270 pb, omitiendo los alineamientos secundarios. La abundancia de cada promotor en cada muestra se cuantificó con *SAMTOOLS* (1.20) [(Danecek et al. 2021\)](https://www.zotero.org/google-docs/?9LO2B8). El control de calidad de las lecturas crudas se llevó a cabo con *FASTQC[^3]* y el desempeño del *pipeline* se reportó mediante *multiQC* [(Ewels et al. 2016\)](https://www.zotero.org/google-docs/?1yGC2M). 
 
 Fig. M8 pipeline bioinfo
 
-Cuantificación de la actividad media y el ruido de los promotores de la *library*
+### Cuantificación de la actividad media y el ruido de los promotores de la *library*
 
 Salvo que se indique lo contrario, los análisis estadísticos y el análisis exploratorio de datos se realizaron utilizando R 4.2.  
 Los conteos de lecturas por promotor se corrigieron según la desviación del tamaño de cada *library* respecto al tamaño medio. Además, dado que el esfuerzo de muestreo para obtener 250.000 células varía para cada rango de intensidades de EGFP, los conteos también se corrigieron mediante un término de relativización determinado por:
 
 ${F}_{k}=\frac{{p}_{k}}{min(p)}$										(E1)
 
-donde [![][image1]](https://www.codecogs.com/eqnedit.php?latex=p#0) es la proporción de células en la fracción [![][image2]](https://www.codecogs.com/eqnedit.php?latex=k#0) respecto a la población total, medida por citometría de flujo (Fig M8A). Es decir que las fracciones que, al medir por citometría de flujo, presentan mayor número de células, se les amplificará, en términos relativos y proporcionales, el número de *counts* por promotor observados. Esta corrección, más típica de la ecología que del campo de la biología molecular, es fundamental para comparar correctamente entre las fracciones de células y evitar un sesgo hacia los gates más altos, donde hay menos células en la población total. 
+donde [![][image2]](https://www.codecogs.com/eqnedit.php?latex=p#0) es la proporción de células en la fracción [![][image3]](https://www.codecogs.com/eqnedit.php?latex=k#0) respecto a la población total, medida por citometría de flujo (Fig M8A). Es decir que las fracciones que, al medir por citometría de flujo, presentan mayor número de células, se les amplificará, en términos relativos y proporcionales, el número de *counts* por promotor observados. Esta corrección, más típica de la ecología que del campo de la biología molecular, es fundamental para comparar correctamente entre las fracciones de células y evitar un sesgo hacia los gates más altos, donde hay menos células en la población total. 
 
-Se calcularon estadísticas descriptivas, como la media y la varianza, para cada secuencia que superara un umbral de 1000 conteos corregidos en cada réplica, asignando a cada fracción un valor de expresión coincidente su índice numérico (1 al 6). Las secuencias con una diferencia en la mediana superior a 2 entre ambas réplicas se descartaron por inconsistencia. Asimismo, se descartaron las secuencias con patrones altamente bimodales al considerarlas potenciales artefactos (Fig. M8B). Para detectar estos patrones, se ideó la estrategia de considerar aquellas con una varianza un 20% superior a la esperada para una distribución uniforme, dado un número [![][image3]](https://www.codecogs.com/eqnedit.php?latex=j#0) de *gates* con conteos. La varianza esperada de la distribución uniforme se calculó como:
+Se calcularon estadísticas descriptivas, como la media y la varianza, para cada secuencia que superara un umbral de 1000 conteos corregidos en cada réplica, asignando a cada fracción un valor de expresión coincidente su índice numérico (1 al 6). Las secuencias con una diferencia en la mediana superior a 2 entre ambas réplicas se descartaron por inconsistencia. Asimismo, se descartaron las secuencias con patrones altamente bimodales al considerarlas potenciales artefactos (Fig. M8B). Para detectar estos patrones, se ideó la estrategia de considerar aquellas con una varianza un 20% superior a la esperada para una distribución uniforme, dado un número [![][image4]](https://www.codecogs.com/eqnedit.php?latex=j#0) de *gates* con conteos. La varianza esperada de la distribución uniforme se calculó como:
 
-Si [![][image4]](https://www.codecogs.com/eqnedit.php?latex=j#0) es impar:
+Si [![][image5]](https://www.codecogs.com/eqnedit.php?latex=j#0) es impar:
 
-[![][image5]](https://www.codecogs.com/eqnedit.php?latex=%5Ctext%7Bvar%7D\(j\)%20%3D%202%20%5Csum_%7Bi%3D1%7D%5E%7Bj%2F2%7D%20\(i%20-%200.5\)%5E2#0)
+[![][image6]](https://www.codecogs.com/eqnedit.php?latex=%5Ctext%7Bvar%7D\(j\)%20%3D%202%20%5Csum_%7Bi%3D1%7D%5E%7Bj%2F2%7D%20\(i%20-%200.5\)%5E2#0)
 
-Si [![][image6]](https://www.codecogs.com/eqnedit.php?latex=j#0) es par:
+Si [![][image7]](https://www.codecogs.com/eqnedit.php?latex=j#0) es par:
 
-[![][image7]](https://www.codecogs.com/eqnedit.php?latex=%5Ctext%7Bvar%7D\(j\)%20%3D%202%20%5Csum_%7Bi%3D1%7D%5E%7B\(j-1\)%2F2%7D%20\(i%20-%200.5\)%5E2#0)								(E2)
+[![][image8]](https://www.codecogs.com/eqnedit.php?latex=%5Ctext%7Bvar%7D\(j\)%20%3D%202%20%5Csum_%7Bi%3D1%7D%5E%7B\(j-1\)%2F2%7D%20\(i%20-%200.5\)%5E2#0)								(E2)
 
 Fig M9. sample effort \+ bimodal
 
-**Caracterización de la *library***
+## Caracterización de la *library*
 
-Composición y diseño de la *library*
+### Composición y diseño de la *library*
 
 La *library* utilizada consiste en 23908 secuencias de 300 pb de longitud, de las cuales 20851 incluyen una región de promotor basal (core promoter) de \-251 a \+16 con respecto a la posición anotada como TSS principal en la Eukaryotic Promoter Database[^4] (EPD) [(Meylan et al. 2020\)](https://www.zotero.org/google-docs/?xdbf79), con adaptadores de 24pb en cada extremo para facilitar la clonación (Fig. M10 A-B). EPD define sus TSS (29512 sitios en total) a partir de datos del repositorio del consorcio FANTOM que utilizan la técnica *Cap Analysis of Gene Expression* (CAGE) para la determinación del extremo 5’ de los transcriptos con la precisión de un nucleótido y con ello inferir la actividad promotora a lo largo de todo el genoma en diversas muestras biológicas. Agrupando únicamente las muestras de dicho repositorio correspondientes a cultivos primarios de células, se observa como el TSS indicado por EPD para los promotores seleccionados de la *library* coincide con aquel más usado, si bien son mínimos los casos donde no se observa actividad proveniente de las bases vecinas (Fig. M10C). Es preciso aclarar que en ningún momento se evaluó el TSS en el contexto del reportero utilizado, por lo que cada vez que me refiera a dicho sitio a lo largo de esta tesis, será teniendo en cuenta al anotado.
 
 De las restantes secuencias presentes en la *library*, 2910 son regiones de enhancer de 152pb de longitud inmediatamente río arriba de 100pb del promotor FN1(Fig. M10 A-B). También hay un subgrupo de 147 promotores asociados al cáncer, tanto en sus versiones wild-type como mutantes, y que no responden a la estructura tal cual fue definida para los promotores EPD. Estos últimos grupos, aunque presentes en la *library* y secuenciados, no fueron considerados durante el análisis bioinformático posterior al recuento de actividad.
 
 Fig. M10   
-   
-Elementos de secuencia del promotor basal
+ 
+
+### Elementos de secuencia del promotor basal
 
 La base de datos EPD provee información respecto a la presencia de motivos típicos en sus promotores anotados, a partir de la búsqueda de patrones y su localización respecto al TSS: TATA-box, CCAAT-box, GC-box e INR. Según sus datos, del 23851 secuencias, el 47.7% contiene un GC-box, el 32% un INR fuerte, el 16.3% un CCAAT-box y solo el 8% TATA-box (Fig. M11A).
 
@@ -632,13 +399,13 @@ La presencia de islas CpG fue determinada a partir de las anotaciones provenient
 
 La frecuencia nucleotídica y su identidad en sitios específicos fue evaluada con el paquete de R-Bioconductor Biostrings[^6]. Se evaluó el contenido de G y C (Fig. M11C), así como la identidad del dinucleótido del TSS (Fig. 11D). Los patrones buscados de forma estricta fueron YCASW para el INR “fuerte”, TCT para el clásico motivo de proteínas ribosomales y el dinucleótido YR (PyPu)[^7]. Respecto a este último patrón se discernir también en sus cuatro posibilidades (CA, CG, TA, TG). Aquellos promotores que no cuadran en su TSS con alguno de los patrones mencionados, fueron catalogados como “No canónicos”. Se incluye el dinucleótido GC para evidenciar que la prevalencia del CG no es simplemente producto de alto contenido de dichos nucleótidos.  
 
-Patrones de conservación de los promotores basales
+### Patrones de conservación de los promotores basales
 
 A su vez, se incorporaron datos que reflejan la historia evolutiva de los promotores, tanto a nivel de secuencia como funcional. Por un lado, se extrajeron datos de PhyloP score [(Pollard et al. 2010\)](https://www.zotero.org/google-docs/?sGIxh1) provenientes de la comparación entre el genoma hg38 y 100 especies de mamíferos. Evaluando la mediana de dicho valor del “metapromotor” a cada base (Fig. M12A), se observa claramente una mayor conservación en la región proximal al TSS (+16 a \-50), con claros picos alrededor del \+1 y del \-30, asociado al TATA-box. En una región de intermedia cercanía (-50 a \-150) hay un progresivo decaimiento de la conservación, mientras que se acerca mucho a valores de evolución neutra para la región más distal (-150 a \-235). A su vez, para cada una de estas regiones, en cada promotor, se evaluó el PhyloP score medio. En términos de conservación funcional, nos basamos en datos de Young et al. [(Young et al. 2015\)](https://www.zotero.org/google-docs/?ot1oe8), quienes utilizan datos de actividad promotora en tejidos de humano y ratón para considerar si, las secuencias que se pueden considerar homólogas, están activas en ambas especies, si perdieron actividad promotora en humanos o en ratón o si, por el contrario, la adquirieron en alguna de estas especies (Fig M12B). 
 
 Fig. M12. evo library
 
-Patrones de actividad endógena de los promotores
+### Patrones de actividad endógena de los promotores
 
 Se obtuvieron datos de accesibilidad de cromatina en HEK293 provenientes de ENCODE (accesible como ENCSR956YZJ). La presencia de Módulos Regulatorios en *cis* (CRM) se extrajo de datos de Remap basados en cientos de muestras de ChIP-seq (ver [(Hammal et al. 2022\)](https://www.zotero.org/google-docs/?JEMB5N), Análisis de datos de ChIP-seq). La posición de los enhancers anotados se obtuvo de UCSC. 
 
@@ -662,7 +429,7 @@ donde Rp y Rm son la señal en sentido y antisentido respectivamente, y ε=1 es 
 
 Fig. M14 orientacion
 
-Prevalencia y co-ocurrencia de las características de los promotores basales
+### Prevalencia y co-ocurrencia de las características de los promotores basales
 
 Las características de los promotores, tanto aquellas basadas en la secuencia como aquellas que surgen de estudiarlos en sus contextos endógenos, no son completamente independientes entre sí. Esto implica que frecuentemente, sea complejo poder asignar a un efecto observado, una característica particular, con confianza de que no se trate de un efecto confusor de otra característica con alto grado de coocurrencia. Si bien esto se puede resolver en ciertos casos con una estratificación por la potencial característica confusora, en los casos más extremos de co-presencia, esta tarea resulta prácticamente imposible y es un limitante en este tipo de enfoques experimentales, basados en secuencias naturales.
 
@@ -674,7 +441,7 @@ Fig. M15 co-ocurrencia
 
 El agrupamiento jerárquico, consistente entre phi y el enriquecimiento, resalta un *cluster* amplio de características asociadas a promotores *housekeeping*: baja especificidad tisular, alta accesibilidad de cromatina, alta actividad endógena en HEK293, promotores anchos, islas CpG, alto contenido G+C y motivo GC-box co-ocurren sistemáticamente entre sí (phi hasta 0,51), aunque su enriquecimiento sobre el azar es moderado (enriquecimiento 1,3-2,1×) al tratarse, en conjunto, de características relativamente frecuentes. El lift, al no tener techo para características raras, revela además un cluster que phi solo esboza débilmente: los promotores derivados de inserciones LTR específicas de humano muestran un enriquecimiento muy fuerte por carecer de módulo cis-regulatorio anotado y no detectarse en las muestras analizadas de FANTOM5 (enriquecimiento entre 4× y 15× en los pares de este grupo, con phi correspondientemente bajo, 0,02-0,20), sugiriendo que se trata de secuencias genómicamente recientes y regulatoriamente poco caracterizadas. Un grupo adicional asocia al motivo TATA-box con la forma angosta del promotor y la alta especificidad tisular, consistente con la asociación conocida entre promotores focalizados y motivos de posicionamiento preciso. 
 
-Algoritmos de predicción de la actividad promotora basados en la secuencia
+### Algoritmos de predicción de la actividad promotora basados en la secuencia
 
 Puffin es un modelo interpretable de aprendizaje automático que predice la señal de inicio transcripcional a resolución de base a partir de la secuencia del promotor, descomponiendo su predicción en la contribución aditiva de tres tipos de elementos de secuencia: motivos, iniciadores y trinucleótidos [(Dudnyk et al. 2024\)](https://www.zotero.org/google-docs/?WdzDtE). A diferencia de otros modelos de *deep learning* de tipo "caja negra", Puffin permite atribuir la señal predicha a posiciones y motivos específicos de la secuencia, facilitando la interpretación mecanística de los determinantes de la actividad promotora. En este trabajo se utilizó un modelo pre-entrenado con datos de CAGE en humano (GRCh38).
 
@@ -684,20 +451,20 @@ Fig. M16
 
 Adicionalmente, se incorporó la métrica de selectividad al contexto genómico ("*selectivity*"), reportada originalmente por Dudnyk et al. [(Dudnyk et al. 2024\)](https://www.zotero.org/google-docs/?JtfeYB) a partir de predicciones con Puffin-D, una variante del modelo orientada a la predicción cuantitativa de expresión que, a diferencia de Puffin, admite hasta 100kb de secuencia como input, permitiendo así incorporar el contexto genómico circundante al promotor. Esta métrica cuantifica el grado de variación en el nivel de expresión predicho de un promotor al insertarlo *in silico* en miles de ubicaciones genómicas distintas, reflejando así su dependencia del contexto regulatorio circundante. En nuestro caso, no se recalculó esta métrica, sino que se utilizaron los valores ya reportados por los autores para el subconjunto de secuencias coincidentes con los promotores de nuestra *library*. 
 
-Análisis de datos masivos de ChIP-seq
+### Análisis de datos masivos de ChIP-seq
 
 Se obtuvieron picos de ChIP-seq no redundantes de la base de datos ReMap y se intersectaron con la *library* de promotores para determinar el estado de unión de cada proteína. La intersección positiva de al menos un pico, fue evidencia suficiente para considerar la presencia de un CRM. El análisis se restringió a los factores de transcripción (TFs) que presentaron picos en al menos 100 promotores en ambas réplicas biológicas.  
 De manera paralela, se llevó a cabo un análisis para modificaciones de histonas y marcas epigenéticas obtenidas del conjunto de datos de ChIP-Atlas [(Zou et al. 2024\)](https://www.zotero.org/google-docs/?KAeqoK).
 
-**Evaluación del efecto de las características del promotor sobre los patrones transcripcionales medidos**
+## Evaluación del efecto de las características del promotor sobre los patrones transcripcionales medidos
 
-Asociación de las características del promotor con la actividad transcripcional
+### Asociación de las características del promotor con la actividad transcripcional
 
 Para visualizar la asociación entre cada característica de los promotores y su actividad, ordenamos los promotores según su actividad media en el reportero y los agrupamos en grupos de 100 promotores por réplica. Luego determinamos la proporción de promotores que presentan la característica en cada intervalo.   
 A su vez, con el objetivo de evaluar la asociación entre cada característica y la actividad de los promotores evaluados, se realizó un test de Wilcoxon utilizando el paquete de R Coin v1.4.3 [(Hothorn et al. 2008\)](https://www.zotero.org/google-docs/?UH1y2E). Para establecer la significancia, la réplica se consideró como una variable de efectos aleatorios. Sin embargo, para obtener el tamaño del efecto, realizamos el test en cada réplica por separado e informamos ambos valores del estimador Hodges-Lehmann. A su vez, para hacer foco en la replicabilidad, se limitaron los resultados a aquellos casos donde los efectos fueran consistentes en sentido entre ambas réplicas.   
 En todos los casos donde se realizaron múltiples comparaciones, se aplicó la corrección de Benjamini-Hochberg sobre los *p-values* [(Benjamini and Hochberg 1995\)](https://www.zotero.org/google-docs/?C3W1cP). 
 
-Asociación de las características del promotor con el ruido transcripcional
+### Asociación de las características del promotor con el ruido transcripcional
 
 En sistemas biológicos, la media y la varianza de la expresión génica están intrínsecamente correlacionadas: los promotores con mayor expresión media tienden también a exhibir mayor varianza absoluta. Esta relación (conocida como ruido proporcional o efecto de Fano) impide comparar directamente el nivel de ruido entre promotores sin antes controlar por su nivel de expresión. Si no se desacopla esta asociación, cualquier característica que influya sobre la media aparecerá artificialmente como moduladora del ruido, generando asociaciones espurias.
 
@@ -715,16 +482,16 @@ El procedimiento fue el siguiente:
 * Se construyó la curva ROC evaluando, para cada posible umbral del rank (valores 1 a 100), la sensibilidad (proporción de promotores con la característica que superan el umbral) y la especificidad (proporción de promotores sin la característica que no lo superan). La curva ROC representa la sensibilidad en función de 1 − especificidad al barrer todos los umbrales posibles.  
 * El AUC-ROC resume esta curva en un único valor: 0.5 indica que la característica no discrimina mejor que el azar; valores superiores a 0.5 indican que la presencia de la característica se asocia con mayor ruido relativo; valores inferiores a 0.5 indican asociación con menor ruido relativo. Los análisis se realizaron con el paquete pROC v1.18.5 en R.
 
-Para estimar la incertidumbre del AUC y determinar qué asociaciones son estadísticamente significativas, se utilizó el método de DeLong (DeLong & Clarke-Pearson 1988), que explota el hecho de que el AUC es matemáticamente equivalente al estadístico U de Mann-Whitney (la probabilidad de que un promotor elegido al azar del grupo con la característica tenga un rank de varianza mayor que uno elegido al azar del grupo sin ella). A partir de esta equivalencia, DeLong deriva una fórmula cerrada y asintótica para la varianza del AUC, sin necesidad de remuestreo. Con esa varianza se calcularon intervalos de confianza del 95% y un p-valor (test de Wald contra el valor nulo de 0.5), que se corrigió por comparaciones múltiples con el método de Benjamini-Hochberg (FDR). Las características cuyo p-valor corregido superó 0.05 en alguna de las dos réplicas, o que mostraron sentido de efecto opuesto entre réplicas, fueron descartadas por no presentar un efecto consistente y significativo sobre el ruido transcripcional.
+Para estimar la incertidumbre del AUC y determinar qué asociaciones son estadísticamente significativas, se utilizó el método de DeLong (**DeLong & Clarke-Pearson 1988**), que explota el hecho de que el AUC es matemáticamente equivalente al estadístico U de Mann-Whitney (la probabilidad de que un promotor elegido al azar del grupo con la característica tenga un rank de varianza mayor que uno elegido al azar del grupo sin ella). A partir de esta equivalencia, DeLong deriva una fórmula cerrada y asintótica para la varianza del AUC, sin necesidad de remuestreo. Con esa varianza se calcularon intervalos de confianza del 95% y un p-valor (test de Wald contra el valor nulo de 0.5), que se corrigió por comparaciones múltiples con el método de Benjamini-Hochberg (FDR). Las características cuyo p-valor corregido superó 0.05 en alguna de las dos réplicas, o que mostraron sentido de efecto opuesto entre réplicas, fueron descartadas por no presentar un efecto consistente y significativo sobre el ruido transcripcional.
 
-Análisis de enriquecimiento funcional de la unión de TFs
+### Análisis de enriquecimiento funcional de la unión de TFs
 
 Las asociaciones entre la ocupación proteica de TFs y tanto el ruido como la actividad transcripcional se evaluaron utilizando el mismo marco de trabajo aplicado a todas las características binarias.   
 Se realizó un análisis de enriquecimiento de conjuntos de genes (*GSEA*) [(Subramanian et al. 2005\)](https://www.zotero.org/google-docs/?TX1IGX) sobre el subconjunto de factores de transcripción identificados utilizando términos de *Gene Ontology* (*GO*), ordenados ya sea por el tamaño del efecto del test de suma de rangos de *Wilcoxon* (*Wilcoxon rank-sum test*) o por el *AUC-ROC*.Estos análisis se implementaron mediante *scripts* propios utilizando los paquetes de *R/Bioconductor* *AnnotationDbi*, *clusterProfiler* [(Yu et al. 2012\)](https://www.zotero.org/google-docs/?T157q5) y *enrichplot*.
 
-**Promotores alternativos**
+## Promotores alternativos
 
-Clasificación de promotores alternativos
+### Clasificación de promotores alternativos
 
 Para clasificar los promotores de acuerdo a su relación con otros regulando el mismo gen, unimos todos los promotores anotados en la base EPD junto con los datos de CAGE de FANTOM5 (tejidos y cultivos primarios).  Como ya se mencionó, las muestras de FANTOM5 fueron unificadas en base a su ontología para evitar redundancias y normalizadas por el tamaño de la *library*. En primer lugar, se clasificaron como “Sin actividad detectada” a aquellos promotores que no alcanzaran 1 TPM en ninguna muestra. Si bien podría llamar la atención que dichos promotores estuvieran incluidos en la base de datos de EPD, que también está basada en datos de FANTOM5, esto asumo que se debe a que son promotores que se registraron activos en líneas celulares, que estoy excluyendo del presente análisis. Se agruparon los promotores restantes por gen, y se separaron aquellos ”Promotores únicos”, para los genes sin promotores alternativos con actividad detectable.   
 Para aquellos genes con múltiples promotores, se buscaron aquellos con mayor actividad para clasificar como “Promotores principales”. Para ello se consideraron aquellos promotores que:  
@@ -733,9 +500,24 @@ Para aquellos genes con múltiples promotores, se buscaron aquellos con mayor ac
 Un pequeño grupo de promotores cumplió únicamente una de aquellas condiciones, que fueron considerados “No clasificables”. El resto se clasificaron como “Promotores secundarios”.  
 En segunda instancia cada par Principal-Secundario fue clasificado en base a la correlación en sus actividades endógenas. Para ello, se inició por la identificación de casos de “Alternancia” (o *switch*), término con el que nos referimos a muestras donde se observa una clara alternancia en el rol Principal/Secundario de los promotores. Se definió como tal cuando el Secundario supera los 5 TPM y, o bien la relación de actividad en escala logarítmica fuera 50% mayor para el Secundario, o bien el Principal no tuviese actividad detectable en la muestra (\<1 TPM). Los pares de promotores sin un caso de alternancia, se clasificaron como “Correlacionados” o “Independientes” según si la correlación (o bien de Spearman o de Pearson) fuese mayor a 0,5. 
 
-# Resultados 1
+# Resultados
 
-Estimación masiva de las propiedades transcripcionales de promotores basales humanos
+## Estimación masiva de las propiedades transcripcionales de promotores basales humanos
+
+Para cuantificar las propiedades transcripcionales que dependen solo de la secuencia del promotor basal, independientemente de su contexto genómico, desarrollamos un MPRA basado en sort-seq. El ensayo permite estimar a la vez la actividad media y el ruido transcripcional de miles de promotores humanos (Fig. M1). A continuación resumo su lógica general; los detalles experimentales y computacionales se encuentran en Métodos.
+
+El punto de partida es una *library* de 23.908 secuencias de 252 pb. De ellas, 20.851 son promotores basales humanos centrados en el TSS principal anotado en EPD. Estas secuencias se clonaron río arriba del gen reportero EGFP y se integraron en células HEK293T-A2 mediante intercambio de casete mediado por recombinasa (RMCE). Con este sistema, cada célula tiene una única copia del reportero, siempre en el mismo locus del genoma. Así, las células que expresan distintos promotores difieren solo en la secuencia del promotor, y no en el número de copias ni en el entorno cromatínico del sitio de integración. Por eso, las diferencias de expresión observadas pueden atribuirse a la secuencia evaluada.
+
+Para medir la expresión de cada promotor, las células se separaron por sorting (FACS) en fracciones según la intensidad de fluorescencia de EGFP. Los umbrales se definieron con un perfil de citometría previo: el rango de expresión se dividió en intervalos de igual tamaño en escala logarítmica, desde la autofluorescencia de células sin reportero hasta el 1% de células más brillantes. De cada fracción se recolectó la misma cantidad de células (250.000), se extrajo el ADN genómico y se secuenció la región del promotor (Amplicon-seq). Así se sabe qué promotores hay en cada fracción y en qué proporción. La fracción de menor fluorescencia se descartó porque no se distinguía de forma confiable de la autofluorescencia, de modo que el análisis usa seis fracciones. Todo el procedimiento se hizo en dos réplicas biológicas independientes. Además, se agregaron controles de *spike-in* celulares (secuencias conocidas en cantidades conocidas) para detectar sesgos técnicos entre fracciones durante el procesamiento posterior.
+
+La idea central del análisis es que la abundancia de un promotor a lo largo de las fracciones refleja cómo se distribuyen sus células en el eje de expresión. Un promotor fuerte aparece sobre todo en las fracciones más brillantes, y uno ruidoso aparece repartido entre muchas fracciones. Por lo tanto, los conteos de lecturas de cada promotor en las seis fracciones forman un histograma discreto de su distribución de expresión. Para que ese histograma sea fiel, los conteos se corrigieron por dos factores:
+
+* Tamaño de cada librería de secuenciación.  
+* Esfuerzo de muestreo. Como se recolectó la misma cantidad de células por fracción, las fracciones poco pobladas (en general, las de mayor expresión) quedan sobrerrepresentadas. Por eso los conteos se reescalaron según la proporción real de células que cada fracción representa en la población total.
+
+Asignando a cada fracción un valor de 1 a 6, de cada histograma se obtuvo una media, que usamos como medida de la actividad promotora, y una varianza, que usamos como medida del ruido transcripcional.
+
+Por último, se conservaron solo las secuencias que cumplían tres condiciones: suficiente cobertura (al menos 1000 conteos corregidos), consistencia entre réplicas y ausencia de patrones muy bimodales, que interpretamos como probables artefactos. La media y la varianza de cada promotor son relativas a la distribución del conjunto de promotores de su réplica. Por eso analizamos cada réplica por separado y consideramos reproducibles solo los efectos consistentes en ambas.
 
 Una vez obtenidos los datos de secuenciación, en sus dos réplicas, el primer paso fue el alineamiento de las lecturas obtenidas con las secuencias de la *library*. Como se ha mencionado previamente, una preocupación a lo largo del proceso experimental fue evitar un cuello de botella que implique que, al analizar los datos, las lecturas observadas correspondieran todas a un subgrupo pequeño de las  secuencias totales. Afortunadamente, este no fue el caso, y contamos con lecturas del 80,9% de las secuencias, en al menos una réplica, y del 67,3%, en ambas réplicas (Fig. R1.1 venn) . 
 
@@ -771,9 +553,7 @@ Fig. R1.7 Filtros
 
 En resumen, el MPRA realizado permitió una cuantificación robusta de las propiedades transcripcionales intrínsecas de gran parte de los promotores basales humanos conocidos, ofreciendo la posibilidad de asociarlas con las características arquitectónicas de los promotores.
 
-# Resultados 2
-
-Efectos del promotor sobre la fuerza transcripcional
+## Efectos del promotor sobre la fuerza transcripcional
 
 En primer lugar, analizamos la influencia de elementos conocidos del promotor basal sobre la fuerza transcripcional. Mientras que la importancia de estos motivos en el funcionamiento del promotor están bien establecidos, el campo todavía escasea de análisis masivos dirigidos y focalizados en los efectos de la secuencia sobre los niveles transcripcionales. Para evaluar el impacto de una dada característica sobre la actividad promotora, las secuencias evaluadas fueron divididas en grupos de acuerdo a la media de su distribución de expresión, calculando en cada uno la proporción de promotores conteniendo dicha característica. A su vez, para evaluar sistemáticamente el tamaño del efecto y la significancia estadística de cada característica sobre la actividad media, se realizaron tests de Wilcoxon-Mann-Whitney (ver Métodos) para comparar la actividad entre los promotores que contienen la característica y los que no la contienen. Como medida de significancia usamos el p-valor de la prueba, y como tamaño del efecto, el estimador de Hodges-Lehmann asociado.
 
@@ -795,7 +575,141 @@ Para profundizar en la relación mecanística entre la secuencia del promotor *c
 
 La mayoría de los TF presentan una asociación positiva con la actividad del promotor (Fig. S3A, barras naranjas) y, al realizar un GSEA (*Gene Set Enrichment Analysis*) con estos TF *rankeados* según su efecto en la actividad (Tabla S1), hallamos que los términos enriquecidos más significativamente en promotores de alta actividad se vinculaban con la actividad de los factores de iniciación general de la RNA Polimerasa II (Fig. S3B). Este hallazgo brinda evidencia adicional de que la capacidad de las regiones fuertes del promotor *core* para ensamblar el complejo de preiniciación y luego iniciar la transcripción está *hard-wired* en la secuencia de DNA. Sorprendentemente, solo la 5-metilcitosina y tres TF, que incluyeron a los factores asociados a Polycomb CBX7 y JARID2, se asociaron negativamente con la actividad (Fig. S3A, barras verdes, recuadro).
 
-# Pestaña 12
+# Referencias
+
+[Agarwal, Vikram, and Jay Shendure. 2020\. “Predicting mRNA Abundance Directly from Genomic Sequence Using Deep Convolutional Neural Networks.” *Cell Reports* 31 (7): 107663\. https\://doi.org/10.1016/j.celrep.2020.107663.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Andersson, Robin, Claudia Gebhard, Irene Miguel-Escalada, et al. 2014\. “An Atlas of Active Enhancers across Human Cell Types and Tissues.” *Nature* 507 (7493): 455–61. https\://doi.org/10.1038/nature12787.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Arias, Alfonso Martinez, and Penelope Hayward. 2006\. “Filtering Transcriptional Noise during Development: Concepts and Mechanisms.” *Nature Reviews Genetics* 7 (1): 34–44. https\://doi.org/10.1038/nrg1750.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Benjamini, Yoav, and Yosef Hochberg. 1995\. “Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing.” *Journal of the Royal Statistical Society. Series B (Methodological)* 57 (1): 289–300.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Boer, Carl G. de, Eeshit Dhaval Vaishnav, Ronen Sadeh, Esteban Luis Abeyta, Nir Friedman, and Aviv Regev. 2020\. “Deciphering Eukaryotic Gene-Regulatory Logic with 100 Million Random Promoters.” *Nature Biotechnology* 38 (1): 56–65. https\://doi.org/10.1038/s41587-019-0315-8.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Bulger, Michael, and Mark Groudine. 2011\. “Functional and Mechanistic Diversity of Distal Transcription Enhancers.” *Cell* 144 (3): 327–39. https\://doi.org/10.1016/j.cell.2011.01.024.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Carelli, Francesco N., Angélica Liechti, Jean Halbert, Maria Warnefors, and Henrik Kaessmann. 2018\. “Repurposing of Promoters and Enhancers during Mammalian Evolution.” *Nature Communications* 9 (1): 1\. https\://doi.org/10.1038/s41467-018-06544-z.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Carelli, Francesco Nicola, Takashi Hayakawa, Yasuhiro Go, Hiroo Imai, Maria Warnefors, and Henrik Kaessmann. 2016\. “The Life History of Retrocopies Illuminates the Evolution of New Mammalian Genes.” *Genome Research* 26 (3): 301–14. https\://doi.org/10.1101/gr.198473.115.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Carninci, Piero, Albin Sandelin, Boris Lenhard, et al. 2006\. “Genome-Wide Analysis of Mammalian Promoter Architecture and Evolution.” *Nature Genetics* 38 (6): 6\. https\://doi.org/10.1038/ng1789.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Chen, Shifu, Yanqing Zhou, Yaru Chen, and Jia Gu. 2018\. “Fastp: An Ultra-Fast All-in-One FASTQ Preprocessor.” *Bioinformatics* 34 (17): i884–90. https\://doi.org/10.1093/bioinformatics/bty560.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Core, Leighton J., André L. Martins, Charles G. Danko, Colin Waters, Adam Siepel, and John T. Lis. 2014\. “Analysis of Nascent RNA Identifies a Unified Architecture of Initiation Regions at Mammalian Promoters and Enhancers.” *Nature Genetics* 46 (12): 1311–20. https\://doi.org/10.1038/ng.3142.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Dadiani, M., D. van Dijk, B. Segal, et al. 2013\. “Two DNA-Encoded Strategies for Increasing Expression with Opposing Effects on Promoter Dynamics and Transcriptional Noise.” *Genome Research* 23 (6): 966–76. https\://doi.org/10.1101/gr.149096.112.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Danecek, Petr, James K. Bonfield, Jennifer Liddle, et al. 2021\. “Twelve Years of SAMtools and BCFtools.” *GigaScience* 10 (2): giab008. https\://doi.org/10.1093/gigascience/giab008.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Dar, R. D., B. S. Razooky, A. Singh, et al. 2012\. “Transcriptional Burst Frequency and Burst Size Are Equally Modulated across the Human Genome.” *Proceedings of the National Academy of Sciences* 109 (43): 17454–59. https\://doi.org/10.1073/pnas.1213530109.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Dudnyk, Kseniia, Donghong Cai, Chenlai Shi, Jian Xu, and Jian Zhou. 2024\. “Sequence Basis of Transcription Initiation in the Human Genome.” *Science (New York, N.Y.)* 384 (6694): eadj0116. https\://doi.org/10.1126/science.adj0116.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Elowitz, M. B. 2002\. “Stochastic Gene Expression in a Single Cell.” *Science* 297 (5584): 1183–86. https\://doi.org/10.1126/science.1070919.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Ewels, Philip, Måns Magnusson, Sverker Lundin, and Max Käller. 2016\. “MultiQC: Summarize Analysis Results for Multiple Tools and Samples in a Single Report.” *Bioinformatics* 32 (19): 3047–48. https\://doi.org/10.1093/bioinformatics/btw354.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Faure, Andre J., Jörn M. Schmiedel, and Ben Lehner. 2017\. “Systematic Analysis of the Determinants of Gene Expression Noise in Embryonic Stem Cells.” *Cell Systems* 5 (5): 471-484.e4. https\://doi.org/10.1016/j.cels.2017.10.003.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Fiszbein, Ana, Keegan S. Krick, Bridget E. Begg, and Christopher B. Burge. 2019\. “Exon-Mediated Activation of Transcription Starts.” *Cell* 179 (7): 1551-1565.e17. https\://doi.org/10.1016/j.cell.2019.11.002.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Frith, Martin C., Eivind Valen, Anders Krogh, Yoshihide Hayashizaki, Piero Carninci, and Albin Sandelin. 2008\. “A Code for Transcription Initiation in Mammalian Genomes.” *Genome Research* 18 (1): 1–12. https\://doi.org/10.1101/gr.6831208.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Gardiner-Garden, M., and M. Frommer. 1987\. “CpG Islands in Vertebrate Genomes.” *Journal of Molecular Biology* 196 (2): 261–82. https\://doi.org/10.1016/0022-2836(87)90689-9.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Greulich, Franziska, Aikaterini Mechtidou, Teresa Horn, and Nina Henriette Uhlenhaut. 2021\. “Protocol for Using Heterologous Spike-Ins to Normalize for Technical Variation in Chromatin Immunoprecipitation.” *STAR Protocols* 2 (3): 100609\. https\://doi.org/10.1016/j.xpro.2021.100609.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Haberle, Vanja, Alistair R. R. Forrest, Yoshihide Hayashizaki, Piero Carninci, and Boris Lenhard. 2015\. “CAGEr: Precise TSS Data Retrieval and High-Resolution Promoterome Mining for Integrative Analyses.” *Nucleic Acids Research* 43 (8): e51. https\://doi.org/10.1093/nar/gkv054.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Haberle, Vanja, and Alexander Stark. 2018\. “Eukaryotic Core Promoters and the Functional Basis of Transcription Initiation.” *Nature Reviews Molecular Cell Biology* 19 (10): 621–37. https\://doi.org/10.1038/s41580-018-0028-8.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Hammal, Fayrouz, Pierre de Langen, Aurélie Bergon, Fabrice Lopez, and Benoit Ballester. 2022\. “ReMap 2022: A Database of Human, Mouse, Drosophila and Arabidopsis Regulatory Regions from an Integrative Analysis of DNA-Binding Sequencing Experiments.” *Nucleic Acids Research* 50 (D1): D316–25. https\://doi.org/10.1093/nar/gkab996.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Hartl, Dominik, Arnaud R. Krebs, Ralph S. Grand, et al. 2019\. “CG Dinucleotides Enhance Promoter Activity Independent of DNA Methylation.” *Genome Research* 29 (4): 554–63. https\://doi.org/10.1101/gr.241653.118.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Hornung, G., R. Bar-Ziv, D. Rosin, et al. 2012\. “Noise-Mean Relationship in Mutated Promoters.” *Genome Research* 22 (12): 2409–17. https\://doi.org/10.1101/gr.139378.112.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Hothorn, Torsten, Kurt Hornik, Mark A. van de Wiel, and Achim Zeileis. 2008\. “Implementing a Class of Permutation Tests: The Coin Package.” *Journal of Statistical Software* 28 (November): 1–23. https\://doi.org/10.18637/jss.v028.i08.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Jiang, Lichun, Felix Schlesinger, Carrie A. Davis, et al. 2011\. “Synthetic Spike-in Standards for RNA-Seq Experiments.” *Genome Research* 21 (9): 1543–51. https\://doi.org/10.1101/gr.121095.111.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Kadonaga, James T., Katherine A. Jones, and Robert Tjian. 1986\. “Promoter-Specific Activation of RNA Polymerase II Transcription by Sp1.” *Trends in Biochemical Sciences*, ahead of print. https\://doi.org/10.1016/0968-0004(86)90226-4.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Kim, Daehwan, Joseph M. Paggi, Chanhee Park, Christopher Bennett, and Steven L. Salzberg. 2019\. “Graph-Based Genome Alignment and Genotyping with HISAT2 and HISAT-Genotype.” *Nature Biotechnology* 37 (8): 907–15. https\://doi.org/10.1038/s41587-019-0201-4.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Koberstein, John N., Melissa L. Stewart, Taylor L. Mighell, Chadwick B. Smith, and Michael S. Cohen. 2021a. “A Sort-Seq Approach to the Development of Single Fluorescent Protein Biosensors.” *ACS Chemical Biology* 16 (9): 1709–20. https\://doi.org/10.1021/acschembio.1c00423.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Koberstein, John N., Melissa L. Stewart, Taylor L. Mighell, Chadwick B. Smith, and Michael S. Cohen. 2021b. “A Sort-Seq Approach to the Development of Single Fluorescent Protein Biosensors.” *ACS Chemical Biology* 16 (9): 1709–20. https\://doi.org/10.1021/acschembio.1c00423.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Kowalczyk, Monika S., Jim R. Hughes, David Garrick, et al. 2012\. “Intragenic Enhancers Act as Alternative Promoters.” *Molecular Cell* 45 (4): 447–58. https\://doi.org/10.1016/j.molcel.2011.12.021.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Kwasnieski, Jamie C., Ilaria Mogno, Connie A. Myers, Joseph C. Corbo, and Barak A. Cohen. 2012\. “Complex Effects of Nucleotide Variants in a Mammalian Cis-Regulatory Element.” *Proceedings of the National Academy of Sciences* 109 (47): 19498–503. https\://doi.org/10.1073/pnas.1210678109.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Landolin, Jane M., David S. Johnson, Nathan D. Trinklein, et al. 2010\. “Sequence Features That Drive Human Promoter Function and Tissue Specificity.” *Genome Research* 20 (7): 890–98. https\://doi.org/10.1101/gr.100370.109.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Lehner, Ben. 2008\. “Selection to Minimise Noise in Living Systems and Its Implications for the Evolution of Gene Expression.” *Molecular Systems Biology* 4 (March): 170\. https\://doi.org/10.1038/msb.2008.11.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Levine, Michael, and Robert Tjian. 2003\. “Transcription Regulation and Animal Diversity.” *Nature* 424 (6945): 147–51. https\://doi.org/10.1038/nature01763.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Li, Cai, Boris Lenhard, and Nicholas M. Luscombe. 2018\. “Integrated Analysis Sheds Light on Evolutionary Trajectories of Young Transcription Start Sites in the Human Genome.” *Genome Research* 28 (5): 676–88. https\://doi.org/10.1101/gr.231449.117.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Lubliner, Shai, Leeat Keren, and Eran Segal. 2013\. “Sequence Features of Yeast and Human Core Promoters That Are Predictive of Maximal Promoter Activity.” *Nucleic Acids Research* 41 (11): 5569–81. https\://doi.org/10.1093/nar/gkt256.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Martin, Marcel. 2011\. “Cutadapt Removes Adapter Sequences from High-Throughput Sequencing Reads.” *EMBnet.Journal* 17 (1): 1\. https\://doi.org/10.14806/ej.17.1.200.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Metzger, Brian P. H., David C. Yuan, Jonathan D. Gruber, Fabien Duveau, and Patricia J. Wittkopp. 2015\. “Selection on Noise Constrains Variation in a Eukaryotic Promoter.” *Nature* 521 (7552): 344–47. https\://doi.org/10.1038/nature14244.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Meylan, Patrick, René Dreos, Giovanna Ambrosini, Romain Groux, and Philipp Bucher. 2020\. “EPD in 2020: Enhanced Data Visualization and Extension to ncRNA Promoters.” *Nucleic Acids Research* 48 (D1): D65–69. https\://doi.org/10.1093/nar/gkz1014.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Morgan, Michael D., and John C. Marioni. 2018\. “CpG Island Composition Differences Are a Source of Gene Expression Noise Indicative of Promoter Responsiveness.” *Genome Biology* 19 (1): 81\. https\://doi.org/10.1186/s13059-018-1461-x.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Newman, John R. S., Sina Ghaemmaghami, Jan Ihmels, et al. 2006\. “Single-Cell Proteomic Analysis of S. Cerevisiae Reveals the Architecture of Biological Noise.” *Nature* 441 (7095): 840–46. https\://doi.org/10.1038/nature04785.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Nguyen, Thomas A., Richard D. Jones, Andrew R. Snavely, et al. 2016\. “High-Throughput Functional Comparison of Promoter and Enhancer Activities.” *Genome Research* 26 (8): 1023–33. https\://doi.org/10.1101/gr.204834.116.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Orengo, James P., Donnie Bundman, and Thomas A. Cooper. 2006\. “A Bichromatic Fluorescent Reporter for Cell-Based Screens of Alternative Splicing.” *Nucleic Acids Research* 34 (22): e148–e148. https\://doi.org/10.1093/nar/gkl967.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Papin, Christophe, Stéphanie Le Gras, Abdulkhaleg Ibrahim, et al. 2021\. “CpG Islands Shape the Epigenome Landscape.” *Journal of Molecular Biology*, Diving into Chromatin across Space and Time, vol. 433 (6): 166659\. https\://doi.org/10.1016/j.jmb.2020.09.018.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Peterman, Neil, and Erel Levine. 2016\. “Sort-Seq under the Hood: Implications of Design Choices on Large-Scale Characterization of Sequence-Function Relations.” *BMC Genomics* 17 (1): 206\. https\://doi.org/10.1186/s12864-016-2533-5.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Pollard, Katherine S., Melissa J. Hubisz, Kate R. Rosenbloom, and Adam Siepel. 2010\. “Detection of Nonneutral Substitution Rates on Mammalian Phylogenies.” *Genome Research* 20 (1): 110–21. https\://doi.org/10.1101/gr.097857.109.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Ptashne, Mark, and Alexander Gann. 1997\. “Transcriptional Activation by Recruitment.” *Nature* 386 (6625): 569–77. https\://doi.org/10.1038/386569a0.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Raser, Jonathan M., and Erin K. O’Shea. 2004\. “Control of Stochasticity in Eukaryotic Gene Expression.” *Science (New York, N.Y.)* 304 (5678): 1811–14. https\://doi.org/10.1126/science.1098641.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Sainsbury, Sarah, Carrie Bernecky, and Patrick Cramer. 2015\. “Structural Basis of Transcription Initiation by RNA Polymerase II.” *Nature Reviews Molecular Cell Biology* 16 (3): 129–43. https\://doi.org/10.1038/nrm3952.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Schor, Ignacio E., Jacob F. Degner, Dermot Harnett, et al. 2017\. “Promoter Shape Varies across Populations and Affects Promoter Evolution and Expression Noise.” *Nature Genetics* 49 (4): 550–58. https\://doi.org/10.1038/ng.3791.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Sharon, Eilon, David van Dijk, Yael Kalma, et al. 2014\. “Probing the Effect of Promoters on Noise in Gene Expression Using Thousands of Designed Sequences.” *Genome Research* 24 (10): 1698–706. https\://doi.org/10.1101/gr.168773.113.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Sharon, Eilon, Yael Kalma, Ayala Sharp, et al. 2012\. “Inferring Gene Regulatory Logic from High-Throughput Measurements of Thousands of Systematically Designed Promoters.” *Nature Biotechnology* 30 (6): 521–30. https\://doi.org/10.1038/nbt.2205.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Subramanian, Aravind, Pablo Tamayo, Vamsi K. Mootha, et al. 2005\. “Gene Set Enrichment Analysis: A Knowledge-Based Approach for Interpreting Genome-Wide Expression Profiles.” *Proceedings of the National Academy of Sciences* 102 (43): 15545–50. https\://doi.org/10.1073/pnas.0506580102.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Sun, Mengyi, and Jianzhi Zhang. 2020\. “Allele-Specific Single-Cell RNA Sequencing Reveals Different Architectures of Intrinsic and Extrinsic Gene Expression Noises.” *Nucleic Acids Research* 48 (2): 533–47. https\://doi.org/10.1093/nar/gkz1134.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[The FANTOM Consortium and the RIKEN PMI and CLST (DGT). 2014\. “A Promoter-Level Mammalian Expression Atlas.” *Nature* 507 (7493): 462–70. https\://doi.org/10.1038/nature13182.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Tirosh, Itay, and Naama Barkai. 2008\. “Two Strategies for Gene Regulation by Promoter Nucleosomes.” *Genome Research* 18 (7): 1084–91. https\://doi.org/10.1101/gr.076059.108.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Urban, Elizabeth A., and Robert J. Johnston. 2018\. “Buffering and Amplifying Transcriptional Noise During Cell Fate Specification.” *Frontiers in Genetics* 9 (November): 591\. https\://doi.org/10.3389/fgene.2018.00591.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Van Arensbergen, Joris, Vincent D. FitzPatrick, Marcel De Haas, et al. 2017\. “Genome-Wide Mapping of Autonomous Promoter Activity in Human Cells.” *Nature Biotechnology* 35 (2): 145–53. https\://doi.org/10.1038/nbt.3754.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Young, Robert S., Yoshihide Hayashizaki, Robin Andersson, et al. 2015\. “The Frequent Evolutionary Birth and Death of Functional Promoters in Mouse and Human.” *Genome Research* 25 (10): 1546–57. https\://doi.org/10.1101/gr.190546.115.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Yu, Guangchuang, Li-Gen Wang, Yanyan Han, and Qing-Yu He. 2012\. “clusterProfiler: An R Package for Comparing Biological Themes Among Gene Clusters.” *OMICS: A Journal of Integrative Biology* 16 (5): 284–87. https\://doi.org/10.1089/omi.2011.0118.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Zabidi, Muhammad A., Cosmas D. Arnold, Katharina Schernhuber, et al. 2015\. “Enhancer-Core-Promoter Specificity Separates Developmental and Housekeeping Gene Regulation.” *Nature* 518 (7540): 556–59. https\://doi.org/10.1038/nature13994.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Ziegenhain, Christoph, Gert-Jan Hendriks, Michael Hagemann-Jensen, and Rickard Sandberg. 2022\. “Molecular Spikes: A Gold Standard for Single-Cell RNA Counting.” *Nature Methods* 19 (5): 560–66. https\://doi.org/10.1038/s41592-022-01446-x.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Zou, Zhaonan, Tazro Ohta, and Shinya Oki. 2024\. “ChIP-Atlas 3.0: A Data-Mining Suite to Explore Chromosome Architecture Together with Large-Scale Regulome Data.” *Nucleic Acids Research* 52 (W1): W45–53. https\://doi.org/10.1093/nar/gkae358.](https://www.zotero.org/google-docs/?Sm3FUd) 
 
 [^1]:   Esta misma lógica fue llevada, mucho más recientemente, a una formulación cuantitativa por el físico Jeremy England, quien propuso que los sistemas de materia sometidos a un flujo externo de energía tienden, con el tiempo, a reorganizarse de manera que absorben y disipan esa energía cada vez más eficazmente —un fenómeno que llamó adaptación disipativa (England, 2015). Bajo esta lente, la aparición de estructuras capaces de sostener orden lejos del equilibrio, como las que caracterizan a la vida, dejaría de ser una rareza estadística para volverse, en cierto sentido, una tendencia esperable de la física de los sistemas dirigidos por energía. 
 
@@ -811,16 +725,18 @@ La mayoría de los TF presentan una asociación positiva con la actividad del pr
 
 [^7]:  Las bases subrayadas refieren a la posición del TSS anotado
 
-[image1]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAJBAMAAAD9fXAdAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAVKvN74lEInYy3WYQmbv8EmWgAAAAEUlEQVR4XmP8z8DAwMRAHAEALZYBEce9Dw0AAAAASUVORK5CYII=>
+[image1]: <data:image/png;base64,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>
 
-[image2]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAALBAMAAABBvoqbAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAECJEVHaJq7vd75nNZjIrqulnAAAAEklEQVR4XmP8z8DwkYkBCEgiAGhhAgZfdY9rAAAAAElFTkSuQmCC>
+[image2]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAJBAMAAAD9fXAdAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAVKvN74lEInYy3WYQmbv8EmWgAAAAEUlEQVR4XmP8z8DAwMRAHAEALZYBEce9Dw0AAAAASUVORK5CYII=>
 
-[image3]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAANBAMAAACX52mGAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAVLvvmRCrIt0yRGbNdol/YymBAAAAEklEQVR4XmP8z8DwkYkBCMgkAHy7AgpX6bqBAAAAAElFTkSuQmCC>
+[image3]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAALBAMAAABBvoqbAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAECJEVHaJq7vd75nNZjIrqulnAAAAEklEQVR4XmP8z8DwkYkBCEgiAGhhAgZfdY9rAAAAAElFTkSuQmCC>
 
 [image4]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAANBAMAAACX52mGAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAVLvvmRCrIt0yRGbNdol/YymBAAAAEklEQVR4XmP8z8DwkYkBCMgkAHy7AgpX6bqBAAAAAElFTkSuQmCC>
 
-[image5]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKEAAAAwBAMAAACLRQdjAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMARO/dzburiWYQVHaZMiKgQ028AAAAOklEQVR4Xu3MoRHAIADAQGD/ZZkAfC1vepeXEZlnWHt9y7OORkejo9HR6Gh0NDoaHY2ORkejo/GH4wVwAAJQRw8HJwAAAABJRU5ErkJggg==>
+[image5]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAANBAMAAACX52mGAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAVLvvmRCrIt0yRGbNdol/YymBAAAAEklEQVR4XmP8z8DwkYkBCMgkAHy7AgpX6bqBAAAAAElFTkSuQmCC>
 
-[image6]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAANBAMAAACX52mGAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAVLvvmRCrIt0yRGbNdol/YymBAAAAEklEQVR4XmP8z8DwkYkBCMgkAHy7AgpX6bqBAAAAAElFTkSuQmCC>
+[image6]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKEAAAAwBAMAAACLRQdjAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMARO/dzburiWYQVHaZMiKgQ028AAAAOklEQVR4Xu3MoRHAIADAQGD/ZZkAfC1vepeXEZlnWHt9y7OORkejo9HR6Gh0NDoaHY2ORkejo/GH4wVwAAJQRw8HJwAAAABJRU5ErkJggg==>
 
-[image7]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALMAAAAwBAMAAACoHla2AAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMARO/dzburiWYQVHaZMiKgQ028AAAAOUlEQVR4Xu3MoQEAIACAMPX/Z71A+7I2FgnMMz7Zy/JOa7RGa7RGa7RGa7RGa7RGa7RGa7RGa3xcX/9kAlCB4WOCAAAAAElFTkSuQmCC>
+[image7]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAANBAMAAACX52mGAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAVLvvmRCrIt0yRGbNdol/YymBAAAAEklEQVR4XmP8z8DwkYkBCMgkAHy7AgpX6bqBAAAAAElFTkSuQmCC>
+
+[image8]: <data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALMAAAAwBAMAAACoHla2AAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMARO/dzburiWYQVHaZMiKgQ028AAAAOUlEQVR4Xu3MoQEAIACAMPX/Z71A+7I2FgnMMz7Zy/JOa7RGa7RGa7RGa7RGa7RGa7RGa7RGa3xcX/9kAlCB4WOCAAAAAElFTkSuQmCC>
