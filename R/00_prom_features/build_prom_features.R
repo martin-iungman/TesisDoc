@@ -70,11 +70,26 @@ lib$CpG <- round(rowSums(CpG) / width(lib), 3)
 prom_df <- elementMetadata(lib) %>% as_tibble() %>% select(seq_id, CpG) %>% left_join(prom_df, .)
 
 # --- Observed vs expected CpG -------------------------------------------
+# exp_cpg: expected CpG frequency per position, (C * G) / L^2.
+# cpg_oe: observed/expected CpG ratio of the 252-bp fragment itself,
+#   (#CG * L) / (#C * #G) (Gardiner-Garden & Frommer 1987).
+# CGI_frag: the fragment itself meets the CpG-island composition criteria
+#   of the UCSC cpgIslandExt track (G+C >= 50% and CpG o/e > 0.6). Unlike
+#   CGI (below, genomic UCSC annotation), it describes only the sequence
+#   that goes into the reporter. Thresholds use the unrounded values.
+# NB: the `CpG` column above counts CG + GC dinucleotides, not CpG only.
 
+cg_counts <- Biostrings::vcountPattern("CG", dna)
 prom_df <- Biostrings::oligonucleotideFrequency(dna, width = 1)[, c("C", "G")] %>%
   as_tibble() %>%
-  mutate(seq_id = lib$seq_id, exp_cpg = (C * G) / (width(dna)^2)) %>%
-  select(-c(C, G)) %>%
+  mutate(
+    seq_id = lib$seq_id,
+    exp_cpg = (C * G) / (width(dna)^2),
+    cpg_oe_raw = ifelse(C * G > 0, cg_counts * width(dna) / (C * G), NA_real_),
+    CGI_frag = (C + G) / width(dna) >= 0.5 & !is.na(cpg_oe_raw) & cpg_oe_raw > 0.6,
+    cpg_oe = round(cpg_oe_raw, 3)
+  ) %>%
+  select(seq_id, exp_cpg, cpg_oe, CGI_frag) %>%
   left_join(prom_df, ., by = "seq_id")
 
 # --- CpG islands (UCSC) ---------------------------------------------------
@@ -99,6 +114,9 @@ prom_df <- prom_df %>%
   group_by(seq_id) %>%
   mutate(width_cgi_overlap = sum(width_cgi_overlap)) %>%
   distinct() %>%
+  # CGI: genomic annotation - total overlap with UCSC CpG islands > 100 bp.
+  # See CGI_frag above for the fragment-based definition (used in the
+  # activity figure cgi_actividad).
   mutate(CGI = width_cgi_overlap > 100) %>%
   ungroup()
 

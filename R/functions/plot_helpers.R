@@ -212,7 +212,10 @@ noise_roc_by_expr <- function(data, feature, titulo) {
 # compartida entre R7 (summary_features.R, efecto sobre actividad) y R3.2
 # (ruido_summary.R, efecto sobre ruido). `keep` son las columnas no-feature
 # a conservar ademas de rep (ej. "mean" para R7, "var_rank_sw" para R3.2).
-build_tidy_features <- function(data, keep) {
+# `cgi_col` es la columna de prom_df que define "Islas CpG": "CGI" (anotacion
+# genomica UCSC, default) o "CGI_frag" (composicion del fragmento de 252 pb,
+# usada en summary_features_secuencia desde 2026-10-08).
+build_tidy_features <- function(data, keep, cgi_col = "CGI") {
   data %>%
     fastDummies::dummy_cols("TE_superclass", ignore_na = TRUE, omit_colname_prefix = TRUE, remove_selected_columns = FALSE) %>%
     fastDummies::dummy_cols("sample_specificity_class", ignore_na = TRUE, omit_colname_prefix = TRUE, remove_selected_columns = TRUE) %>%
@@ -246,7 +249,7 @@ build_tidy_features <- function(data, keep) {
       `TATA-box` = TATA_EPD,
       CCAAT = CCAAT_EPD,
       `GC-box` = GCbox_EPD,
-      `Islas CpG` = CGI,
+      `Islas CpG` = all_of(cgi_col),
       Retrotransposón = DNA,
       TCT = TCT_TSS,
       `CG en TSS` = CG_TSS,
