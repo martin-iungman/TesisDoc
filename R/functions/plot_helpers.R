@@ -81,7 +81,7 @@ endo_activity_scatter <- function(data, tpm_col, titulo) {
 # (mean_sw, ver add_mean_sw_bins), por replica. add_noise_rank() hace
 # ambos pasos juntos - usado por todo R3 (ruido) para construir
 # var_rank_sw desde cero, incluida la re-binning de subconjuntos (ej.
-# solo promotores no-CGI en R3.4).
+# solo promotores no-CGI en R3.4; CGI_frag desde 2026-10-08).
 add_var_rank_sw <- function(df) {
   df %>%
     group_by(rep, mean_sw) %>%
@@ -212,10 +212,11 @@ noise_roc_by_expr <- function(data, feature, titulo) {
 # compartida entre R7 (summary_features.R, efecto sobre actividad) y R3.2
 # (ruido_summary.R, efecto sobre ruido). `keep` son las columnas no-feature
 # a conservar ademas de rep (ej. "mean" para R7, "var_rank_sw" para R3.2).
-# `cgi_col` es la columna de prom_df que define "Islas CpG": "CGI" (anotacion
-# genomica UCSC, default) o "CGI_frag" (composicion del fragmento de 252 pb,
-# usada en summary_features_secuencia desde 2026-10-08).
-build_tidy_features <- function(data, keep, cgi_col = "CGI") {
+# `cgi_col` es la columna de prom_df que define "Islas CpG". Desde 2026-10-08
+# toda la tesis usa "CGI_frag" (composicion del fragmento de 252 pb, ver
+# R/00_prom_features/build_prom_features.R); "CGI" (anotacion genomica UCSC)
+# queda solo como alternativa.
+build_tidy_features <- function(data, keep, cgi_col = "CGI_frag") {
   data %>%
     fastDummies::dummy_cols("TE_superclass", ignore_na = TRUE, omit_colname_prefix = TRUE, remove_selected_columns = FALSE) %>%
     fastDummies::dummy_cols("sample_specificity_class", ignore_na = TRUE, omit_colname_prefix = TRUE, remove_selected_columns = TRUE) %>%
@@ -414,7 +415,8 @@ wilcox_effect_summary <- function(tidy_data) {
 # usada para co-ocurrencia, no para asociacion con actividad/ruido).
 # Requiere prom_df.tsv completo (no filtrado a type=="promoter"). Usado
 # por M14 (coocurrencia_motivos) y R5.7 (promalt_coocurrencia).
-build_cooccurrence_features <- function(prom_df) {
+# `cgi_col`: igual que en build_tidy_features() (default "CGI_frag").
+build_cooccurrence_features <- function(prom_df, cgi_col = "CGI_frag") {
   prom_df %>%
     fastDummies::dummy_cols("TE_superclass", ignore_na = TRUE, omit_colname_prefix = TRUE, remove_selected_columns = FALSE) %>%
     fastDummies::dummy_cols("sample_specificity_class", ignore_na = TRUE, omit_colname_prefix = TRUE, remove_selected_columns = TRUE) %>%
@@ -447,7 +449,7 @@ build_cooccurrence_features <- function(prom_df) {
       `TATA-box` = TATA_EPD,
       CCAAT = CCAAT_EPD,
       `GC-box` = GCbox_EPD,
-      `Islas CpG` = CGI,
+      `Islas CpG` = all_of(cgi_col),
       Retrotransposón = DNA,
       TCT = TCT_TSS,
       `CG en TSS` = CG_TSS,

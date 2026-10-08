@@ -112,10 +112,11 @@ ggsave(
 
 # --- H3K4me3, solo promotores sin isla CpG --------------------------------
 # mean_sw/var_rank_sw recalculados desde cero dentro del subconjunto
-# no-CGI (no reutiliza los del dataset completo).
+# no-CGI (no reutiliza los del dataset completo). Islas CpG definidas por
+# la composicion del fragmento (CGI_frag), no por la anotacion UCSC (CGI).
 
 hist_data_h3k4me3_nonCGI <- data %>%
-  filter(!CGI) %>%
+  filter(!CGI_frag) %>%
   select(-mean_sw, -var_rank_sw) %>%
   left_join(binary_hist %>% select(seq_id, any_of("Hist_H3K4me3")), by = "seq_id") %>%
   mutate(H3K4me3 = replace_na(Hist_H3K4me3, FALSE)) %>%

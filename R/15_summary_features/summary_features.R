@@ -29,9 +29,9 @@ data <- inner_join(stats_highconf, prom_df, by = c("seq_id", "name"))
 # build_tidy_features()/feature_groups en R/functions/plot_helpers.R
 # (compartido con R3.2, el mismo resumen pero para ruido en vez de actividad).
 
-# Islas CpG definidas por la composicion del fragmento (CGI_frag), igual
-# que en cgi_actividad y composicion_secuencia_library.
-tidy_data <- build_tidy_features(data, keep = "mean", cgi_col = "CGI_frag")
+# Islas CpG definidas por la composicion del fragmento (CGI_frag, default
+# de build_tidy_features()).
+tidy_data <- build_tidy_features(data, keep = "mean")
 vbles_split <- map(c("seq", "endo"), ~ feature_groups$feature[feature_groups$group == .x])
 
 # --- Wilcoxon: efecto de cada feature sobre la actividad media ----------

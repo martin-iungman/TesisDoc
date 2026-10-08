@@ -1,7 +1,7 @@
 # composicion_secuencia_library (ver docs/mapping_figuras.csv para el numero
 # de figura vigente)
 # Panel A: motivos EPD (TATA, INR, CCAAT, GC-box)
-# Panel B: islas CpG
+# Panel B: islas CpG (definidas por la composicion del fragmento, CGI_frag)
 # Panel C: contenido G+C
 # Panel D: patrones de motivo en el TSS
 #
@@ -31,9 +31,11 @@ panel_a <- promoters_df %>%
   labs(y = "Frecuencia", x = "Motivo")
 
 # --- Panel B: islas CpG ----------------------------------------------------
+# Usa CGI_frag (el fragmento de 252 pb cumple G+C >= 50% y CpG o/e > 0.6),
+# no la anotacion genomica de UCSC (CGI); ver R/00_prom_features/build_prom_features.R.
 
 panel_b <- promoters_df %>%
-  count(CGI) %>%
+  count(CGI = CGI_frag) %>%
   filter(CGI) %>%
   mutate(CGI = "Isla CpG") %>%
   count_bar_labeled(CGI, n, n_promoters) +

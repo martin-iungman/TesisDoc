@@ -90,7 +90,10 @@ prom_df <- Biostrings::oligonucleotideFrequency(dna, width = 1)[, c("C", "G")] %
     cpg_oe = round(cpg_oe_raw, 3)
   ) %>%
   select(seq_id, exp_cpg, cpg_oe, CGI_frag) %>%
-  left_join(prom_df, ., by = "seq_id")
+  left_join(prom_df, ., by = "seq_id") %>%
+  # Solo definido para los promotores EPD: en enhancers/promotores de cancer
+  # la secuencia ensayada no coincide con la region de library.bed.
+  mutate(across(c(cpg_oe, CGI_frag), ~ if_else(type == "promoter", .x, NA)))
 
 # --- CpG islands (UCSC) ---------------------------------------------------
 # Source: http://hgdownload.cse.ucsc.edu/goldenpath/hg38/database/cpgIslandExt.txt.gz

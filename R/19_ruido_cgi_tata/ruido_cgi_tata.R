@@ -30,15 +30,17 @@ data <- inner_join(stats_highconf, prom_df, by = c("seq_id", "name"))
 data <- add_noise_rank(data)
 
 # --- CGI ---------------------------------------------------------------
+# Islas CpG definidas por la composicion del fragmento (CGI_frag: G+C >= 50%
+# y CpG o/e > 0.6), no por la anotacion genomica UCSC (CGI).
 
 ggsave(
   file.path(out_dir, "noise_scatter_CGI.jpg"),
-  noise_scatter(data, "CGI", "Ruido vs. actividad, por isla CpG", "Isla CpG"),
+  noise_scatter(data, "CGI_frag", "Ruido vs. actividad, por isla CpG", "Isla CpG"),
   width = 9, height = 6.75, units = "in"
 )
 ggsave(
   file.path(out_dir, "ROC_CGI.jpg"),
-  noise_roc(data, "CGI", "Curva ROC - Isla CpG"),
+  noise_roc(data, "CGI_frag", "Curva ROC - Isla CpG"),
   width = 7, height = 6.75, units = "in"
 )
 
