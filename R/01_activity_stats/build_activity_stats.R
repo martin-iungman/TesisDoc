@@ -4,7 +4,7 @@
 # (correccion_sesgo_muestreo), R1 (representatividad_library_venn), R2
 # (sesgo_representatividad), R3 (spike_in_robustez), R4
 # (distribuciones_expresion), R5 (filtros_consistencia_replicas) and R6
-# (tata_cgi_actividad).
+# (cgi_actividad, tata_actividad, ccaat_gcbox_actividad).
 # Run from the TesisDoc repo root. Output: data/processed/data_long.tsv,
 # data/processed/activity_stats_full.tsv, data/processed/activity_stats.tsv
 # (post sum_counts>=100 filter only - NOT the bimodal/consistency filters,
