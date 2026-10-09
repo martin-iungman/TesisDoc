@@ -1,12 +1,12 @@
 # Comparacion del efecto sobre la actividad media del reportero entre el
 # MOTIVO (EPD) y la UNION DEL TF correspondiente (ChIP-seq de ReMap2022):
 # CCAAT-box vs. NFYA, GC-box vs. SP1/SP2 (union en cualquier linea celular
-# y restringida a HEK293 para SP1/SP2). Mismo estadistico que R2.2: efecto
+# y restringida a HEK293 para SP1/SP2). Mismo estadistico que summary_features_secuencia: efecto
 # de Wilcoxon (estimador de Hodges-Lehmann, mean ~ feature, IC95% por
 # replica) via wilcox_effect_summary() - no se filtra por significancia,
 # para ver los 5-7 features lado a lado.
 #
-# Sale en la carpeta de R2.4 (tf_nfya_sp_contexto_endogeno), no es una
+# Sale en la carpeta de tf_nfya_sp_contexto_endogeno, no es una
 # figura nueva en mapping_figuras.csv.
 #
 # Requiere: data/processed/remap_tf_hits.tsv, activity_stats_highconf.tsv

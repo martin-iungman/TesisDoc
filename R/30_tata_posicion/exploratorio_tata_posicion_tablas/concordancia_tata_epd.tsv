@@ -1,0 +1,4 @@
+corte	VP	FP (no anotados)	FN (anotados no recuperados)	VN	sensibilidad	vpp	acuerdo
+−9,00	1653	329	0	18868	1	0.834	0.984
+−8,17 (EPD)	1653	0	0	19197	1	1	1
+−7,00	1235	0	418	19197	0.747	1	0.98

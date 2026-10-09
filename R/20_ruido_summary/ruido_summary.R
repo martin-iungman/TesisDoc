@@ -30,7 +30,7 @@
 # (bloque de resumen de la seccion de ruido, plot_auc2). build_tidy_
 # features()/feature_groups (identicas a las de R/15_summary_features,
 # el resumen de actividad) viven en R/functions/plot_helpers.R. Incluye
-# "Promotor unidireccional" (ver Fig. M14) como cualquier otra feature de
+# "Promotor unidireccional" (ver orientacion_promotor) como cualquier otra feature de
 # build_tidy_features(), sin tratamiento especial.
 
 library(tidyverse)

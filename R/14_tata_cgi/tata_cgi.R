@@ -6,9 +6,9 @@
 # una sola figura (tata_cgi_actividad, 12 paneles). Las islas CpG se definen
 # por la composicion del fragmento (CGI_frag), y cgi_actividad suma un panel
 # con la razon CpG o/e como variable continua (cgi_oe_deciles.jpg).
-# Tablas de soporte del texto: tata_estratificado_cgi.tsv (R2.2),
+# Tablas de soporte del texto: tata_estratificado_cgi.tsv (tata_actividad),
 # ccaat_gcbox_estratificado_cgi.tsv, motivos_prevalencia_cgi.tsv y
-# ccaat_gcbox_combinacion.tsv (R2.3).
+# ccaat_gcbox_combinacion.tsv (ccaat_gcbox_actividad).
 # Ademas guarda cgi_correlaciones.tsv (Spearman de la actividad con cpg_oe y
 # g_c, en total y dentro de cada grupo de CGI_frag, por replica).
 #
@@ -29,7 +29,7 @@ prom_df <- read_tsv("data/processed/prom_df.tsv", show_col_types = FALSE) %>% fi
 
 data <- inner_join(stats_highconf, prom_df, by = c("seq_id", "name"))
 # copia sin recortar (los bins descartan los promotores sobrantes de menor
-# rank); las tablas de efectos usan todos los promotores, igual que R2.4.
+# rank); las tablas de efectos usan todos los promotores, igual que summary_features_secuencia.
 data_full <- data
 
 # bins de 100 promotores por actividad media (rank), por separado en cada

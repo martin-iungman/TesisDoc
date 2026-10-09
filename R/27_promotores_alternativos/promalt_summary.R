@@ -4,7 +4,7 @@
 # izquierda, correlated/independent/switch). Efecto de ser Principal o
 # Secundario, dentro de cada clase de par (switch/correlated/
 # independent), sobre la actividad media (barplot Wilcoxon, similar a
-# Fig. R2.2) y sobre el ruido (barplot AUC-ROC, similar a R3.2/R3.3/
+# summary_features_secuencia) y sobre el ruido (barplot AUC-ROC, similar a R3.2/R3.3/
 # R3.4). Las diferencias son maximas para pares independientes y casi
 # nulas para pares switch, tanto en actividad como en ruido.
 #

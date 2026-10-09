@@ -293,7 +293,7 @@ build_tidy_features <- function(data, keep, cgi_col = "CGI_frag") {
 # con el mismo sentido en ambas replicas. Usado por R3.2 (features
 # curadas, show_labels=TRUE), R3.3 (TFs de ReMap, show_labels=FALSE,
 # show_errorbars=FALSE - demasiados para etiquetar o mostrar IC, igual
-# que remap_act.jpg en R2.6) y R3.4.
+# que remap_act.jpg en remap_tf_activity_gsea) y R3.4.
 # Dos criterios de significancia soportados segun las columnas de
 # auc_df: si trae `pval_corr` (p-valor de Wald via varianza de DeLong,
 # corregido por BH - ver R3.2/ruido_summary.R, resync 2026-09-30) se usa
@@ -414,7 +414,7 @@ wilcox_effect_summary <- function(tidy_data) {
 # que build_tidy_features()/R7, pero por seq_id en vez de por rep -
 # usada para co-ocurrencia, no para asociacion con actividad/ruido).
 # Requiere prom_df.tsv completo (no filtrado a type=="promoter"). Usado
-# por M14 (coocurrencia_motivos) y R5.7 (promalt_coocurrencia).
+# por coocurrencia_motivos y promalt_coocurrencia.
 # `cgi_col`: igual que en build_tidy_features() (default "CGI_frag").
 build_cooccurrence_features <- function(prom_df, cgi_col = "CGI_frag") {
   prom_df %>%
@@ -483,7 +483,7 @@ build_cooccurrence_features <- function(prom_df, cgi_col = "CGI_frag") {
 
 # Matriz de coeficiente phi (correlacion de Pearson entre columnas
 # booleanas 0/1) y de similitud de Jaccard, mas su heatmap - usado por
-# M14 y R5.7 para co-ocurrencia entre features booleanas del promotor
+# coocurrencia_motivos y promalt_coocurrencia para co-ocurrencia entre features booleanas del promotor
 # (incluida la categoria de promotor alternativo en R5.7).
 cooccurrence_phi_matrix <- function(feat_mat) cor(feat_mat, use = "pairwise.complete.obs")
 
@@ -524,7 +524,7 @@ cooccurrence_jaccard_matrix <- function(feat_mat) {
 # un conjunto chico esta casi totalmente contenido en uno mucho mas
 # grande (ej. TATA-box practicamente un subconjunto de "Promotores
 # angostos", pero Jaccard da bajo por la asimetria de tamanios - ver
-# sesion 2026-09-30, M15/coocurrencia_motivos).
+# sesion 2026-09-30, coocurrencia_motivos).
 cooccurrence_overlap_matrix <- function(feat_mat) {
   m <- matrix(NA, nrow = ncol(feat_mat), ncol = ncol(feat_mat), dimnames = list(colnames(feat_mat), colnames(feat_mat)))
   for (i in seq_len(ncol(feat_mat))) {
@@ -543,7 +543,7 @@ cooccurrence_overlap_matrix <- function(feat_mat) {
 # P(A∩B) / (P(A)*P(B)). Simetrico (a diferencia del overlap), pero NO
 # tiene el "techo" de phi cuando las prevalencias estan lejos de 50/50 -
 # aporta informacion que phi no muestra para relaciones fuertes entre
-# features raras (ver sesion 2026-09-30, M15/coocurrencia_motivos: ej.
+# features raras (ver sesion 2026-09-30, coocurrencia_motivos: ej.
 # LTR+Insertado en humanos da lift=15x pero phi=0.16, mientras que
 # Baja especificidad tisular+Alta accesibilidad da phi=0.51 pero
 # lift=1.9x - el orden por cada metrica es bien distinto, Spearman~0.74

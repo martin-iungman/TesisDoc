@@ -1,0 +1,835 @@
+---
+title: "TATA-box: ¿el efecto sobre la actividad depende de su posición respecto del TSS?"
+subtitle: "Análisis exploratorio con la regla de EPD — no forma parte del pipeline de figuras"
+date: today
+lang: es
+format:
+  html:
+    embed-resources: true
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Código"
+    fig-width: 10
+    fig-height: 5.5
+    df-print: kable
+knitr:
+  opts_knit:
+    root.dir: "../.."
+  opts_chunk:
+    message: false
+    warning: false
+    dpi: 110
+---
+
+```{r setup}
+#| code-summary: "Configuración"
+library(tidyverse)
+library(ggpubr)
+library(ggseqlogo)
+library(Biostrings)
+library(BSgenome.Hsapiens.UCSC.hg38)
+library(rtracklayer)
+
+select <- dplyr::select
+filter <- dplyr::filter
+
+# Tablas intermedias de este exploratorio (no van a data/processed/).
+# No se usa exploratorio_tata_posicion_files/ porque Quarto la borra al
+# renderizar con embed-resources.
+tab_dir <- "R/30_tata_posicion/exploratorio_tata_posicion_tablas"
+dir.create(tab_dir, showWarnings = FALSE)
+
+# Regla de busqueda y logica compartida con la figura tata_posicion
+# (constantes TATA_*, tata_scores(), tata_hits(), tata_classify(), ...).
+# Ver el encabezado de R/functions/tata_scan.R: fragmento de -236 a +15 (TSS
+# en la posicion 237), pesos W de EPD, columna 4 entre -31 y -26, corte -8.17.
+source("R/functions/tata_scan.R")
+FRAG_LEN <- TATA_FRAG_LEN
+TSS_POS <- TATA_TSS_POS
+ANCHOR_COL <- TATA_ANCHOR_COL
+CANON <- TATA_CANON
+CORTE_EPD <- TATA_CORTE_EPD
+CORTES <- c(-9, CORTE_EPD, -7) # el de EPD + uno mas laxo y uno mas estricto, como robustez
+WIN_ORIGIN <- TATA_WIN_ORIGIN
+TOL <- TATA_TOL
+
+col_misma <- "#216869"
+col_opuesta <- "#14AFB2"
+col_alto <- "#D6741F"
+col_bajo <- "#7FB800"
+th <- theme_pubclean(base_size = 13) +
+  theme(strip.text = element_text(face = "bold"), legend.position = "top")
+lab_corte <- function(x) if_else(abs(x - CORTE_EPD) < TOL, "−8,17 (EPD)", sprintf("%.2f", x) %>% str_replace("\\.", ",") %>% str_replace("^-", "−"))
+niveles_corte <- lab_corte(CORTES)
+CORTE_LAB <- lab_corte(CORTE_EPD)
+fmt_p <- function(x) formatC(x, format = "e", digits = 1)
+```
+
+# 1. Verificación de la posición del TSS
+
+**Pregunta.** Todo el análisis expresa posiciones respecto del TSS, así que
+primero hay que confirmar en qué posición de cada fragmento cae el TSS anotado
+en EPD. Crucé las coordenadas de `data/raw/library.bed` con
+`data/external/EPD/human38_epdnew.bed` (uniendo por nombre de promotor, sin el
+prefijo `FP…_`) para **todos** los promotores de la librería, en las dos
+hebras. La posición se calcula sobre la secuencia orientada según la hebra del
+promotor (como devuelve `getSeq`): en la hebra + es `TSS − inicio`, en la − es
+`fin − TSS + 1` (coordenadas BED, TSS 1-based). Se usan solo los promotores
+FP (EPDnew); los enhancers y las secuencias de cáncer/controles quedan afuera.
+
+```{r tss-check}
+lib <- import.bed("data/raw/library.bed")
+lib <- lib[grepl("^FP", lib$name)]
+epd <- import.bed("data/external/EPD/human38_epdnew.bed")
+
+tss_check <- tibble(
+  seq_id = lib$name, name = sub("^FP[0-9]+_", "", lib$name),
+  chr = as.character(seqnames(lib)), lib_start0 = start(lib) - 1L, lib_end = end(lib),
+  lib_strand = as.character(strand(lib)), width = width(lib)
+) %>%
+  inner_join(tibble(name = epd$name, tss = start(epd), epd_strand = as.character(strand(epd))), by = "name") %>%
+  mutate(pos_tss = if_else(lib_strand == "+", tss - lib_start0, lib_end - tss + 1L))
+
+tss_check %>%
+  count(hebra = lib_strand, hebra_coincide = lib_strand == epd_strand, largo = width, posicion_TSS = pos_tss, name = "promotores")
+```
+
+Algunos ejemplos de cada hebra:
+
+```{r tss-ejemplos}
+set.seed(1)
+tss_check %>%
+  group_by(lib_strand) %>%
+  slice_sample(n = 4) %>%
+  ungroup() %>%
+  transmute(seq_id, chr, `inicio BED` = lib_start0, `fin BED` = lib_end, hebra = lib_strand,
+    `TSS EPD (1-based)` = tss, `posición del TSS en el fragmento` = pos_tss)
+```
+
+Como chequeo independiente de la anotación, el iniciador más común en
+humanos es un dinucleótido pirimidina-purina (YR) en −1/0. Si el TSS está en la
+posición `r TSS_POS`, esas dos posiciones deberían estar enriquecidas en C/T y
+A/G respectivamente, y las vecinas no:
+
+```{r tss-inr}
+dna <- getSeq(Hsapiens, lib)
+names(dna) <- lib$name
+seq_mat <- as.matrix(dna)
+
+map_dfr(-3:2, function(p) {
+  b <- seq_mat[, TSS_POS + p]
+  tibble(`posición` = p, A = mean(b == "A"), C = mean(b == "C"), G = mean(b == "G"), T = mean(b == "T"))
+}) %>%
+  mutate(`Y (C+T)` = C + T, `R (A+G)` = A + G) %>%
+  mutate(across(-`posición`, ~ round(.x, 2)))
+```
+
+::: {.callout-note}
+**Interpretación.** Los 20.851 promotores `FP` tienen el TSS de EPD en la posición 237, sin excepciones y en las dos hebras (la hebra de `library.bed` coincide siempre con la de EPD). Es decir, el fragmento va de −236 a +15, como fue diseñado. El iniciador lo confirma de forma independiente: en −1 hay 81% de pirimidinas y en 0 un 85% de purinas, frente a ~50% en las posiciones vecinas.
+:::
+
+# 2. Matriz y regla de EPD
+
+**Pregunta.** ¿Con qué regla buscamos la TATA-box? Usamos exactamente la de
+EPD ([tata_old.php](https://epd.expasy.org/epd/promoter_elements/tata_old.php)):
+
+- **Matriz:** la de Bucher (1990, *J. Mol. Biol.* 212:563, tabla 3), 389
+  TATA-boxes alineadas de 502 promotores. Sus conteos son idénticos, columna por
+  columna, a los de JASPAR MA0108.2 y TRANSFAC V\$TATA_01 (M00252).
+- **Puntaje:** la suma de los pesos W publicados por EPD (log-odds en los que la
+  mejor base de cada columna vale 0). El puntaje máximo posible es 0.
+- **Corte:** −8,17. EPD publica −8,16 como "corte optimizado", pero los pesos
+  publicados están redondeados a 2 decimales: con −8,16 se pierden 5
+  promotores anotados cuyo puntaje con los pesos redondeados da −8,17.
+- **Posición:** la posición 0 de la matriz es la **columna 4** (la segunda T de
+  `TATA`). Para que el promotor cuente como TATA, esa columna tiene que caer
+  entre **−31 y −26** respecto del TSS. La página de EPD da como "región
+  preferida" −36 a −20, pero con esa ventana sobran 171 promotores que EPD no
+  anota, todos en los bordes. Con −31 a −26 la regla reproduce `TATA_EPD`
+  exactamente (sección 3), así que es la ventana con la que EPDnew anotó estos
+  promotores.
+
+Como robustez, todo se repite con un corte más laxo (−9) y uno más estricto
+(−7).
+
+```{r motivo}
+#| fig-height: 3.5
+bucher_counts <- TATA_COUNTS # conteos de Bucher (1990), solo para el logo
+stopifnot(all(colSums(bucher_counts) == 389))
+MOTIF_LEN <- ncol(bucher_counts)
+w_epd <- TATA_W # pesos W de EPD, columnas = posiciones -3..11 de EPD
+stopifnot(all(apply(w_epd, 2, max) == 0))
+
+ggplot() +
+  geom_logo(bucher_counts, method = "bits", seq_type = "dna") +
+  scale_x_continuous(breaks = seq_len(MOTIF_LEN), labels = seq_len(MOTIF_LEN) - ANCHOR_COL) +
+  th +
+  labs(x = "Posición en la matriz (0 = columna de referencia de EPD)", y = "Bits",
+    title = "TATA-box, matriz de Bucher (1990) = JASPAR MA0108.2")
+```
+
+En el eje del logo, la posición 0 es la columna de referencia de EPD. El núcleo
+`TATAAA` ocupa las posiciones −2 a +3.
+
+# 3. Búsqueda en todo el fragmento
+
+**Pregunta.** ¿Dónde aparecen coincidencias con la matriz a lo largo de cada
+fragmento, en las dos hebras? La matriz se buscó en la secuencia orientada del
+promotor (hebra "misma") y, con la matriz en complemento reverso, en la hebra
+opuesta.
+
+**Convención de posiciones.** TSS = 0, sin posición "+1" separada. El fragmento
+va de −236 a +15. La **posición de una coincidencia es la de la columna 4 de la
+matriz** (la posición 0 de EPD), medida en la orientación del promotor, en las
+dos hebras. En la hebra opuesta es la base que la columna 4 ocupa sobre esa
+hebra. Como la matriz tiene que entrar completa, las posiciones posibles van de
+−233 a +4 en la misma hebra y de −225 a +12 en la opuesta.
+
+Los puntajes en todas las posiciones se calculan vectorizados. Abajo se verifica
+que se obtienen **exactamente** las mismas coincidencias que con
+`Biostrings::matchPWM(w_epd, ..., min.score = −8,17)` en 500 promotores al azar,
+en las dos hebras.
+
+```{r scan}
+# Codificacion entera de las secuencias (A=1, C=2, G=3, T=4; N -> NA)
+code <- matrix(match(seq_mat, c("A", "C", "G", "T")), nrow = nrow(seq_mat), dimnames = list(rownames(seq_mat), NULL))
+has_n <- rowSums(is.na(code)) > 0
+
+# Puntajes vectorizados y coincidencias: R/functions/tata_scan.R
+score_matrix <- tata_score_matrix
+rev_comp_weights <- tata_rev_comp
+scores_misma <- score_matrix(w_epd, code)
+scores_opuesta <- score_matrix(rev_comp_weights(w_epd), code)
+hits_from_scores <- function(s_misma, s_opuesta, min_score) {
+  tata_hits(s_misma, s_opuesta, min_score, exclude = names(which(has_n)))
+}
+hits <- hits_from_scores(scores_misma, scores_opuesta, min(CORTES))
+write_tsv(hits %>% select(seq_id, hebra, pos, score), file.path(tab_dir, "hits_tata_epd_corte_min9.tsv.gz"))
+```
+
+```{r scan-verificacion}
+set.seed(42)
+check_ids <- sample(rownames(code)[!has_n], 500)
+via_matchpwm <- map_dfr(check_ids, function(id) {
+  s <- dna[[id]]
+  f <- matchPWM(w_epd, s, min.score = CORTE_EPD)
+  r <- matchPWM(w_epd, reverseComplement(s), min.score = CORTE_EPD)
+  bind_rows(
+    tibble(seq_id = id, hebra = "Misma hebra", start_idx = start(f)),
+    # una coincidencia en la reversa complementaria que empieza en t ocupa,
+    # en la secuencia orientada, de L - t - k + 2 a L - t + 1
+    tibble(seq_id = id, hebra = "Hebra opuesta", start_idx = FRAG_LEN - start(r) - MOTIF_LEN + 2L)
+  )
+})
+via_vector <- hits %>%
+  filter(seq_id %in% check_ids, score >= CORTE_EPD - TOL) %>%
+  transmute(seq_id, hebra = as.character(hebra), start_idx)
+tibble(
+  `coincidencias matchPWM` = nrow(via_matchpwm),
+  `coincidencias vectorizado` = nrow(via_vector),
+  `solo en matchPWM` = nrow(anti_join(via_matchpwm, via_vector, by = c("seq_id", "hebra", "start_idx"))),
+  `solo en vectorizado` = nrow(anti_join(via_vector, via_matchpwm, by = c("seq_id", "hebra", "start_idx")))
+)
+```
+
+`r sum(has_n)` fragmento(s) con N quedan fuera del análisis.
+
+## Dónde caen las coincidencias
+
+Frecuencia de coincidencias por posición (proporción de promotores con una
+coincidencia cuya columna de referencia cae en cada posición), con el corte de
+EPD, separando los promotores anotados con TATA-box en EPD (`TATA_EPD`) del
+resto. **Cada panel tiene su propia escala vertical**: en los promotores sin
+`TATA_EPD` la escala es ~100 veces menor. Gris: ventana de EPD (−31 a −26).
+
+```{r hits-posicion}
+#| fig-height: 6
+prom_df <- read_tsv("data/processed/prom_df.tsv", show_col_types = FALSE) %>% filter(type == "promoter")
+prom_ids <- prom_df %>%
+  filter(seq_id %in% rownames(code)[!has_n]) %>%
+  distinct(seq_id, TATA_EPD, CGI_frag)
+
+hits_pos <- hits %>%
+  filter(score >= CORTE_EPD - TOL) %>%
+  inner_join(prom_ids, by = "seq_id") %>%
+  distinct(seq_id, TATA_EPD, hebra, pos) %>%
+  count(TATA_EPD, hebra, pos) %>%
+  left_join(count(prom_ids, TATA_EPD, name = "n_prom"), by = "TATA_EPD")
+pos_modal <- hits_pos %>% filter(TATA_EPD, hebra == "Misma hebra") %>% slice_max(n, n = 1) %>% pull(pos)
+
+hits_pos %>%
+  mutate(TATA_EPD = if_else(TATA_EPD, "TATA_EPD = TRUE", "TATA_EPD = FALSE (escala ~100 veces menor)")) %>%
+  ggplot(aes(pos, 100 * n / n_prom, color = hebra)) +
+  annotate("rect", xmin = CANON[1], xmax = CANON[2], ymin = -Inf, ymax = Inf, fill = "grey85", alpha = 0.5) +
+  geom_line() +
+  facet_wrap(~TATA_EPD, ncol = 1, scales = "free_y") +
+  scale_color_manual(values = c("Misma hebra" = col_misma, "Hebra opuesta" = col_opuesta)) +
+  th +
+  labs(x = "Posición de la coincidencia (columna de referencia) respecto del TSS (pb)", y = "% de promotores",
+    color = NULL, title = paste0("Coincidencias con la matriz (corte ", CORTE_LAB, ")"))
+```
+
+En los promotores `TATA_EPD`, la posición más frecuente de la columna de
+referencia en la misma hebra es **`r pos_modal`**.
+
+## Concordancia con `TATA_EPD`
+
+Para cada corte: ¿los promotores con una coincidencia en la misma hebra cuya
+columna de referencia cae entre −31 y −26 son los que EPD anota con TATA-box?
+Se cuenta cada promotor una vez (no por réplica). Con el corte −8,17 esta es
+la regla de EPD.
+
+```{r concordancia}
+canon_ids <- function(ct) {
+  hits %>%
+    filter(score >= ct - TOL, hebra == "Misma hebra", between(pos, CANON[1], CANON[2])) %>%
+    pull(seq_id) %>%
+    unique()
+}
+concordancia <- map_dfr(CORTES, function(ct) {
+  prom_ids %>%
+    mutate(canonica = seq_id %in% canon_ids(ct)) %>%
+    summarise(
+      `VP` = sum(canonica & TATA_EPD), `FP (no anotados)` = sum(canonica & !TATA_EPD),
+      `FN (anotados no recuperados)` = sum(!canonica & TATA_EPD), `VN` = sum(!canonica & !TATA_EPD)
+    ) %>%
+    mutate(corte = lab_corte(ct), .before = 1)
+}) %>%
+  mutate(
+    sensibilidad = round(VP / (VP + `FN (anotados no recuperados)`), 3),
+    vpp = round(VP / (VP + `FP (no anotados)`), 3),
+    acuerdo = round((VP + VN) / (VP + `FP (no anotados)` + `FN (anotados no recuperados)` + VN), 3)
+  )
+write_tsv(concordancia, file.path(tab_dir, "concordancia_tata_epd.tsv"))
+concordancia
+```
+
+¿Cómo son los promotores en los que la regla y la anotación no coinciden (corte
+de EPD)? Mejor puntaje en la ventana y posición de la columna de referencia de
+esa coincidencia:
+
+```{r discordantes}
+best_canon <- tibble(
+  seq_id = rownames(scores_misma),
+  score = apply(scores_misma[, (CANON[1]:CANON[2]) - (ANCHOR_COL - 1L) + TSS_POS], 1, max),
+  pos = CANON[1] - 1L + apply(scores_misma[, (CANON[1]:CANON[2]) - (ANCHOR_COL - 1L) + TSS_POS], 1, which.max)
+)
+discordantes <- prom_ids %>%
+  inner_join(best_canon, by = "seq_id") %>%
+  mutate(regla = score >= CORTE_EPD - TOL) %>%
+  filter(regla != TATA_EPD)
+if (nrow(discordantes) == 0) {
+  tibble(resultado = "Ningún promotor discordante: la regla reproduce TATA_EPD exactamente.")
+} else {
+  discordantes %>%
+    mutate(caso = if_else(regla, "Regla sí, EPD no", "EPD sí, regla no")) %>%
+    group_by(caso) %>%
+    summarise(
+      n = n(), `puntaje (mediana)` = round(median(score), 2), `puntaje (rango)` = sprintf("%.2f a %.2f", min(score), max(score)),
+      `posición (mediana)` = median(pos), `posición (rango)` = paste(min(pos), "a", max(pos)), .groups = "drop"
+    )
+}
+```
+
+::: {.callout-note}
+**Interpretación.** Con el corte −8,17 y la columna de referencia entre −31 y −26, la regla reproduce `TATA_EPD` **exactamente**: 1.653 de 1.653 promotores anotados, sin falsos positivos ni falsos negativos sobre 20.850 promotores. Es la regla con la que EPDnew anotó estos promotores, así que de acá en adelante la clase "canónica" (corte de EPD) es idéntica a `TATA_EPD`. El pico de la misma hebra está en −28, y el de la hebra opuesta cae casi en la misma posición: es la misma TATA leída en complemento reverso (ver 4b). En los promotores sin `TATA_EPD` (con otra escala) no hay pico en la misma hebra: solo un fondo de ~0,1–0,3% por posición, y también algunas coincidencias en la hebra opuesta alrededor de −28 y en el TSS. Los cortes de robustez cambian el conjunto en la dirección esperada: −9 recupera todas las anotadas, pero con 329 de más (VPP 83%); −7 no agrega ninguna de más, pero pierde 418 (sensibilidad 75%).
+:::
+
+# 4. Análisis
+
+```{r datos-actividad}
+stats_highconf <- read_tsv("data/processed/activity_stats_highconf.tsv", show_col_types = FALSE)
+data <- inner_join(stats_highconf, prom_df, by = c("seq_id", "name")) %>%
+  filter(seq_id %in% rownames(code)[!has_n]) %>%
+  group_by(rep) %>%
+  mutate(act_pct = 100 * percent_rank(mean)) %>%
+  ungroup()
+
+niveles_clase <- TATA_CLASES
+clasificar <- function(hits_u, ids) tata_classify(hits_u, ids, canon = CANON)
+hits_u_list <- set_names(map(CORTES, ~ filter(hits, score >= .x - TOL)), niveles_corte)
+clases <- imap_dfr(hits_u_list, ~ clasificar(.x, unique(data$seq_id)) %>% mutate(corte = .y)) %>%
+  mutate(corte = factor(corte, levels = niveles_corte))
+write_tsv(clases, file.path(tab_dir, "clases_tata_por_corte.tsv"))
+
+data_clases <- data %>% inner_join(clases, by = "seq_id", relationship = "many-to-many")
+
+# Hodges-Lehmann + IC 95% y comparacion de cada clase contra "Sin motivo"
+# (BH dentro de cada replica x corte x estrato): R/functions/tata_scan.R
+hl_vs <- tata_hl_vs
+compare_classes <- tata_compare_classes
+
+col_efecto <- scale_color_manual(
+  values = c("Mayor actividad" = col_alto, "Menor actividad" = col_bajo, "n.s." = "grey60"), drop = FALSE
+)
+plot_forest <- function(res, facets) {
+  ggplot(res, aes(estimate, clase, color = efecto)) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+    geom_linerange(aes(xmin = conf.low, xmax = conf.high), linewidth = 0.9) +
+    geom_point(size = 2.8) +
+    geom_text(aes(label = paste0("n=", n)), vjust = -1, size = 3, color = "grey30") +
+    facet_grid(facets) +
+    col_efecto +
+    th +
+    labs(x = "Diferencia de actividad media vs. «Sin motivo»\n(Hodges-Lehmann, IC 95%)", y = NULL, color = NULL)
+}
+fmt_res <- function(res) {
+  res %>% mutate(across(c(estimate, conf.low, conf.high), ~ round(.x, 3)), across(c(p, p_adj), fmt_p))
+}
+```
+
+## a) Clases de promotor
+
+**Pregunta.** ¿Cambia la actividad según dónde está la TATA-box? Cada
+promotor va a una sola clase, en este orden de prioridad:
+- **Canónica:** alguna coincidencia en la misma hebra con la columna de
+  referencia entre −31 y −26. Con el corte de EPD, coincide con `TATA_EPD`.
+- **Solo no canónica:** coincidencias en la misma hebra, todas fuera de esa
+  ventana.
+- **Solo hebra opuesta:** coincidencias únicamente en la hebra opuesta.
+- **Sin motivo:** ninguna coincidencia en todo el fragmento.
+
+Cada clase se compara contra "sin motivo". El gráfico muestra la diferencia de
+actividad estimada (Hodges-Lehmann) con su IC 95%. Naranja = significativamente
+mayor, verde = significativamente menor (BH < 0.05 dentro de cada réplica ×
+corte).
+
+```{r clases-n}
+data_clases %>%
+  count(corte, rep, clase) %>%
+  pivot_wider(names_from = clase, values_from = n)
+```
+
+```{r clases-test}
+#| fig-height: 6.5
+res_clases <- compare_classes(data_clases, c("rep", "corte"))
+write_tsv(res_clases, file.path(tab_dir, "clases_vs_sin_motivo.tsv"))
+plot_forest(res_clases, corte ~ rep) +
+  ggtitle("Actividad por clase de TATA-box, por corte y réplica")
+```
+
+```{r clases-tabla}
+res_clases %>% fmt_res() %>% select(rep, corte, clase, n, n_ref, estimate, conf.low, conf.high, p, p_adj)
+```
+
+Distribución de la actividad por clase, corte de EPD:
+
+```{r clases-violin}
+#| fig-height: 5
+data_clases %>%
+  filter(corte == CORTE_LAB) %>%
+  ggplot(aes(clase, mean, fill = clase)) +
+  geom_violin(alpha = 0.7, draw_quantiles = 0.5, color = "grey30") +
+  facet_wrap(~rep) +
+  scale_fill_manual(values = c("Canónica" = col_misma, "Solo no canónica" = col_opuesta,
+    "Solo hebra opuesta" = "#9FD8D9", "Sin motivo" = "grey80"), guide = "none") +
+  th +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+  labs(x = NULL, y = "Actividad media", title = paste0("Corte ", CORTE_LAB))
+```
+
+::: {.callout-note}
+**Interpretación.** En las dos réplicas y con los tres cortes, solo la clase **canónica** tiene más actividad que "sin motivo". Con el corte de EPD, el efecto es HL = 0,24 \[0,19; 0,29\] en la réplica 1 (n = 715) y 0,21 \[0,15; 0,27\] en la réplica 2 (n = 848). Crece con el corte (≈ 0,19–0,21 con −9; ≈ 0,26–0,28 con −7). Las coincidencias fuera de la ventana, en la misma hebra o en la opuesta, no suman actividad: muestran un efecto chico negativo (≈ −0,05 a −0,07), que la sección 5 atribuye al contenido de A/T.
+:::
+
+## b) Perfil del efecto por posición
+
+**Pregunta.** Es el gráfico central: ¿en qué posiciones tener una TATA-box
+se asocia con más actividad? El fragmento se divide en ventanas de 10 pb,
+alineadas para que una de ellas (−33 a −24) contenga el pico de posiciones
+de las TATA de EPD. Para cada ventana y hebra se comparan dos grupos:
+- los promotores con al menos una coincidencia cuya columna de referencia cae
+  en esa ventana;
+- los promotores **sin ninguna coincidencia en todo el fragmento**.
+
+Se grafica el estimador de Hodges-Lehmann con su IC 95%, en el centro de la
+ventana. Un promotor con coincidencias en varias ventanas aparece en cada una
+de ellas. Solo se muestran ventanas con ≥ 20 promotores, y las líneas no unen
+ventanas salteadas. Puntos rellenos = BH < 0.05 (dentro de réplica × corte).
+Gris: ventana de EPD. Abajo, la proporción de promotores con coincidencia en
+cada ventana.
+
+```{r perfil-funciones}
+profile_effect <- tata_profile_effect # R/functions/tata_scan.R
+
+col_hebra <- scale_color_manual(values = c("Misma hebra" = col_misma, "Hebra opuesta" = col_opuesta))
+plot_profile <- function(prof, facets, title = NULL, dodge = 3) {
+  ggplot(prof, aes(win_center, estimate, color = hebra)) +
+    annotate("rect", xmin = CANON[1], xmax = CANON[2], ymin = -Inf, ymax = Inf, fill = "grey90") +
+    geom_hline(yintercept = 0, color = "grey50") +
+    geom_linerange(aes(ymin = conf.low, ymax = conf.high), position = position_dodge(width = dodge), alpha = 0.7) +
+    geom_line(aes(group = seg), position = position_dodge(width = dodge), alpha = 0.6) +
+    geom_point(aes(shape = sig), position = position_dodge(width = dodge), size = 2, fill = "white") +
+    scale_shape_manual(values = c(`TRUE` = 16, `FALSE` = 21), labels = c(`TRUE` = "BH < 0.05", `FALSE` = "n.s."), name = NULL) +
+    col_hebra +
+    facet_grid(facets) +
+    scale_x_continuous(breaks = seq(-240, 0, 20)) +
+    th +
+    labs(x = "Posición de la coincidencia respecto del TSS (centro de ventana de 10 pb)",
+      y = "Diferencia de actividad vs.\nsin motivo (HL, IC 95%)", color = NULL, title = title)
+}
+plot_prop <- function(prof, facets) {
+  ggplot(prof, aes(win_center, prop, color = hebra)) +
+    annotate("rect", xmin = CANON[1], xmax = CANON[2], ymin = -Inf, ymax = Inf, fill = "grey90") +
+    geom_line(aes(group = seg)) +
+    geom_point(size = 1.2) +
+    col_hebra +
+    facet_grid(facets) +
+    scale_x_continuous(breaks = seq(-200, 0, 50)) +
+    th +
+    theme(legend.position = "none") +
+    labs(x = "Posición de la coincidencia respecto del TSS (pb)", y = "Proporción de\npromotores")
+}
+
+perfil <- imap_dfr(hits_u_list, ~ profile_effect(data, .x) %>% mutate(corte = .y)) %>%
+  mutate(corte = factor(corte, levels = niveles_corte))
+write_tsv(perfil, file.path(tab_dir, "perfil_posicion_hl.tsv"))
+```
+
+```{r perfil-principal}
+#| fig-height: 8
+perfil_p <- filter(perfil, corte == CORTE_LAB)
+patchwork::wrap_plots(
+  plot_profile(perfil_p, rep ~ ., paste0("Efecto de la TATA-box según su posición (corte ", CORTE_LAB, ")")),
+  plot_prop(perfil_p, . ~ rep),
+  ncol = 1, heights = c(2.2, 1)
+)
+```
+
+Robustez a los otros cortes:
+
+```{r perfil-cortes}
+#| fig-height: 9
+plot_profile(perfil, corte ~ rep, "Perfil por posición, los tres cortes")
+```
+
+Las ventanas con el mayor efecto en cada réplica y hebra (corte de EPD):
+
+```{r perfil-top}
+perfil_p %>%
+  group_by(rep, hebra) %>%
+  slice_max(estimate, n = 3) %>%
+  ungroup() %>%
+  transmute(rep, hebra, ventana = paste0(win, " a ", win + 9), n, estimate = round(estimate, 3),
+    conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), p_adj = fmt_p(p_adj))
+```
+
+**¿Qué son las coincidencias en la hebra opuesta cerca de la ventana de
+EPD?** La TATA-box es casi palindrómica (`TATAAA` / `TTTATA`), así que una
+TATA canónica en la misma hebra puede coincidir también con la matriz en
+complemento reverso, en casi la misma posición. Si esas coincidencias son la
+misma TATA vista desde la otra hebra, la mayoría de esos promotores debería
+tener además una coincidencia canónica en la misma hebra, con un
+desplazamiento fijo entre ambas. El efecto de los que **no** la tienen dice si
+la hebra opuesta aporta algo por sí sola.
+
+```{r opuesta-canon}
+h_p <- hits_u_list[[CORTE_LAB]]
+canon_p <- h_p %>% filter(hebra == "Misma hebra", between(pos, CANON[1], CANON[2]))
+op_c <- h_p %>% filter(hebra == "Hebra opuesta", between(pos, CANON[1] - 10, CANON[2] + 10))
+op_ids <- unique(op_c$seq_id)
+
+tibble(
+  `ventana (hebra opuesta)` = paste(CANON[1] - 10, "a", CANON[2] + 10),
+  `promotores con coincidencia opuesta` = length(op_ids),
+  `también con coincidencia canónica (misma hebra)` = sum(op_ids %in% canon_p$seq_id)
+) %>% mutate(`proporción` = round(`también con coincidencia canónica (misma hebra)` / `promotores con coincidencia opuesta`, 3))
+
+# desplazamiento (pos hebra opuesta - pos misma hebra) mas frecuente
+op_c %>%
+  inner_join(canon_p, by = "seq_id", suffix = c("_op", "_misma"), relationship = "many-to-many") %>%
+  count(`desplazamiento (pb)` = pos_op - pos_misma, name = "pares") %>%
+  slice_max(pares, n = 5)
+
+# efecto de esas coincidencias opuestas en promotores sin coincidencia canonica
+sin_motivo_ids <- setdiff(unique(data$seq_id), h_p$seq_id)
+data %>%
+  filter(seq_id %in% c(setdiff(op_ids, canon_p$seq_id), sin_motivo_ids)) %>%
+  mutate(grupo = if_else(seq_id %in% op_ids, "op", "ref")) %>%
+  group_by(rep) %>%
+  summarise(n = sum(grupo == "op"), hl_vs(mean[grupo == "op"], mean[grupo == "ref"]), .groups = "drop") %>%
+  mutate(across(c(estimate, conf.low, conf.high), ~ round(.x, 3)), p = fmt_p(p))
+```
+
+::: {.callout-note}
+**Interpretación.** El perfil confirma la predicción en las dos réplicas y con los tres cortes. En la misma hebra, la única ventana con un efecto positivo y significativo es **−33 a −24**, la que contiene la ventana de EPD: HL = 0,23 en la réplica 1 y 0,20 en la réplica 2 (BH < 1e-10). El resto de las ventanas tiende a negativo. Algunas lo son significativamente, sobre todo en la réplica 1, pero son pocas y distintas en cada réplica. En la hebra opuesta aparece un pico en la misma ventana (≈ 0,20 en las dos réplicas), pero es la misma TATA canónica leída en la otra hebra: el 59% de esas coincidencias opuestas está en promotores que también tienen la canónica, desplazadas apenas 1–3 pb. Las que no la tienen no muestran efecto (HL ≈ −0,03, n.s. en las dos réplicas).
+:::
+
+## c) Dosis-respuesta dentro de la ventana de EPD
+
+**Pregunta.** Si la TATA-box canónica es la que aporta actividad, un motivo
+más parecido al consenso debería dar más actividad. Para **todos** los
+promotores (sin corte) se toma el mejor puntaje en la misma hebra con la
+columna de referencia entre −31 y −26, y se correlaciona con la actividad
+(Spearman, por réplica). Como control posicional, lo mismo con una ventana del
+mismo tamaño lejos del TSS (−131 a −126). El gráfico agrupa los promotores en
+deciles del puntaje:
+- punto = media del percentil de actividad del decil;
+- barra = IC 95%;
+- línea punteada = corte de EPD.
+
+Es el mismo formato que `cgi_oe_deciles.jpg`.
+
+```{r dosis}
+#| fig-height: 5.5
+best_in_window <- tata_best_in_window # R/functions/tata_scan.R
+best_scores <- tibble(
+  seq_id = rownames(scores_misma),
+  `EPD (−31 a −26)` = best_in_window(scores_misma, CANON[1], CANON[2]),
+  `Control (−131 a −126)` = best_in_window(scores_misma, CANON[1] - 100, CANON[2] - 100)
+) %>% pivot_longer(-seq_id, names_to = "ventana", values_to = "score")
+
+dosis <- data %>%
+  select(rep, seq_id, mean, act_pct) %>%
+  inner_join(best_scores, by = "seq_id", relationship = "many-to-many")
+
+dosis_rho <- dosis %>%
+  group_by(rep, ventana) %>%
+  summarise(
+    rho = cor(score, mean, method = "spearman"),
+    p = cor.test(score, mean, method = "spearman", exact = FALSE)$p.value,
+    rho_sobre_corte = cor(score[score >= CORTE_EPD - TOL], mean[score >= CORTE_EPD - TOL], method = "spearman"),
+    n_sobre_corte = sum(score >= CORTE_EPD - TOL),
+    .groups = "drop"
+  )
+dosis_rho %>% mutate(across(c(rho, rho_sobre_corte), ~ round(.x, 3)), p = fmt_p(p))
+
+dosis %>%
+  group_by(rep, ventana) %>%
+  mutate(decil = ntile(score, 10)) %>%
+  group_by(rep, ventana, decil) %>%
+  summarise(sc = median(score), m = mean(act_pct), se = sd(act_pct) / sqrt(n()), .groups = "drop") %>%
+  ggplot(aes(sc, m, color = ventana)) +
+  geom_hline(yintercept = 50, linetype = "dotted", color = "grey60") +
+  geom_vline(xintercept = CORTE_EPD, linetype = "dashed", color = "grey40") +
+  geom_errorbar(aes(ymin = m - 1.96 * se, ymax = m + 1.96 * se), width = 0) +
+  geom_line() +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = c("EPD (−31 a −26)" = col_misma, "Control (−131 a −126)" = "grey55")) +
+  facet_wrap(~rep) +
+  th +
+  labs(x = "Mejor puntaje en la ventana (suma de pesos W, mediana del decil)", y = "Percentil de\nactividad media",
+    color = NULL, title = "Dosis-respuesta: puntaje del motivo vs. actividad")
+```
+
+::: {.callout-note}
+**Interpretación.** La relación es de tipo umbral. En los nueve deciles inferiores, el mejor puntaje en la ventana de EPD no se asocia con la actividad (percentil ≈ 46–51). Solo el decil superior, que cae por encima del corte, sube a ≈ 60 (réplica 1) y ≈ 56 (réplica 2). Por eso la Spearman global es baja (ρ = 0,09 y 0,06), aunque entre los promotores que superan el corte el puntaje sigue correlacionando con la actividad (ρ = 0,19 y 0,18). En la ventana control (−131 a −126) la correlación es levemente **negativa** (ρ ≈ −0,04 a −0,05): es el sello de un efecto genérico de A/T, no del motivo.
+:::
+
+# 5. Controles
+
+## Contenido de A/T
+
+**Pregunta.** La TATA-box es rica en A/T, y el contenido de A/T de un
+fragmento (o su contraparte, G+C/islas CpG) se asocia por sí solo con la
+actividad. Un fragmento rico en A/T tiene más chances de tener coincidencias
+débiles en cualquier lado. ¿El efecto de la TATA-box es solo un reflejo del
+A/T? Se calcula el A/T de la región proximal (−50 a −1) y se repiten (a) y (b)
+estratificando por terciles de A/T. Los terciles se calculan dentro de cada
+réplica, y la referencia "sin motivo" es la del mismo tercil. Además se ajusta
+un modelo lineal por réplica, percentil de actividad ~ clase + A/T, con y sin
+la covariable.
+
+```{r at-calculo}
+at_prox <- tata_at_prox(code, -50, -1)
+data_at <- data %>%
+  mutate(at_prox = at_prox[seq_id], at_frag = 1 - g_c) %>%
+  group_by(rep) %>%
+  mutate(tercil_at = factor(ntile(at_prox, 3), labels = c("A/T bajo", "A/T medio", "A/T alto"))) %>%
+  ungroup()
+
+data_at %>%
+  group_by(rep, tercil_at) %>%
+  summarise(n = n(), `A/T −50 a −1 (rango)` = sprintf("%.2f – %.2f", min(at_prox), max(at_prox)), .groups = "drop")
+
+data_at %>%
+  inner_join(filter(clases, corte == CORTE_LAB), by = "seq_id") %>%
+  group_by(rep, clase) %>%
+  summarise(`A/T −50 a −1 (mediana)` = round(median(at_prox), 3), `A/T fragmento (mediana)` = round(median(at_frag), 3), .groups = "drop")
+```
+
+```{r at-clases}
+#| fig-height: 7
+data_at_clases <- data_at %>% inner_join(filter(clases, corte == CORTE_LAB), by = "seq_id")
+res_at <- compare_classes(data_at_clases, c("rep", "tercil_at"))
+write_tsv(res_at, file.path(tab_dir, "clases_vs_sin_motivo_por_tercil_AT.tsv"))
+plot_forest(res_at, tercil_at ~ rep) +
+  ggtitle(paste0("Clases por tercil de A/T (−50 a −1), corte ", CORTE_LAB))
+```
+
+```{r at-n}
+data_at_clases %>% count(rep, tercil_at, clase) %>% pivot_wider(names_from = clase, values_from = n)
+```
+
+Modelo lineal (coeficientes de cada clase vs. "sin motivo", en puntos de
+percentil de actividad, IC 95%):
+
+```{r at-modelo}
+#| fig-height: 4.5
+modelos <- data_at_clases %>%
+  mutate(clase = relevel(clase, ref = "Sin motivo")) %>%
+  group_by(rep) %>%
+  group_modify(function(d, k) {
+    bind_rows(
+      broom::tidy(lm(act_pct ~ clase, data = d), conf.int = TRUE) %>% mutate(modelo = "Sin covariable"),
+      broom::tidy(lm(act_pct ~ clase + at_prox, data = d), conf.int = TRUE) %>% mutate(modelo = "+ A/T (−50 a −1)"),
+      broom::tidy(lm(act_pct ~ clase + at_prox + at_frag, data = d), conf.int = TRUE) %>% mutate(modelo = "+ A/T proximal y del fragmento")
+    )
+  }) %>%
+  ungroup() %>%
+  filter(str_detect(term, "^clase")) %>%
+  mutate(clase = factor(str_remove(term, "^clase"), levels = rev(setdiff(niveles_clase, "Sin motivo"))),
+    modelo = factor(modelo, levels = c("Sin covariable", "+ A/T (−50 a −1)", "+ A/T proximal y del fragmento")))
+write_tsv(modelos, file.path(tab_dir, "modelo_clase_AT.tsv"))
+
+ggplot(modelos, aes(estimate, clase, color = modelo)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_linerange(aes(xmin = conf.low, xmax = conf.high), position = position_dodge(width = 0.6), linewidth = 0.9) +
+  geom_point(position = position_dodge(width = 0.6), size = 2.5) +
+  scale_color_manual(values = c("grey55", col_opuesta, col_misma)) +
+  facet_wrap(~rep) +
+  th +
+  labs(x = "Coeficiente vs. «Sin motivo» (puntos de percentil de actividad)", y = NULL, color = NULL)
+```
+
+Perfil por posición dentro de cada tercil de A/T:
+
+```{r at-perfil}
+#| fig-height: 9
+perfil_at <- profile_effect(data_at, hits_u_list[[CORTE_LAB]], group_vars = c("rep", "tercil_at"))
+write_tsv(perfil_at, file.path(tab_dir, "perfil_posicion_por_tercil_AT.tsv"))
+plot_profile(perfil_at, tercil_at ~ rep, paste0("Perfil por posición por tercil de A/T, corte ", CORTE_LAB))
+```
+
+::: {.callout-note}
+**Interpretación.** El efecto canónico **resiste** el control por A/T. Es positivo y significativo en los tres terciles de las dos réplicas, y es mayor cuanto más pobre en A/T es la región proximal: HL ≈ 0,47–0,54 en A/T bajo, 0,29–0,36 en medio y 0,15–0,19 en alto. En el modelo, el coeficiente canónico aumenta al agregar A/T: de 11,0 a 13,5 puntos de percentil en la réplica 1 y de 7,5 a 10,0 en la réplica 2. En cambio, los efectos negativos de "solo no canónica" y "solo hebra opuesta" se concentran en el tercil A/T alto y se anulan (≈ 0) con A/T proximal y del fragmento como covariables. En el perfil estratificado, la ventana −33 a −24 es la única positiva en todos los terciles.
+:::
+
+## Matriz permutada
+
+**Pregunta.** Una matriz con la misma composición que la de la TATA-box
+(mismas columnas, en otro orden) detecta secuencias igual de ricas en A/T,
+pero no el motivo. Si el efecto canónico es específico de la TATA-box, no
+debería aparecer con matrices permutadas. Se generaron 10 permutaciones
+aleatorias de las columnas de los pesos W y se buscaron con el mismo corte
+(−8,17). El corte es comparable porque la permutación no cambia la
+distribución del puntaje sobre secuencias al azar. La columna de referencia
+sigue siendo la 4ª de cada matriz permutada. Después se calculó el mismo
+perfil (b). Gris: cada permutación; color: matriz real.
+
+```{r permutadas}
+#| fig-height: 8
+perms <- unname(tata_permutations(10, seed = 2024))
+perm_tbl <- tibble(perm = paste0("perm", seq_along(perms)), orden = map_chr(perms, ~ paste(.x, collapse = ",")),
+  consenso = map_chr(perms, ~ paste(c("A", "C", "G", "T")[apply(w_epd[, .x], 2, which.max)], collapse = "")))
+perm_tbl
+
+perfil_perm <- map2_dfr(perms, perm_tbl$perm, function(p, nm) {
+  w <- w_epd[, p]
+  h <- hits_from_scores(score_matrix(w, code), score_matrix(rev_comp_weights(w), code), CORTE_EPD)
+  profile_effect(data, h) %>% mutate(perm = nm, n_prom_con_hit = n_distinct(h$seq_id))
+})
+write_tsv(perfil_perm, file.path(tab_dir, "perfil_posicion_matriz_permutada.tsv"))
+
+ggplot(perfil_perm, aes(win_center, estimate)) +
+  annotate("rect", xmin = CANON[1], xmax = CANON[2], ymin = -Inf, ymax = Inf, fill = "grey90") +
+  geom_hline(yintercept = 0, color = "grey50") +
+  geom_line(aes(group = paste(perm, seg)), color = "grey60", alpha = 0.6) +
+  geom_line(data = perfil_p, aes(color = hebra, group = seg), linewidth = 1) +
+  geom_point(data = perfil_p, aes(color = hebra), size = 1.8) +
+  col_hebra +
+  facet_grid(rep ~ hebra) +
+  scale_x_continuous(breaks = seq(-240, 0, 40)) +
+  th +
+  labs(x = "Posición de la coincidencia respecto del TSS (centro de ventana de 10 pb)",
+    y = "Diferencia de actividad vs.\nsin motivo (HL)", color = NULL,
+    title = paste0("Matriz real vs. 10 matrices permutadas (corte ", CORTE_LAB, ")"))
+```
+
+Efecto en la ventana −33 a −24 (misma hebra) de cada matriz:
+
+```{r permutadas-canon}
+bind_rows(
+  perfil_p %>% mutate(perm = "Matriz real"),
+  perfil_perm
+) %>%
+  filter(hebra == "Misma hebra", win == WIN_ORIGIN) %>%
+  select(rep, perm, n, estimate, conf.low, conf.high, p_adj) %>%
+  mutate(across(c(estimate, conf.low, conf.high), ~ round(.x, 3)), p_adj = fmt_p(p_adj)) %>%
+  pivot_wider(names_from = rep, values_from = c(n, estimate, conf.low, conf.high, p_adj), names_vary = "slowest")
+```
+
+::: {.callout-note}
+**Interpretación.** Ninguna de las 10 matrices permutadas reproduce el efecto canónico. En la ventana −33 a −24, sus efectos van de −0,15 a +0,05 y ninguno es positivo y significativo, frente a 0,23 y 0,20 de la matriz real. En todo el fragmento, solo una ventana de una permutación es positiva y significativa (perm3, −43 a −34, réplica 1: 0,15), y no se repite en la réplica 2 (0,06, n.s.). El efecto depende del orden de las bases del motivo, no de su composición.
+:::
+
+## Forma del promotor: solo promotores angostos
+
+**Pregunta.** En los promotores anchos (con varios TSS dispersos), el TSS
+anotado en EPD es solo uno de muchos y la posición "−30" pierde sentido. En
+los angostos, el TSS es más confiable y el pico, si es real, debería ser igual
+o más nítido. Se repite (b) solo con el tercil inferior de
+`interquantile_width`, calculado dentro de cada réplica como en
+`build_tidy_features()`. La referencia "sin motivo" también se restringe a
+promotores angostos.
+
+```{r angostos}
+#| fig-height: 8
+data_angostos <- data %>%
+  filter(!is.na(interquantile_width)) %>%
+  group_by(rep) %>%
+  filter(ntile(interquantile_width, 3) == 1) %>%
+  ungroup()
+data_angostos %>% group_by(rep) %>% summarise(n = n(), `interquantile_width máx.` = max(interquantile_width))
+
+perfil_angostos <- profile_effect(data_angostos, hits_u_list[[CORTE_LAB]])
+write_tsv(perfil_angostos, file.path(tab_dir, "perfil_posicion_angostos.tsv"))
+patchwork::wrap_plots(
+  plot_profile(perfil_angostos, rep ~ ., paste0("Promotores angostos, corte ", CORTE_LAB)),
+  plot_prop(perfil_angostos, . ~ rep),
+  ncol = 1, heights = c(2.2, 1)
+)
+```
+
+::: {.callout-note}
+**Interpretación.** En los promotores angostos el pico en −33 a −24 es **más grande**: HL 0,36 en las dos réplicas, contra 0,23 y 0,20 en todos los promotores. Sigue sin haber otras ventanas positivas. Es lo esperado si el efecto depende de la distancia exacta al TSS: donde el TSS anotado es más confiable, la señal posicional se afina.
+:::
+
+## Islas CpG
+
+**Pregunta.** La TATA-box es mucho más frecuente en promotores sin isla CpG,
+que además difieren en actividad. ¿Las clases se comportan igual dentro de
+cada tipo de promotor? Se repite (a) por separado para `CGI_frag` TRUE y
+FALSE, con los tres cortes; la referencia "sin motivo" es la del mismo grupo.
+
+```{r cgi}
+#| fig-height: 9
+data_cgi_clases <- data_clases %>%
+  filter(!is.na(CGI_frag)) %>%
+  mutate(cgi = if_else(CGI_frag, "Con isla CpG", "Sin isla CpG"))
+data_cgi_clases %>%
+  filter(corte == CORTE_LAB) %>%
+  count(rep, cgi, clase) %>%
+  pivot_wider(names_from = clase, values_from = n)
+
+res_cgi <- compare_classes(data_cgi_clases, c("rep", "corte", "cgi"))
+write_tsv(res_cgi, file.path(tab_dir, "clases_vs_sin_motivo_por_CGI.tsv"))
+plot_forest(res_cgi, corte + cgi ~ rep) +
+  ggtitle("Clases de TATA-box dentro de cada grupo de CGI_frag")
+```
+
+::: {.callout-note}
+**Interpretación.** La TATA canónica se asocia con más actividad tanto con isla CpG como sin ella, en las dos réplicas y con los tres cortes. El efecto es mayor con isla (HL 0,39 y 0,42 con el corte de EPD) que sin isla (0,16 y 0,12). Las clases no canónicas no son significativas en los promotores con isla. Sin isla, solo "solo no canónica" da un efecto negativo chico en la réplica 1 (−0,05), que no se repite en la réplica 2, así que no es robusto.
+:::
+
+# 6. Conclusión
+
+**Sí: el efecto de la TATA-box sobre la actividad depende de su posición canónica.** Con la regla de EPD (pesos W de Bucher, corte −8,17, posición 0 de la matriz entre −31 y −26), que reproduce exactamente la anotación `TATA_EPD`, solo las TATA en la misma hebra y en esa ventana se asocian con más actividad: HL ≈ +0,21–0,24 unidades, mayor con cortes más estrictos. La misma matriz en cualquier otra posición del fragmento, o en la hebra opuesta, no suma actividad. El único pico de la hebra opuesta es la propia TATA canónica leída en complemento reverso. El efecto **resiste los controles**: persiste en los tres terciles de A/T y con A/T como covariable, no aparece con 10 matrices de igual composición permutadas, se acentúa en los promotores angostos (≈ 0,36) y está presente con y sin isla CpG. La relación con el puntaje es de tipo umbral: solo las coincidencias que superan el corte tienen efecto. Los efectos negativos chicos de las coincidencias no canónicas se explican por el contenido de A/T. Como la regla coincide con `TATA_EPD`, para la tesis se puede seguir usando la anotación de EPD directamente: este análisis agrega que esa anotación captura un elemento posicional y que su efecto no es un artefacto de composición.
+
+# Información de la sesión
+
+```{r session}
+#| code-fold: true
+sessionInfo()
+```

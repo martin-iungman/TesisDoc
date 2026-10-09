@@ -1,4 +1,4 @@
-# Fig. M14 (ver docs/mapping_figuras.csv) - Orientación transcripcional
+# orientacion_promotor (ver docs/mapping_figuras.csv para el numero vigente) - Orientación transcripcional
 # del promotor (unidireccional vs. bidireccional), a partir de PRO-cap
 # (HEK293, ENCODE). Ver R/00_prom_features/build_promoter_orientation.R
 # para el cómputo de la Orientation Index (OI) y la clasificación
@@ -39,7 +39,7 @@ META_WIN <- 500L
 BIN_SIZE <- 10L
 MIN_SENSE <- 10L
 
-# Mismos colores que Fig. M13 (shape_especificidad_tisular.R): azul =
+# Mismos colores que shape_especificidad_tisular (shape_especificidad_tisular.R): azul =
 # thesis_clr ("#358AAA"), rojo = "#AD343E".
 cls_colors <- c(bidireccional = "#AD343E", unidireccional = "#358AAA")
 color_umbral_senal <- "#7FB800" # verde oliva, elegido para combinar con cls_colors

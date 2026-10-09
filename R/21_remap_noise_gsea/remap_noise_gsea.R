@@ -11,13 +11,13 @@
 # the TesisDoc repo root.
 #
 # Ported from transcriptional_library/Analysis/scripts/final_github.R
-# ("## Remap noise analysis"), analogo a R/17_remap_activity_gsea (R2.6)
+# ("## Remap noise analysis"), analogo a R/17_remap_activity_gsea (remap_tf_activity_gsea)
 # pero con AUC/ROC sobre var_rank_sw en vez de Wilcoxon sobre mean.
 # El original usa un objeto `tidy_TF_data` que nunca se define en el
 # script - claramente pensado como el `data_TF` de la seccion de
 # actividad (misma union de TFs) pero con var_rank_sw en vez de mean;
 # reconstruido aca desde remap_tf_hits.tsv siguiendo el mismo patron
-# que R2.6. IMPORTANTE: las columnas booleanas se convierten a
+# que remap_tf_activity_gsea. IMPORTANTE: las columnas booleanas se convierten a
 # factor(levels=c("TRUE","FALSE")) antes de pROC::roc(..., direction=
 # ">") - igual que build_tidy_features() y Histone_chipatlas.qmd's
 # tidy_hist_data (que sí definia esto para el analisis de ruido, a
@@ -68,7 +68,7 @@ data_TF <- data %>%
   mutate(across(-c(seq_id, rep, var_rank_sw), ~ replace_na(.x, FALSE)))
 
 # TFs con >100 promotores unidos en AMBAS replicas, excluyendo marcas de
-# histona (mismo criterio que R2.6).
+# histona (mismo criterio que remap_tf_activity_gsea).
 nTF <- data_TF %>%
   group_by(rep) %>%
   summarise(across(where(is.logical), sum, na.rm = TRUE)) %>%

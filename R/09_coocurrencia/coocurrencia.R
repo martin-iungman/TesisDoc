@@ -19,7 +19,7 @@
 # build_cooccurrence_features()/plot_cooccurrence_phi()/
 # plot_cooccurrence_lift()/plot_feature_frequency() en
 # R/functions/plot_helpers.R, compartidos con R5.7 (promalt_coocurrencia).
-# Incluye "Promotor unidireccional" (orientacion de PRO-cap, ver Fig. M14
+# Incluye "Promotor unidireccional" (orientacion de PRO-cap, ver orientacion_promotor
 # / R/00_prom_features/build_promoter_orientation.R) como feature mas de
 # build_cooccurrence_features() - resync 2026-09-30: dejo de agregarse
 # localmente para estar disponible en todos los analisis de features

@@ -40,7 +40,7 @@ vbles_split <- map(c("seq", "endo"), ~ feature_groups$feature[feature_groups$gro
 
 wilcox_df <- wilcox_effect_summary(tidy_data)
 
-# saved for R/09_coocurrencia (M12), which needs the significant/consistent
+# saved for R/09_coocurrencia (coocurrencia_motivos), which needs the significant/consistent
 # feature list without recomputing every Wilcoxon test.
 write_tsv(wilcox_df, "data/processed/activity_summary.tsv")
 
