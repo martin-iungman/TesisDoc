@@ -4,7 +4,7 @@
 # TATA-box canonica, por bins FIJOS de puntaje (misma idea que
 # tata_puntaje_dosis.jpg, pero con los grupos armados por valor de puntaje y
 # no por cantidad de promotores; mismo formato que cgi_oe_deciles de
-# R/14_tata_cgi/tata_cgi.R).
+# R/14_motivos_cgi_actividad/motivos_cgi_actividad.R).
 #
 # Para cada promotor, el mejor puntaje (pesos W de EPD, misma hebra) con la
 # columna de referencia entre -31 y -26 del TSS, sin corte; y lo mismo en una
@@ -56,7 +56,7 @@ best <- tibble(
   pivot_longer(-seq_id, names_to = "ventana", values_to = "score") %>%
   mutate(ventana = factor(if_else(ventana == "canonica", VENTANAS[1], VENTANAS[2]), levels = VENTANAS))
 
-# Actividad media por replica, como en tata_cgi.R; percentil dentro de cada replica
+# Actividad media por replica, como en motivos_cgi_actividad.R; percentil dentro de cada replica
 stats_highconf <- read_tsv("data/processed/activity_stats_highconf.tsv", show_col_types = FALSE)
 prom_df <- read_tsv("data/processed/prom_df.tsv", show_col_types = FALSE) %>% filter(type == "promoter")
 data <- inner_join(stats_highconf, prom_df, by = c("seq_id", "name")) %>%
