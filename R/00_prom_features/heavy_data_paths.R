@@ -14,6 +14,12 @@ translib <- "../transcriptional_library"
 # path_repeatmasker <- "data/external/repeatMasker_hg38.txt"
 path_repeatmasker <- file.path(translib, "External_data/repeatMasker_hg38.txt")
 
+# RepeatMasker hg38 alignments (2.5GB comprimido), para la divergencia de
+# Kimura con correccion CpG de cada copia de TE (ver
+# R/00_prom_features/filter_rmsk_align.py, que lo lee en streaming).
+# Source: https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.align.gz
+path_repeatmasker_align <- file.path(translib, "External_data/hg38.fa.align.gz")
+
 # ENCODE DNase-seq bigWig (630MB). ENCFF165GHP.
 # Source: ENCODE (https://www.encodeproject.org/files/ENCFF165GHP/) - not
 # listed in download_data.sh, downloaded separately; confirm cell line with author.
