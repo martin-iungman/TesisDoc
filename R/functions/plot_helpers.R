@@ -208,7 +208,7 @@ noise_roc_by_expr <- function(data, feature, titulo) {
     labs(col = "", linetype = "")
 }
 
-# Tabla de ~32 features booleanas del promotor (nombres en espanol),
+# Tabla de 34 features booleanas del promotor (nombres en espanol),
 # compartida entre R7 (summary_features.R, efecto sobre actividad) y R3.2
 # (ruido_summary.R, efecto sobre ruido). `keep` son las columnas no-feature
 # a conservar ademas de rep (ej. "mean" para R7, "var_rank_sw" para R3.2).
@@ -216,6 +216,11 @@ noise_roc_by_expr <- function(data, feature, titulo) {
 # toda la tesis usa "CGI_frag" (composicion del fragmento de 252 pb, ver
 # R/00_prom_features/build_prom_features.R); "CGI" (anotacion genomica UCSC)
 # queda solo como alternativa.
+# Conjunto de features de secuencia desde 2026-10-15: se agregan YY1, CRE,
+# E-box CAGGTR y tracto poli(dA:dT) proximal (YY1_motif, CRE_motif,
+# Ebox_CAGGTR, polyAT_prox de prom_df) y se sacan "Repeticiones de baja
+# complejidad" (LCR_overlap), LTR y la clase DNA de RepeatMasker - las
+# columnas siguen en prom_df. Mismo conjunto en build_cooccurrence_features().
 build_tidy_features <- function(data, keep, cgi_col = "CGI_frag") {
   data %>%
     fastDummies::dummy_cols("TE_superclass", ignore_na = TRUE, omit_colname_prefix = TRUE, remove_selected_columns = FALSE) %>%
@@ -223,11 +228,10 @@ build_tidy_features <- function(data, keep, cgi_col = "CGI_frag") {
     group_by(rep) %>%
     mutate(
       `Alto contenido G+C` = (cut_number(g_c, n = 3) %>% as.numeric()) == 3,
-      across(c(DNA, SINE, LINE, LTR), ~ replace_na(.x, 0)),
+      across(c(SINE, LINE), ~ replace_na(.x, 0)),
       `Sin actividad en ratón` = turnover %in% c("expression-turnover", "mouse-diminished"),
       `Insertado en humanos` = turnover == "human-inserted",
       `Elementos transponibles` = !is.na(TE_superclass),
-      `Repeticiones de baja complejidad` = LCR_overlap > 0,
       `Alta conservación (16 a -50pb)` = (cut_number(phylop100_close, n = 3) %>% as.numeric()) == 3,
       `Alta conservación (-50 a -150)` = (cut_number(phylop100_intermediate, n = 3) %>% as.numeric()) == 3,
       `Alta conservación (-150 a -235)` = (cut_number(phylop100_far, n = 3) %>% as.numeric()) == 3,
@@ -251,8 +255,11 @@ build_tidy_features <- function(data, keep, cgi_col = "CGI_frag") {
       CCAAT = CCAAT_EPD,
       `GC-box` = GCbox_EPD,
       `Islas CpG` = all_of(cgi_col),
-      Retrotransposón = DNA,
       TCT = TCT_TSS,
+      YY1 = YY1_motif,
+      `CRE (CREB/ATF)` = CRE_motif,
+      `E-box CAGGTR` = Ebox_CAGGTR,
+      `Tracto poli(dA:dT) proximal` = polyAT_prox,
       `CG en TSS` = CG_TSS,
       `TA en TSS` = TA_TSS,
       `TG en TSS` = TG_TSS,
@@ -266,11 +273,12 @@ build_tidy_features <- function(data, keep, cgi_col = "CGI_frag") {
     ) %>%
     select(
       all_of(keep), rep,
-      LINE, SINE, LTR,
+      LINE, SINE,
       `Alto contenido G+C`, `Sin actividad en ratón`, `Insertado en humanos`,
-      `Elementos transponibles`, `Repeticiones de baja complejidad`,
+      `Elementos transponibles`,
       `Alta conservación (16 a -50pb)`, `Alta conservación (-50 a -150)`, `Alta conservación (-150 a -235)`,
-      `TATA-box`, CCAAT, `GC-box`, `Islas CpG`, Retrotransposón, TCT,
+      `TATA-box`, CCAAT, `GC-box`, `Islas CpG`, TCT,
+      YY1, `CRE (CREB/ATF)`, `E-box CAGGTR`, `Tracto poli(dA:dT) proximal`,
       `CG en TSS`, `TA en TSS`, `TG en TSS`, `CA en TSS`,
       `TSS no canónico`, `TSS fuerte`,
       `No detectado (FANTOM5)`,
@@ -333,12 +341,13 @@ plot_noise_auc_summary <- function(auc_df, show_labels = TRUE, show_errorbars = 
 # transcriptional_library/Analysis/Tables/tidy_names.tsv. Usado por R7.
 feature_groups <- tribble(
   ~feature, ~group,
-  "LINE", "seq", "SINE", "seq", "LTR", "seq",
+  "LINE", "seq", "SINE", "seq",
   "Alto contenido G+C", "seq",
   "Elementos transponibles", "seq",
-  "Repeticiones de baja complejidad", "seq",
   "TATA-box", "seq", "CCAAT", "seq", "GC-box", "seq", "Islas CpG", "seq",
-  "Retrotransposón", "seq", "TCT", "seq",
+  "TCT", "seq",
+  "YY1", "seq", "CRE (CREB/ATF)", "seq", "E-box CAGGTR", "seq",
+  "Tracto poli(dA:dT) proximal", "seq",
   "CG en TSS", "seq", "TA en TSS", "seq", "TG en TSS", "seq", "CA en TSS", "seq",
   "TSS no canónico", "seq", "TSS fuerte", "seq",
   "Sin actividad en ratón", "endo", "Insertado en humanos", "endo",
@@ -422,11 +431,10 @@ build_cooccurrence_features <- function(prom_df, cgi_col = "CGI_frag") {
     fastDummies::dummy_cols("sample_specificity_class", ignore_na = TRUE, omit_colname_prefix = TRUE, remove_selected_columns = TRUE) %>%
     mutate(
       `Alto contenido G+C` = (cut_number(g_c, n = 3) %>% as.numeric()) == 3,
-      across(c(DNA, SINE, LINE, LTR), ~ replace_na(.x, 0)),
+      across(c(SINE, LINE), ~ replace_na(.x, 0)),
       `Sin actividad en ratón` = turnover %in% c("expression-turnover", "mouse-diminished"),
       `Insertado en humanos` = turnover == "human-inserted",
       `Elementos transponibles` = !is.na(TE_superclass),
-      `Repeticiones de baja complejidad` = LCR_overlap > 0,
       `Alta conservación (16 a -50pb)` = (cut_number(phylop100_close, n = 3) %>% as.numeric()) == 3,
       `Alta conservación (-50 a -150)` = (cut_number(phylop100_intermediate, n = 3) %>% as.numeric()) == 3,
       `Alta conservación (-150 a -235)` = (cut_number(phylop100_far, n = 3) %>% as.numeric()) == 3,
@@ -450,8 +458,11 @@ build_cooccurrence_features <- function(prom_df, cgi_col = "CGI_frag") {
       CCAAT = CCAAT_EPD,
       `GC-box` = GCbox_EPD,
       `Islas CpG` = all_of(cgi_col),
-      Retrotransposón = DNA,
       TCT = TCT_TSS,
+      YY1 = YY1_motif,
+      `CRE (CREB/ATF)` = CRE_motif,
+      `E-box CAGGTR` = Ebox_CAGGTR,
+      `Tracto poli(dA:dT) proximal` = polyAT_prox,
       `CG en TSS` = CG_TSS,
       `TA en TSS` = TA_TSS,
       `TG en TSS` = TG_TSS,
@@ -465,11 +476,12 @@ build_cooccurrence_features <- function(prom_df, cgi_col = "CGI_frag") {
     ) %>%
     select(
       seq_id,
-      LINE, SINE, LTR,
+      LINE, SINE,
       `Alto contenido G+C`, `Sin actividad en ratón`, `Insertado en humanos`,
-      `Elementos transponibles`, `Repeticiones de baja complejidad`,
+      `Elementos transponibles`,
       `Alta conservación (16 a -50pb)`, `Alta conservación (-50 a -150)`, `Alta conservación (-150 a -235)`,
-      `TATA-box`, CCAAT, `GC-box`, `Islas CpG`, Retrotransposón, TCT,
+      `TATA-box`, CCAAT, `GC-box`, `Islas CpG`, TCT,
+      YY1, `CRE (CREB/ATF)`, `E-box CAGGTR`, `Tracto poli(dA:dT) proximal`,
       `CG en TSS`, `TA en TSS`, `TG en TSS`, `CA en TSS`,
       `TSS no canónico`, `TSS fuerte`,
       `No detectado (FANTOM5)`,

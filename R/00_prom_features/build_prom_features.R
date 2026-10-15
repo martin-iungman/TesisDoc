@@ -427,6 +427,67 @@ hek_summ <- hek_df %>%
 prom_df <- left_join(prom_df, hek_summ, by = c("seq_id" = "name"))
 rm(lib_hek, hek, hek_df, hek_summ)
 
+# --- Additional sequence features (YY1, CRE, E-box CAGGTR, poly(dA:dT)) ---
+# Only defined for EPD promoters (type == "promoter"), on the oriented
+# 252-bp fragment (-236..+15, TSS = 0 at position 237; TATA_TSS_POS in
+# R/functions/tata_scan.R). Same definitions as the exploratory scripts:
+# YY1_motif / CRE_motif: at least one hit, either strand, anywhere in the
+#   fragment, of JASPAR 2024 MA0095.4 (YY1) / MA0018.5 (CREB1) with
+#   relative score >= 0.85 - same file, pseudocount, background and
+#   universalmotif::scan_sequences() call as R/34_motivos_tf/motivos_tf.R.
+# Ebox_CAGGTR: CAGGTR (R = A/G) on either strand, anywhere in the fragment
+#   (EBOX_ZEB in motivos_tf.R).
+# polyAT_prox: at least one A or T homopolymer run >= 8 bp centred between
+#   -100 and -1 (prox8 in R/36_polyAT_g4/polyAT_g4.R; a centre at -100.5
+#   is upstream, one at -0.5 or later is not proximal).
+
+library(universalmotif)
+MOTIF_REL_SCORE <- 0.85
+FRAG_TSS_POS <- 237L
+path_jaspar <- "data/external/JASPAR/JASPAR2024_CORE_vertebrates_non-redundant_pfms_jaspar.txt"
+
+lib_prom <- lib[lib$seq_id %in% prom_df$seq_id[prom_df$type == "promoter"]]
+dna_prom <- getSeq(Hsapiens, lib_prom)
+names(dna_prom) <- lib_prom$seq_id
+stopifnot(all(width(dna_prom) == 252L))
+seqs_prom <- as.character(dna_prom)
+
+jaspar <- read_jaspar(path_jaspar)
+jaspar_ids <- map_chr(jaspar, ~ .x@name)
+motif_hit_ids <- function(jaspar_id) {
+  pcm <- jaspar[[which(jaspar_ids == jaspar_id)]]
+  pwm <- convert_type(pcm, "PWM")@motif
+  s_min <- sum(apply(pwm, 2, min))
+  s_max <- sum(apply(pwm, 2, max))
+  res <- scan_sequences(pcm, dna_prom,
+    threshold = s_min + MOTIF_REL_SCORE * (s_max - s_min), threshold.type = "logodds.abs",
+    RC = TRUE, calc.pvals = FALSE, warn.NA = FALSE, verbose = 0
+  )
+  unique(as.character(res$sequence))
+}
+stopifnot(sum(jaspar_ids == "MA0095.4") == 1, sum(jaspar_ids == "MA0018.5") == 1)
+yy1_ids <- motif_hit_ids("MA0095.4")
+cre_ids <- motif_hit_ids("MA0018.5")
+
+at_runs <- gregexpr("A+|T+", seqs_prom, perl = TRUE)
+at_prox_ids <- names(seqs_prom)[map_lgl(at_runs, function(m) {
+  len <- attr(m, "match.length")
+  centre <- m + (len - 1) / 2 - FRAG_TSS_POS
+  any(m > 0 & len >= 8 & centre >= -100 & centre <= -1)
+})]
+
+seq_motifs_df <- tibble(
+  seq_id = names(seqs_prom),
+  YY1_motif = seq_id %in% yy1_ids,
+  CRE_motif = seq_id %in% cre_ids,
+  Ebox_CAGGTR = str_detect(seqs_prom, "CAGGT[AG]|[CT]ACCTG"),
+  polyAT_prox = seq_id %in% at_prox_ids
+)
+prom_df <- prom_df %>%
+  left_join(seq_motifs_df, by = "seq_id") %>%
+  mutate(across(c(YY1_motif, CRE_motif, Ebox_CAGGTR, polyAT_prox), ~ if_else(type == "promoter", .x, NA)))
+rm(jaspar, lib_prom, dna_prom, seqs_prom, at_runs, seq_motifs_df)
+
 # --- Write output -----------------------------------------------------
 
 dir.create("data/processed", showWarnings = FALSE, recursive = TRUE)

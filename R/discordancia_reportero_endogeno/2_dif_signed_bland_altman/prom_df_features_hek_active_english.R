@@ -20,7 +20,7 @@ label_en <- c(
   "LTR" = "LTR",
   "Sin actividad en ratón" = "No activity in mouse",
   "Insertado en humanos" = "Human inserted",
-  "Retrotransposón" = "Retrotransposon",
+  "Transposón de ADN" = "DNA transposon",
   "Alta accesibilidad de cromatina (DNase-seq)" = "High chromatin accesibility (DNase-seq)",
   "CCAAT" = "CCAAT",
   "LINE" = "LINE",
@@ -48,6 +48,14 @@ label_en <- c(
   "TATA-box" = "TATA-box",
   "Enhancers a 50kb" = "Enhancers at 50kb window",
   "Alta actividad en HEK293" = "High activity in HEK293",
+  # Features de secuencia agregadas 2026-10-15 (plot_helpers.R). LTR, "Transposón
+  # de ADN" y "Repeticiones de baja complejidad" ya no salen de
+  # build_tidy_features(); sus entradas quedan para leer el rank_dif_lmm.tsv
+  # previo hasta que se regenere.
+  "YY1" = "YY1",
+  "CRE (CREB/ATF)" = "CRE (CREB/ATF)",
+  "E-box CAGGTR" = "E-box CAGGTR",
+  "Tracto poli(dA:dT) proximal" = "Proximal poly(dA:dT) tract",
   "Promotor unidireccional" = "Unidirectional promoter"
 )
 

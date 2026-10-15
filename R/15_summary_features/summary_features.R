@@ -63,7 +63,8 @@ plot_summary <- function(df, features) {
     theme(text = element_text(size = 20), legend.position = "top") +
     labs(fill = "Efecto", x = "Efecto sobre la actividad", y = "Features", alpha = "") +
     geom_errorbarh(aes(xmax = P2.5, xmin = P97.5), position = position_dodge(1), height = 0.05, col = "#777777", linewidth = 1.5) +
-    xlim(c(-0.3, 0.55)) +
+    # -0.35: el IC de "Tracto poli(dA:dT) proximal" llega a -0.30 (Rep 2)
+    xlim(c(-0.35, 0.55)) +
     scale_fill_manual(values = c("Actividad alta" = "#D6741F", "Actividad baja" = "#7FB800")) +
     guides(alpha = "none")
 }

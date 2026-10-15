@@ -3,7 +3,7 @@
 # promoters only (hek_tpm > 0), further excluding:
 #   - "Non detected activity (FANTOM5)" (floor/tie artifact, see session
 #     2026-09-11 discussion)
-#   - "Retrotransposon" (excluded per author request, as in the other
+#   - "DNA transposon" (excluded per author request, as in the other
 #     English figures)
 #   - any feature with fewer than 100 promoters carrying it (TRUE), among
 #     the HEK293-active set - too small/unstable a group to report
@@ -45,7 +45,7 @@ label_en <- c(
   "LTR" = "LTR",
   "Sin actividad en ratón" = "No activity in mouse",
   "Insertado en humanos" = "Human inserted",
-  "Retrotransposón" = "Retrotransposon",
+  "Transposón de ADN" = "DNA transposon",
   "Alta accesibilidad de cromatina (DNase-seq)" = "High chromatin accesibility (DNase-seq)",
   "CCAAT" = "CCAAT",
   "LINE" = "LINE",
@@ -71,12 +71,20 @@ label_en <- c(
   "Alta conservación (-50 a -150)" = "High conservation (-50 to -150)",
   "Alta conservación (16 a -50pb)" = "High conservation (16 to -50pb)",
   "TATA-box" = "TATA-box",
-  "Enhancers a 50kb" = "Enhancers at 50kb window"
+  "Enhancers a 50kb" = "Enhancers at 50kb window",
+  # Features de secuencia agregadas 2026-10-15 (plot_helpers.R). LTR, "Transposón
+  # de ADN" y "Repeticiones de baja complejidad" ya no salen de
+  # build_tidy_features(); sus entradas quedan para leer el rank_dif_lmm.tsv
+  # previo hasta que se regenere.
+  "YY1" = "YY1",
+  "CRE (CREB/ATF)" = "CRE (CREB/ATF)",
+  "E-box CAGGTR" = "E-box CAGGTR",
+  "Tracto poli(dA:dT) proximal" = "Proximal poly(dA:dT) tract"
   # "Alta actividad en HEK293" intentionally omitted - not in this model
   # (tautological with the hek_tpm-based outcome, see prom_df_features_hek_endo.R)
 )
 
-excluded_features <- c("No detectado (FANTOM5)", "Retrotransposón", small_features)
+excluded_features <- c("No detectado (FANTOM5)", "Transposón de ADN", small_features)
 
 resultados_lmm <- resultados_lmm %>%
   filter(!variable %in% excluded_features) %>%
