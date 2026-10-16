@@ -1,4 +1,7 @@
-# summary_features_secuencia = Fig. R7 (ver docs/mapping_figuras.csv)
+# Dos figuras (ver docs/mapping_figuras.csv):
+#   - summary_features_secuencia: panel de secuencia (summary_seq.jpg)
+#   - summary_features_endogeno: panel de contexto endogeno
+#     (summary_endo.jpg), figura propia
 # Resumen del efecto de features de secuencia (seq) y de contexto
 # endogeno/genomico (endo) sobre la actividad transcripcional media:
 # para cada feature booleana, test de Wilcoxon (mean ~ feature, pareado
@@ -18,8 +21,8 @@ library(coin)
 source("R/functions/fig_paths.R")
 source("R/functions/plot_helpers.R")
 
-slug <- "summary_features_secuencia"
-out_dir <- fig_dir(slug)
+out_dir_seq <- fig_dir("summary_features_secuencia")
+out_dir_endo <- fig_dir("summary_features_endogeno")
 
 stats_highconf <- read_tsv("data/processed/activity_stats_highconf.tsv", show_col_types = FALSE)
 prom_df <- read_tsv("data/processed/prom_df.tsv", show_col_types = FALSE) %>% filter(type == "promoter")
@@ -70,9 +73,9 @@ plot_summary <- function(df, features) {
 }
 
 panel_seq <- plot_summary(wilcox_df, vbles_split[[1]])
-ggsave(file.path(out_dir, "summary_seq.jpg"), panel_seq, width = 13.5, height = 6.75, units = "in")
+ggsave(file.path(out_dir_seq, "summary_seq.jpg"), panel_seq, width = 13.5, height = 6.75, units = "in")
 
 panel_endo <- plot_summary(wilcox_df, vbles_split[[2]])
-ggsave(file.path(out_dir, "summary_endo.jpg"), panel_endo, width = 13.5, height = 6.75, units = "in")
+ggsave(file.path(out_dir_endo, "summary_endo.jpg"), panel_endo, width = 13.5, height = 6.75, units = "in")
 
-message("Figuras guardadas en ", out_dir)
+message("Figuras guardadas en ", out_dir_seq, " y ", out_dir_endo)
