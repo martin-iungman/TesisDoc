@@ -16,7 +16,10 @@ mapping <- read_csv("docs/mapping_figuras.csv", show_col_types = FALSE)
 existing <- list.dirs("figures", recursive = FALSE, full.names = FALSE)
 
 for (slug in mapping$slug) {
-  current <- existing[str_detect(existing, paste0("^([A-Za-z0-9.]+_)?", slug, "$"))]
+  # el prefijo opcional solo puede ser un numero de figura (lo que devuelve
+  # fig_number_prefix): asi una carpeta como exploratorio_<slug> no se toma
+  # como la de la figura <slug>
+  current <- existing[str_detect(existing, paste0("^((M[0-9]+|R[0-9]+\\.[0-9]+|sinnum)_)?", slug, "$"))]
   if (length(current) == 0) next
   if (length(current) > 1) {
     warning("Multiple folders match slug '", slug, "': ", paste(current, collapse = ", "), " - skipping")
