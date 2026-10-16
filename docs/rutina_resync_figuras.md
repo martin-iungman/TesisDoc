@@ -25,10 +25,15 @@ más decks con el tiempo). Cada una corresponde 1:1 a un archivo local
 >    título es nuevo, creá el archivo).
 > 2. Corré `git status --porcelain -- "docs/Fig *.pptx"` para ver cuáles
 >    decks cambiaron de verdad (modificados o nuevos). Si no cambió
->    ninguno, no hay nada que hacer.
-> 3. Para cada deck que cambió: releelo completo, extrayendo el texto de
->    cada slide (`markitdown`) y las imágenes embebidas (`python-pptx`,
->    iterando shapes de tipo PICTURE). El número de slide = número de
+>    ninguno, saltá directo al paso 9 (export del CSV).
+>    Todo lo mecánico pasa por `python R/maintenance/resync_figuras.py`:
+>    `save-deck --title "<título>" --src <resultado de la descarga>`
+>    guarda el pptx (y si solo cambió la recodificación de imágenes que
+>    hace Google, deja la versión commiteada), `changed` lista los decks
+>    que cambiaron de verdad.
+> 3. Para cada deck que cambió: `python R/maintenance/resync_figuras.py
+>    report --deck "<título>"` imprime por slide el texto y, para cada
+>    imagen embebida, con qué archivo de `figures/` coincide. El número de slide = número de
 >    figura actual según el deck: en `Fig MyM` slide N = Fig. M{N}; en
 >    `Fig R{deck}` slide N = Fig. R{deck}.{N} (mismo esquema que ya usa
 >    el CSV, ej. "Fig. R1.2"). Si aparece un deck con un nombre que no
@@ -44,6 +49,13 @@ más decks con el tiempo). Cada una corresponde 1:1 a un archivo local
 >    cambió. Si un slug ya no aparece en el deck, o el deck es
 >    enteramente nuevo (sin filas existentes de esa sección), no
 >    agregues/elimines filas ni inventes slugs - decime antes.
+>    **No escribas en `notas` el historial de numeración** (nada del
+>    estilo "Resync <fecha>: pasó de R2.7 a R2.8"): el cambio de número
+>    queda en el commit y en el resumen del paso 9, no en el CSV.
+>    Sí actualizá, si cambiaron en el slide, `leyenda_lista` (`si` /
+>    `no` / `desactualizada`, según si el slide tiene leyenda y si
+>    coincide con la figura actual) y `archivos` (nombres de los
+>    archivos de imagen de la figura, sin path, separados por `; `).
 > 6. Corré `Rscript R/maintenance/sync_figure_folders.R` para renombrar
 >    las carpetas de `figures/` según el CSV actualizado. Confirmá el
 >    resultado (qué se renombró, qué quedó igual).
@@ -52,9 +64,21 @@ más decks con el tiempo). Cada una corresponde 1:1 a un archivo local
 > 8. Agregá al commit los `docs/Fig *.pptx` que cambiaron, el CSV y las
 >    carpetas renombradas de `figures/`. No hagas push - dejá el commit
 >    local en main para revisar.
-> 9. Resumime qué decks se bajaron y cambiaron, qué figuras cambiaron de
->    número (por deck) y cuáles quedaron ambiguas o sin resolver (si las
->    hay).
+> 9. Exportá `docs/mapping_figuras.csv` a la carpeta "Tesis" de Drive
+>    (`1yKXenI9vXq5CzfckUxYKU97EUSaK7Zus`) como Google Sheet llamada
+>    `mapping_figuras`, solo si el CSV (incluyendo cambios sin commitear)
+>    difiere del último exportado. Este paso corre aunque ningún deck
+>    haya cambiado. El conector no puede sobrescribir contenido, así que:
+>    creá la Sheet nueva (`create_file` con `contentMimeType: text/csv`,
+>    con conversión) y, solo si salió bien, mandá la anterior a la
+>    papelera (`trash_file`, nunca borrado permanente). `resync_figuras.py
+>    export-check` dice si hace falta exportar (y el id anterior) y
+>    `export-record --file-id <id>` registra el export; el estado se
+>    guarda fuera del repo, en
+>    `C:\Users\marti\.claude\scheduled-tasks\resync-figuras-mapping\export_state.json`.
+> 10. Resumime qué decks se bajaron y cambiaron, qué figuras cambiaron de
+>    número (por deck), si se exportó el CSV a Drive (con el link) y
+>    cuáles quedaron ambiguas o sin resolver (si las hay).
 
 ---
 

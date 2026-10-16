@@ -108,5 +108,12 @@ docs/rutina_resync_figuras.md       prompt para resincronizar numeración
   secuenciación) en `data/processed/` con nombre versionado, para no
   tener que recorrer todo el pipeline al retocar una figura.
 - Al agregar o modificar una figura, actualizar la fila correspondiente
-  en `docs/mapping_figuras.csv` (estado, script, notas) en el mismo
-  cambio.
+  en `docs/mapping_figuras.csv` (estado, leyenda_lista, script,
+  archivos, notas) en el mismo cambio. `archivos` = nombres de los
+  archivos de imagen de la figura, sin path, separados por `; `.
+  `leyenda_lista` = `si` / `no` / `desactualizada` (según el slide del
+  deck). Si `estado` es `revisar`, `notas` empieza con "Revisar:
+  <motivo concreto>".
+- En `notas` no se registra el historial de numeración ("pasó de R2.7
+  a R2.8", "Resync <fecha>..."): eso queda en git. Tampoco referenciar
+  otras figuras por número en `notas` — usar su slug.
