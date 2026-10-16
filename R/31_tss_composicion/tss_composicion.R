@@ -30,8 +30,13 @@
 # R/functions/tata_scan.R). Se verifica contra TSS_seq y las columnas
 # *_TSS de prom_df antes de seguir.
 #
-# Salidas en figures/exploratorio_tss_composicion/ (no es figura numerada
-# todavia, por eso no pasa por fig_dir()).
+# Figuras de la tesis (numero vigente en docs/mapping_figuras.csv), escritas
+# via fig_dir():
+#   - perfil_efectos_promotor: tss_perfil_efectos_promotor_hl.jpg (HL, sin ajuste por G+C) y su tabla.
+#   - tss_composicion: tss_perfil_YR_todos.jpg y tss_modelo.jpg (en ese orden),
+#     con tss_perfil_bases.tsv, tss_perfil_dinucleotidos.tsv y tss_modelo.tsv.
+# Todo lo demas (graficos y tablas) es exploratorio y va a
+# figures/exploratorio_tss_composicion/.
 # Requiere: data/processed/activity_stats_highconf.tsv,
 # data/processed/prom_df.tsv y la secuencia de la library
 # (../promoter_MPRA/Library_data/data/promoters_wo_dupl_SpikeIns.fa).
@@ -42,12 +47,16 @@ library(ggpubr)
 library(patchwork)
 library(Biostrings)
 source("R/functions/tata_scan.R") # TATA_TSS_POS, TATA_FRAG_LEN, tata_hl_vs()
+source("R/functions/plot_helpers.R") # thesis_clr
+source("R/functions/fig_paths.R")
 
 select <- dplyr::select
 filter <- dplyr::filter
 rename <- dplyr::rename # Biostrings/S4Vectors la enmascara
 
 out_dir <- "figures/exploratorio_tss_composicion"
+dir_perfil_efectos <- fig_dir("perfil_efectos_promotor") # figura de la tesis
+dir_tss <- fig_dir("tss_composicion") # figura de la tesis
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 path_fa <- "../promoter_MPRA/Library_data/data/promoters_wo_dupl_SpikeIns.fa"
 
@@ -72,6 +81,9 @@ GRUPOS <- c("Todos", "Con isla CpG", "Sin isla CpG")
 col_alto <- "#D6741F"
 col_bajo <- "#7FB800"
 col_grupo <- c("Todos" = "grey30", "Con isla CpG" = "#216869", "Sin isla CpG" = "#14AFB2")
+# mismos colores por base que perfil_nucleotidos_library
+# (R/32_perfil_nucleotidos/perfil_nucleotidos.R), para que sean comparables
+col_bases <- c(A = "#7FB800", C = thesis_clr, G = "#D6741F", T = "#B5345A")
 col_efecto <- scale_color_manual(values = c("Mayor actividad" = col_alto, "Menor actividad" = col_bajo, "n.s." = "grey60"), drop = FALSE)
 th <- theme_pubclean(base_size = 13) +
   theme(strip.text = element_text(face = "bold"), legend.position = "top")
@@ -209,7 +221,7 @@ prevalencia <- prevalencia_feats(prev_universos, names(FEATS))
 save_tsv(prevalencia, "tss_prevalencia_cgi.tsv")
 
 modelo <- modelos_feats(data, names(FEATS))
-save_tsv(modelo, "tss_modelo.tsv")
+write_tsv(modelo, file.path(dir_tss, "tss_modelo.tsv"))
 
 # grafico de puntos con IC (formato de las clases de TATA)
 feat_levels <- rev(unname(FEATS))
@@ -228,8 +240,8 @@ panel_efecto <- efecto %>%
 ggsave(file.path(out_dir, "tss_efecto_cgi.jpg"), panel_efecto, width = 11, height = 7, units = "in")
 
 panel_modelo <- modelo %>%
-  filter(term == "feat", modelo != modelos_lab[3]) %>%
-  mutate(caracteristica = factor(FEATS[caracteristica], levels = feat_levels)) %>%
+  filter(term == "feat", modelo != modelos_lab[3], caracteristica != "TCT_TSS") %>% # el TCT se ve en tss_tct_rp.jpg
+  mutate(caracteristica = factor(FEATS[caracteristica], levels = setdiff(feat_levels, FEATS[["TCT_TSS"]]))) %>%
   ggplot(aes(estimate, caracteristica, color = modelo)) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
   geom_linerange(aes(xmin = conf.low, xmax = conf.high), position = position_dodge(width = 0.6), linewidth = 0.9) +
@@ -238,7 +250,7 @@ panel_modelo <- modelo %>%
   facet_grid(. ~ rep) +
   th +
   labs(x = "Coeficiente de la característica sobre el percentil de actividad\n(modelo lineal, IC 95%)", y = NULL)
-ggsave(file.path(out_dir, "tss_modelo.jpg"), panel_modelo, width = 11, height = 6, units = "in")
+ggsave(file.path(dir_tss, "tss_modelo.jpg"), panel_modelo, width = 11, height = 6, units = "in")
 
 # =============================================================================
 # PUNTO 2 - perfil posicional
@@ -358,8 +370,8 @@ dinuc <- crudo %>%
   ajustar_bh() %>%
   relocate(rep, grupo, ventana, conjunto, posicion, dinucleotido)
 
-save_tsv(perfil %>% filter(ventana == ventana_tss), "tss_perfil_bases.tsv")
-save_tsv(dinuc %>% filter(ventana == ventana_tss), "tss_perfil_dinucleotidos.tsv")
+write_tsv(perfil %>% filter(ventana == ventana_tss), file.path(dir_tss, "tss_perfil_bases.tsv"))
+write_tsv(dinuc %>% filter(ventana == ventana_tss), file.path(dir_tss, "tss_perfil_dinucleotidos.tsv"))
 save_tsv(
   bind_rows(perfil %>% filter(ventana == ventana_control), dinuc %>% filter(ventana == ventana_control) %>% rename(base = dinucleotido)),
   "tss_perfil_control.tsv"
@@ -411,19 +423,20 @@ perfil_yr <- bind_rows(
   dinuc %>% filter(conjunto == "YR (CA/CG/TA/TG)") %>% mutate(serie = "YR en (p, p+1)")
 ) %>% mutate(serie = factor(serie, c("Y en p", "R en p", "YR en (p, p+1)")))
 lim_yr <- range(c(perfil_yr$conf.low, perfil_yr$conf.high), na.rm = TRUE)
-col_serie <- scale_color_manual(values = c("Y en p" = "#216869", "R en p" = "#14AFB2", "YR en (p, p+1)" = col_alto), name = NULL)
-lineas_pos <- function(res, x_lab, marcas = NULL) {
+# Y violeta claro, R oliva/dorado (promedio RGB de la A y la G de col_bases), YR negro
+col_serie <- scale_color_manual(values = c("Y en p" = "#A98BD0", "R en p" = "#AA960F", "YR en (p, p+1)" = "black"), name = NULL)
+lineas_pos <- function(res, x_lab, marcas = NULL, facets = grupo ~ rep, ylim = lim_yr) {
   ggplot(res, aes(posicion, estimate, color = serie)) +
     {if (!is.null(marcas)) geom_vline(xintercept = marcas, linetype = "dotted", color = "grey40")} +
     geom_hline(yintercept = 0, color = "grey50") +
-    geom_linerange(aes(ymin = conf.low, ymax = conf.high), position = position_dodge(width = 0.5), alpha = 0.6) +
-    geom_line(position = position_dodge(width = 0.5), alpha = 0.7) +
-    geom_point(aes(shape = p_adj < 0.05), position = position_dodge(width = 0.5), size = 1.8, fill = "white") +
+    geom_linerange(aes(ymin = conf.low, ymax = conf.high), alpha = 0.6) +
+    geom_line(alpha = 0.7) +
+    geom_point(aes(shape = p_adj < 0.05), size = 1.8, fill = "white") +
     scale_shape_manual(values = c(`TRUE` = 16, `FALSE` = 21), labels = c(`TRUE` = "BH < 0,05", `FALSE` = "n.s."), name = NULL) +
     col_serie +
     scale_x_continuous(breaks = breaks_pares, labels = minus) +
-    coord_cartesian(ylim = lim_yr) +
-    facet_grid(grupo ~ rep) +
+    coord_cartesian(ylim = ylim) +
+    facet_grid(facets) +
     th +
     labs(x = x_lab, y = "Diferencia de actividad media\n(HL, IC 95%)")
 }
@@ -431,10 +444,36 @@ p_yr_tss <- perfil_yr %>%
   filter(ventana == ventana_tss) %>%
   lineas_pos("Posición p respecto del TSS (TSS = 0; punteadas en −1 y 0)", marcas = c(-1, 0))
 ggsave(file.path(out_dir, "tss_perfil_YR.jpg"), p_yr_tss, width = 12, height = 9, units = "in")
+# version solo con todos los promotores (sin el estrato por isla CpG)
+p_yr_tss_todos <- perfil_yr %>%
+  filter(ventana == ventana_tss, grupo == "Todos") %>%
+  lineas_pos("Posición p respecto del TSS (TSS = 0; punteadas en −1 y 0)", marcas = c(-1, 0), facets = . ~ rep, ylim = NULL)
+ggsave(file.path(dir_tss, "tss_perfil_YR_todos.jpg"), p_yr_tss_todos, width = 12, height = 4.5, units = "in")
 p_yr_ctl <- perfil_yr %>%
   filter(ventana == ventana_control) %>%
   lineas_pos("Posición p respecto del TSS (ventana control; misma escala que el TSS)")
 ggsave(file.path(out_dir, "tss_perfil_YR_control.jpg"), p_yr_ctl, width = 12, height = 9, units = "in")
+
+# --- efecto de cada base por posicion (todos los promotores) ----------------
+p_efecto_bases <- perfil %>%
+  filter(ventana == ventana_tss, conjunto == "Base", grupo == "Todos") %>%
+  ggplot(aes(posicion, estimate, colour = base)) +
+  geom_vline(xintercept = c(-1, 0), linetype = "dotted", colour = "grey40") +
+  geom_hline(yintercept = 0, colour = "grey50") +
+  geom_linerange(aes(ymin = conf.low, ymax = conf.high), alpha = 0.5) +
+  geom_line(alpha = 0.8) +
+  geom_point(aes(shape = p_adj < 0.05), size = 2, fill = "white") +
+  scale_shape_manual(values = c(`TRUE` = 16, `FALSE` = 21), guide = "none") +
+  scale_colour_manual(values = col_bases, name = "Base") +
+  scale_x_continuous(breaks = breaks_pares, labels = minus) +
+  facet_grid(. ~ rep) +
+  th +
+  labs(
+    x = "Posición respecto del TSS (TSS = 0; punteadas en −1 y 0)",
+    y = "Diferencia de actividad media\ncon vs. sin la base (HL, IC 95%)",
+    caption = "Todos los promotores. Punto lleno: BH < 0,05 (dentro de réplica); vacío: n.s."
+  )
+ggsave(file.path(out_dir, "tss_efecto_bases.jpg"), p_efecto_bases, width = 12, height = 4.5, units = "in")
 
 # --- ajuste por G+C local: coeficiente crudo vs. ajustado (todos los promotores)
 p_gc <- perfil %>%
@@ -446,7 +485,7 @@ p_gc <- perfil %>%
   geom_hline(yintercept = 0, color = "grey50") +
   geom_line() +
   geom_point(data = ~ filter(.x, modelo != "Crudo", lm_gc_p_adj < 0.05), size = 1.6) +
-  scale_color_manual(values = c(A = "#7FB800", C = "#216869", G = "#D6741F", T = "#14AFB2"), name = NULL) +
+  scale_color_manual(values = col_bases, name = "Base") +
   scale_x_continuous(breaks = breaks_pares, labels = minus) +
   facet_grid(rep ~ ventana, scales = "free_x") +
   th +
@@ -459,7 +498,9 @@ ggsave(file.path(out_dir, "tss_ajuste_gc.jpg"), p_gc, width = 13, height = 8, un
 # =============================================================================
 
 forest <- function(res, y, color, valores_color, x_lab, facets = . ~ rep, dodge = 0.7) {
-  ggplot(res, aes(estimate, {{ y }}, color = {{ color }})) +
+  # group explicito: sin el, geom_point se agrupa por color x forma (sig) y
+  # el dodge de los puntos no coincide con el de las barras
+  ggplot(res, aes(estimate, {{ y }}, color = {{ color }}, group = {{ color }})) +
     geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
     geom_linerange(aes(xmin = conf.low, xmax = conf.high), position = position_dodge(width = dodge), linewidth = 0.9) +
     geom_point(aes(shape = sig), size = 2.6, fill = "white", position = position_dodge(width = dodge)) +
@@ -700,3 +741,232 @@ p_rp <- rp_contexto %>%
 ggsave(file.path(out_dir, "tss_tct_rp.jpg"), p_tct_hl / p_tct_lm / p_rp + plot_layout(heights = c(1.3, 1.3, 0.6)),
   width = 11, height = 11, units = "in"
 )
+
+# =============================================================================
+# PUNTO 6 - perfil de efectos en todo el promotor y frecuencia vs. efecto
+# =============================================================================
+# Mismo modelo que tss_ajuste_gc (percentil ~ base y percentil ~ base +
+# GC_local, GC_local = G+C de +-5 pb sin la propia posicion; en los bordes
+# del fragmento la ventana queda truncada) en las 252 posiciones (-236 a
+# +15), por replica x grupo de isla CpG. BH dentro de replica x grupo (las
+# 252 x 4 pruebas del modelo ajustado). Por velocidad se usa lm.fit.
+#
+# Frecuencia vs. efecto: enriquecimiento posicional = log2(frecuencia de la
+# base en la posicion / frecuencia media de esa base en las 252 posiciones),
+# calculado sobre los mismos promotores con actividad de cada replica x
+# grupo (no sobre la library completa de perfil_nucleotidos.tsv). Efecto =
+# coeficiente ajustado por G+C local. Spearman y regresion ponderada por
+# 1/SE^2, en todas las posiciones y en subconjuntos.
+
+POS_TODAS <- seq_len(TATA_FRAG_LEN) - TSS_POS # -236..+15
+ZOOM <- c(-50, 15)
+TATA_BANDA <- TATA_CANON
+th_perfil <- theme_pubclean(base_size = 14) +
+  theme(strip.text = element_text(face = "bold"), legend.position = "right")
+marca_tata <- annotate("rect", xmin = TATA_BANDA[1] - 0.5, xmax = TATA_BANDA[2] + 0.5, ymin = -Inf, ymax = Inf, fill = "grey80", alpha = 0.4)
+marca_tss <- geom_vline(xintercept = 0, linetype = "dashed", colour = "grey40")
+marca_cero <- geom_hline(yintercept = 0, colour = "grey60")
+x_completo <- scale_x_continuous(breaks = c(-200, -150, -100, -50, 0), labels = minus, expand = expansion(0.01))
+x_zoom <- scale_x_continuous(breaks = seq(-50, 10, 10), labels = minus, expand = expansion(0.02))
+
+# coeficiente de la columna 2 de X (la base) con su SE y p
+coef_base <- function(y, X) {
+  fit <- lm.fit(X, y)
+  if (fit$rank < ncol(X)) return(c(est = NA_real_, se = NA_real_, p = NA_real_))
+  s2 <- sum(fit$residuals^2) / fit$df.residual
+  se <- sqrt(diag(chol2inv(qr.R(fit$qr)))[2] * s2)
+  est <- unname(fit$coefficients[2])
+  c(est = est, se = se, p = 2 * pt(-abs(est / se), fit$df.residual))
+}
+
+efectos_promotor <- function(d) {
+  M <- seq_mat[d$seq_id, , drop = FALSE]
+  es_gc <- (M == "G" | M == "C") * 1
+  y <- d$act_pct
+  map_dfr(seq_len(ncol(M)), function(col) {
+    vecinas <- setdiff(max(1, col - GC_FLANCO):min(ncol(M), col + GC_FLANCO), col)
+    gc_local <- rowMeans(es_gc[, vecinas, drop = FALSE])
+    b <- M[, col]
+    ok <- b %in% BASES
+    map_dfr(BASES, function(base) {
+      ind <- (b[ok] == base) * 1
+      out <- tibble(posicion = col - TSS_POS, base = base, n = sum(ind), n_ref = sum(1 - ind), frecuencia = mean(ind))
+      if (sum(ind) < MIN_N || sum(1 - ind) < MIN_N) return(out)
+      cr <- coef_base(y[ok], cbind(1, ind))
+      aj <- coef_base(y[ok], cbind(1, ind, gc_local[ok]))
+      out %>% mutate(
+        crudo_est = cr[["est"]], crudo_se = cr[["se"]], crudo_p = cr[["p"]],
+        estimate = aj[["est"]], se = aj[["se"]], p = aj[["p"]]
+      )
+    })
+  })
+}
+
+efectos_prom <- data_g %>%
+  group_by(rep, grupo) %>%
+  group_modify(~ efectos_promotor(.x)) %>%
+  ungroup() %>%
+  group_by(rep, grupo) %>%
+  mutate(
+    conf.low = estimate - qnorm(0.975) * se, conf.high = estimate + qnorm(0.975) * se,
+    p_adj = p.adjust(p, "BH"),
+    enriquecimiento = log2(frecuencia / ave(frecuencia, base, FUN = mean))
+  ) %>%
+  ungroup() %>%
+  relocate(rep, grupo, posicion, base)
+save_tsv(efectos_prom, "tss_perfil_efectos_promotor.tsv")
+
+# --- grafico: fila superior fragmento completo, inferior zoom (formato M12)
+perfil_efectos_plot <- function(res, facets, y_lab = "Efecto ajustado por G+C local\n(Δ percentil de actividad)") {
+  y_lims <- range(res$estimate, na.rm = TRUE)
+  completo <- ggplot(res, aes(posicion, estimate, colour = base)) +
+    marca_tata + marca_cero + marca_tss +
+    geom_line(linewidth = 0.5) +
+    facet_grid(facets) +
+    scale_colour_manual(values = col_bases, name = "Base") +
+    x_completo +
+    coord_cartesian(ylim = y_lims) +
+    labs(x = "Posición respecto del TSS (pb)", y = y_lab) +
+    th_perfil
+  zoom <- res %>%
+    filter(between(posicion, ZOOM[1], ZOOM[2])) %>%
+    ggplot(aes(posicion, estimate, colour = base)) +
+    marca_tata + marca_cero + marca_tss +
+    geom_line(linewidth = 0.6) +
+    geom_point(aes(shape = p_adj < 0.05), size = 1.4, fill = "white", show.legend = FALSE) +
+    scale_shape_manual(values = c(`TRUE` = 16, `FALSE` = 21)) +
+    facet_grid(facets) +
+    scale_colour_manual(values = col_bases, name = "Base") +
+    x_zoom +
+    coord_cartesian(ylim = y_lims) +
+    labs(x = paste0("Posición respecto del TSS (pb), ", minus(ZOOM[1]), " a +", ZOOM[2]),
+         y = y_lab,
+         caption = "Banda gris: −31 a −26 (TATA canónica). Abajo, punto lleno: BH < 0,05 (dentro de réplica × grupo).") +
+    th_perfil
+  completo / zoom + plot_layout(guides = "collect")
+}
+ggsave(file.path(out_dir, "tss_perfil_efectos_promotor.jpg"),
+  perfil_efectos_plot(filter(efectos_prom, grupo == "Todos"), . ~ rep), width = 14, height = 8, units = "in")
+ggsave(file.path(out_dir, "tss_perfil_efectos_promotor_cgi.jpg"),
+  perfil_efectos_plot(efectos_prom, grupo ~ rep), width = 14, height = 16, units = "in")
+
+# --- version HL (sin ajuste por G+C) del perfil de efectos -------------------
+# HL (IC 95%) de la actividad media con vs. sin la base, en cada posicion de
+# -236 a +15, por replica x grupo de isla CpG; BH dentro de replica x grupo.
+# Son ~6000 Wilcoxon con IC: se reparten en un cluster local y el resultado
+# crudo (sin BH) se cachea en data/processed/ (borrar el .rds para recalcular).
+cache_hl <- "data/processed/tss_composicion_perfil_hl_v1.rds"
+if (file.exists(cache_hl)) {
+  efectos_hl <- readRDS(cache_hl)
+} else {
+  t0 <- Sys.time()
+  d_split_hl <- data_g %>% select(rep, grupo, seq_id, mean) %>% group_split(rep, grupo)
+  tareas_hl <- expand_grid(g = seq_along(d_split_hl), col = seq_len(TATA_FRAG_LEN))
+  hl_tarea <- function(i) {
+    d <- d_split_hl[[tareas_hl$g[i]]]
+    col <- tareas_hl$col[i]
+    b <- seq_mat[d$seq_id, col]
+    ok <- b %in% BASES
+    map_dfr(BASES, function(base) {
+      ind <- b[ok] == base
+      tata_hl_vs(d$mean[ok][ind], d$mean[ok][!ind], MIN_N) %>%
+        mutate(rep = d$rep[1], grupo = d$grupo[1], posicion = col - TSS_POS, base = base,
+               n = sum(ind), n_ref = sum(!ind), frecuencia = mean(ind))
+    })
+  }
+  cl <- parallel::makeCluster(max(1, min(12, parallel::detectCores() - 2)))
+  parallel::clusterEvalQ(cl, suppressMessages(library(tidyverse)))
+  parallel::clusterExport(cl, c("d_split_hl", "tareas_hl", "seq_mat", "tata_hl_vs", "TSS_POS", "BASES", "MIN_N"))
+  efectos_hl <- bind_rows(parallel::parLapplyLB(cl, seq_len(nrow(tareas_hl)), hl_tarea))
+  parallel::stopCluster(cl)
+  saveRDS(efectos_hl, cache_hl)
+  message("Perfil HL: ", format(Sys.time() - t0))
+}
+efectos_hl <- efectos_hl %>%
+  group_by(rep, grupo) %>%
+  mutate(p_adj = p.adjust(p, "BH")) %>%
+  ungroup() %>%
+  relocate(rep, grupo, posicion, base, n, n_ref, frecuencia)
+write_tsv(efectos_hl, file.path(dir_perfil_efectos, "tss_perfil_efectos_promotor_hl.tsv"))
+
+y_lab_hl <- "Diferencia de actividad media\ncon vs. sin la base (HL)"
+ggsave(file.path(dir_perfil_efectos, "tss_perfil_efectos_promotor_hl.jpg"),
+  perfil_efectos_plot(filter(efectos_hl, grupo == "Todos"), . ~ rep, y_lab_hl), width = 14, height = 8, units = "in")
+ggsave(file.path(out_dir, "tss_perfil_efectos_promotor_hl_cgi.jpg"),
+  perfil_efectos_plot(efectos_hl, grupo ~ rep, y_lab_hl), width = 14, height = 16, units = "in")
+
+# --- frecuencia vs. efecto -------------------------------------------------
+
+SUBCONJ <- c(
+  "a) Todas (−236 a +15)", "b) −50 a +15", "c) −236 a −51", "d) Sin −1, 0 ni −31 a −26"
+)
+en_subconj <- function(pos, s) {
+  switch(s,
+    "a) Todas (−236 a +15)" = rep(TRUE, length(pos)),
+    "b) −50 a +15" = between(pos, -50, 15),
+    "c) −236 a −51" = pos <= -51,
+    "d) Sin −1, 0 ni −31 a −26" = !(pos %in% c(-1, 0) | between(pos, TATA_BANDA[1], TATA_BANDA[2]))
+  )
+}
+cor_frec_efecto <- function(d) {
+  d <- filter(d, !is.na(estimate), is.finite(enriquecimiento))
+  if (nrow(d) < 10) return(NULL)
+  sp <- cor.test(d$enriquecimiento, d$estimate, method = "spearman", exact = FALSE)
+  w <- broom::tidy(lm(estimate ~ enriquecimiento, data = d, weights = 1 / se^2), conf.int = TRUE) %>%
+    filter(term == "enriquecimiento")
+  tibble(
+    n_puntos = nrow(d), rho = unname(sp$estimate), p_spearman = sp$p.value,
+    pendiente_pond = w$estimate, pendiente_conf.low = w$conf.low, pendiente_conf.high = w$conf.high, p_pond = w$p.value
+  )
+}
+frec_efecto <- expand_grid(subconjunto = SUBCONJ, bases = c("Todas", BASES)) %>%
+  pmap_dfr(function(subconjunto, bases) {
+    efectos_prom %>%
+      filter(en_subconj(posicion, subconjunto), bases == "Todas" | base == bases) %>%
+      group_by(rep, grupo) %>%
+      group_modify(~ cor_frec_efecto(.x)) %>%
+      ungroup() %>%
+      mutate(subconjunto = subconjunto, bases = bases)
+  }) %>%
+  relocate(rep, grupo, subconjunto, bases)
+save_tsv(frec_efecto, "tss_frecuencia_vs_efecto.tsv")
+
+frec_efecto_plot <- function(res, facets) {
+  res <- res %>%
+    filter(!is.na(estimate)) %>%
+    mutate(
+      zona = case_when(
+        posicion %in% c(-1, 0) ~ "−1 / 0",
+        between(posicion, TATA_BANDA[1], TATA_BANDA[2]) ~ "TATA (−31 a −26)",
+        TRUE ~ "Resto"
+      ),
+      etiqueta = if_else(zona == "−1 / 0", paste0(base, minus(posicion)), NA_character_)
+    )
+  rotulos <- frec_efecto %>%
+    filter(bases == "Todas", subconjunto %in% SUBCONJ[c(1, 4)]) %>%
+    semi_join(distinct(res, rep, grupo), by = c("rep", "grupo")) %>%
+    group_by(rep, grupo) %>%
+    summarise(label = paste0("ρ todas = ", sprintf("%.2f", rho[subconjunto == SUBCONJ[1]]),
+                             "\nρ sin −1/0/TATA = ", sprintf("%.2f", rho[subconjunto == SUBCONJ[4]])), .groups = "drop")
+  ggplot(res, aes(enriquecimiento, estimate)) +
+    marca_cero +
+    geom_vline(xintercept = 0, colour = "grey60") +
+    geom_point(data = ~ filter(.x, zona == "Resto"), aes(colour = base), size = 1.1, alpha = 0.45) +
+    geom_point(data = ~ filter(.x, zona != "Resto"), aes(fill = base, shape = zona), size = 3, colour = "black", stroke = 0.6) +
+    ggrepel::geom_text_repel(aes(label = etiqueta, colour = base), size = 3.5, na.rm = TRUE, show.legend = FALSE, min.segment.length = 0) +
+    geom_text(data = rotulos, aes(x = -Inf, y = Inf, label = label), hjust = -0.05, vjust = 1.2, size = 3.5, inherit.aes = FALSE) +
+    scale_colour_manual(values = col_bases, name = "Base") +
+    scale_fill_manual(values = col_bases, guide = "none") +
+    scale_shape_manual(values = c("−1 / 0" = 21, "TATA (−31 a −26)" = 24), name = NULL) +
+    facet_grid(facets) +
+    th_perfil +
+    labs(
+      x = "Enriquecimiento posicional\nlog2(frecuencia en la posición / frecuencia media de la base en el fragmento)",
+      y = "Efecto ajustado por G+C local\n(Δ percentil de actividad)",
+      caption = "Un punto por posición × base (−236 a +15). ρ de Spearman con todas las bases juntas."
+    )
+}
+ggsave(file.path(out_dir, "tss_frecuencia_vs_efecto.jpg"),
+  frec_efecto_plot(filter(efectos_prom, grupo == "Todos"), . ~ rep), width = 13, height = 6, units = "in")
+ggsave(file.path(out_dir, "tss_frecuencia_vs_efecto_cgi.jpg"),
+  frec_efecto_plot(efectos_prom, grupo ~ rep), width = 13, height = 15, units = "in")
