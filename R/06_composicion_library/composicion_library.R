@@ -3,7 +3,10 @@
 # Panel A: motivos EPD (TATA, INR, CCAAT, GC-box)
 # Panel B: islas CpG (definidas por la composicion del fragmento, CGI_frag)
 # Panel C: contenido G+C
+# Panel C2: razon CpG observado/esperado del fragmento (panel_cpg_oe.jpg)
 # Panel D: patrones de motivo en el TSS
+# Las letras de arriba (y de los nombres de variable/archivo) son historicas;
+# en la compuesta el orden es A EPD, B CpG o/e, C islas CpG, D G+C, E TSS.
 #
 # Requiere: data/processed/prom_df.tsv (generado por
 # R/00_prom_features/build_prom_features.R). Run from the TesisDoc repo root.
@@ -51,6 +54,21 @@ panel_c <- promoters_df %>%
   ylab("Densidad") +
   theme_pubclean(base_size = 16)
 
+# --- Panel C2: razon CpG o/e ----------------------------------------------
+# cpg_oe del fragmento de 252 pb (ver R/00_prom_features/build_prom_features.R);
+# la linea marca el corte de 0.6 de CGI_frag.
+
+panel_cpg_oe <- promoters_df %>%
+  filter(!is.na(cpg_oe)) %>%
+  ggplot(aes(cpg_oe)) +
+  geom_histogram(aes(y = after_stat(density)), binwidth = 0.025, fill = thesis_clr_bg, colour = "white", linewidth = 0.2) +
+  geom_density(col = thesis_clr, linewidth = 1.2) +
+  geom_vline(xintercept = 0.6, linetype = "dashed", colour = "grey30", linewidth = 0.8) +
+  annotate("text", x = 0.62, y = Inf, vjust = 1.5, hjust = 0, label = "corte isla CpG", colour = "grey30", size = 5) +
+  xlab("Razón CpG observado/esperado") +
+  ylab("Densidad") +
+  theme_pubclean(base_size = 16)
+
 # --- Panel D: patrones de motivo en el TSS ------------------------------
 
 panel_d <- promoters_df %>%
@@ -73,7 +91,8 @@ out_dir <- fig_dir(slug)
 ggsave(file.path(out_dir, "panel_a_motivos_epd.jpg"), panel_a, width = 9, height = 6.75, units = "in")
 ggsave(file.path(out_dir, "panel_b_cgi.jpg"), panel_b, width = 3, height = 6.75, units = "in")
 ggsave(file.path(out_dir, "panel_c_gc.jpg"), panel_c, width = 9, height = 6.75, units = "in")
+ggsave(file.path(out_dir, "panel_cpg_oe.jpg"), panel_cpg_oe, width = 9, height = 6.75, units = "in")
 ggsave(file.path(out_dir, "panel_d_tss_motifs.jpg"), panel_d, width = 9, height = 6.75, units = "in")
 
-combined <- (panel_a + panel_b) / (panel_c + panel_d) + plot_annotation(tag_levels = "A")
-ggsave(file.path(out_dir, paste0(slug, ".jpg")), combined, width = 14, height = 12, units = "in")
+combined <- (panel_a + panel_cpg_oe) / (panel_b + panel_c + plot_layout(widths = c(1, 3))) / panel_d + plot_annotation(tag_levels = "A")
+ggsave(file.path(out_dir, paste0(slug, ".jpg")), combined, width = 14, height = 18, units = "in")
