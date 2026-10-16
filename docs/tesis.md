@@ -40,95 +40,97 @@ How much of a gene's regulatory behaviour is written in its own sequence is a ce
 
 [**Índice	4**](#índice)
 
-[**Introducción	5**](#introducción)
+[**Introducción	6**](#introducción)
 
-[Orden, azar e innovación en la materia viva	5](#orden,-azar-e-innovación-en-la-materia-viva)
+[Orden, azar e innovación en la materia viva	6](#orden,-azar-e-innovación-en-la-materia-viva)
 
-[Del genotipo al fenotipo regulatorio	8](#del-genotipo-al-fenotipo-regulatorio)
+[Del genotipo al fenotipo regulatorio	9](#del-genotipo-al-fenotipo-regulatorio)
 
-[Más allá del enhancer: el rol regulatorio del promotor basal	9](#más-allá-del-enhancer:-el-rol-regulatorio-del-promotor-basal)
+[Más allá del enhancer: el rol regulatorio del promotor basal	10](#más-allá-del-enhancer:-el-rol-regulatorio-del-promotor-basal)
 
-[Diversidad arquitectónica de promotores: robustez y especificidad	11](#diversidad-arquitectónica-de-promotores:-robustez-y-especificidad)
+[Diversidad arquitectónica de promotores: robustez y especificidad	12](#diversidad-arquitectónica-de-promotores:-robustez-y-especificidad)
 
-[Un gen, varios promotores	13](#un-gen,-varios-promotores)
+[Un gen, varios promotores	14](#un-gen,-varios-promotores)
 
-[Ruido transcripcional. El componente estocástico de la transcripción	14](#ruido-transcripcional.-el-componente-estocástico-de-la-transcripción)
+[Ruido transcripcional. El componente estocástico de la transcripción	15](#ruido-transcripcional.-el-componente-estocástico-de-la-transcripción)
 
-[Abordajes experimentales para el estudio del promotor basal	16](#abordajes-experimentales-para-el-estudio-del-promotor-basal)
+[Abordajes experimentales para el estudio del promotor basal	17](#abordajes-experimentales-para-el-estudio-del-promotor-basal)
 
-[**Objetivos	19**](#objetivos)
+[**Objetivos	20**](#objetivos)
 
-[**Materiales y métodos experimentales	20**](#materiales-y-métodos-experimentales)
+[**Materiales y métodos experimentales	21**](#materiales-y-métodos-experimentales)
 
-[Lógica del ensayo	20](#lógica-del-ensayo)
+[Lógica del ensayo	21](#lógica-del-ensayo)
 
-[Construcción de los plásmidos reporteros conteniendo la library de promotores basales	21](#construcción-de-los-plásmidos-reporteros-conteniendo-la-library-de-promotores-basales)
+[Construcción de los plásmidos reporteros conteniendo la library de promotores basales	22](#construcción-de-los-plásmidos-reporteros-conteniendo-la-library-de-promotores-basales)
 
-[Cultivo celular y transfección	22](#cultivo-celular-y-transfección)
+[Cultivo celular y transfección	23](#cultivo-celular-y-transfección)
 
-[Citometría de flujo y sorting	23](#citometría-de-flujo-y-sorting)
+[Citometría de flujo y sorting	24](#citometría-de-flujo-y-sorting)
 
-[Controles de spike-in basados en células	24](#controles-de-spike-in-basados-en-células)
+[Controles de spike-in basados en células	25](#controles-de-spike-in-basados-en-células)
 
-[Co-extracción de ADN/ARN  y RT-qPCR de EGFP	24](#co-extracción-de-adn/arn-y-rt-qpcr-de-egfp)
+[Co-extracción de ADN/ARN  y RT-qPCR de EGFP	25](#co-extracción-de-adn/arn-y-rt-qpcr-de-egfp)
 
-[Secuenciación de amplicones (Amp-seq)	25](#secuenciación-de-amplicones-\(amp-seq\))
+[Secuenciación de amplicones (Amp-seq)	26](#secuenciación-de-amplicones-\(amp-seq\))
 
-[Secuencias de interés y primers utilizados	27](#secuencias-de-interés-y-primers-utilizados)
+[Secuencias de interés y primers utilizados	28](#secuencias-de-interés-y-primers-utilizados)
 
-[**Métodos computacionales:	29**](#métodos-computacionales:)
+[**Métodos computacionales:	30**](#métodos-computacionales:)
 
-[Procesamiento de datos y cuantificación de la actividad promotora	29](#procesamiento-de-datos-y-cuantificación-de-la-actividad-promotora)
+[Procesamiento de datos y cuantificación de la actividad promotora	30](#procesamiento-de-datos-y-cuantificación-de-la-actividad-promotora)
 
-[Procesamiento de los datos de secuenciación	29](#procesamiento-de-los-datos-de-secuenciación)
+[Procesamiento de los datos de secuenciación	30](#procesamiento-de-los-datos-de-secuenciación)
 
-[Cuantificación de la actividad media y el ruido de los promotores de la library	29](#cuantificación-de-la-actividad-media-y-el-ruido-de-los-promotores-de-la-library)
+[Cuantificación de la actividad media y el ruido de los promotores de la library	30](#cuantificación-de-la-actividad-media-y-el-ruido-de-los-promotores-de-la-library)
 
-[Caracterización de la library	30](#caracterización-de-la-library)
+[Caracterización de la library	31](#caracterización-de-la-library)
 
-[Composición y diseño de la library	30](#composición-y-diseño-de-la-library)
+[Composición y diseño de la library	31](#composición-y-diseño-de-la-library)
 
-[Elementos de secuencia del promotor basal	31](#elementos-de-secuencia-del-promotor-basal)
+[Elementos de secuencia del promotor basal	32](#elementos-de-secuencia-del-promotor-basal)
 
-[Patrones de conservación de los promotores basales	33](#patrones-de-conservación-de-los-promotores-basales)
+[Patrones de conservación de los promotores basales	34](#patrones-de-conservación-de-los-promotores-basales)
 
-[Patrones de actividad endógena de los promotores	33](#patrones-de-actividad-endógena-de-los-promotores)
+[Patrones de actividad endógena de los promotores	35](#patrones-de-actividad-endógena-de-los-promotores)
 
-[Prevalencia y co-ocurrencia de las características de los promotores basales	35](#prevalencia-y-co-ocurrencia-de-las-características-de-los-promotores-basales)
+[Prevalencia y co-ocurrencia de las características de los promotores basales	37](#prevalencia-y-co-ocurrencia-de-las-características-de-los-promotores-basales)
 
-[Algoritmos de predicción de la actividad promotora basados en la secuencia	37](#algoritmos-de-predicción-de-la-actividad-promotora-basados-en-la-secuencia)
+[Algoritmos de predicción de la actividad promotora basados en la secuencia	38](#algoritmos-de-predicción-de-la-actividad-promotora-basados-en-la-secuencia)
 
-[Análisis de datos masivos de ChIP-seq	38](#análisis-de-datos-masivos-de-chip-seq)
+[Análisis de datos masivos de ChIP-seq	39](#análisis-de-datos-masivos-de-chip-seq)
 
-[Evaluación del efecto de las características del promotor sobre los patrones transcripcionales medidos	38](#evaluación-del-efecto-de-las-características-del-promotor-sobre-los-patrones-transcripcionales-medidos)
+[Evaluación del efecto de las características del promotor sobre los patrones transcripcionales medidos	40](#evaluación-del-efecto-de-las-características-del-promotor-sobre-los-patrones-transcripcionales-medidos)
 
-[Asociación de las características del promotor con la actividad transcripcional	38](#asociación-de-las-características-del-promotor-con-la-actividad-transcripcional)
+[Asociación de las características del promotor con la actividad transcripcional	40](#asociación-de-las-características-del-promotor-con-la-actividad-transcripcional)
 
-[Dependencia posicional de la TATA-box	39](#efecto-de-la-secuencia-por-posición)
+[Efecto de la secuencia por posición	41](#efecto-de-la-secuencia-por-posición)
 
-[Asociación de las características del promotor con el ruido transcripcional	40](#asociación-de-las-características-del-promotor-con-el-ruido-transcripcional)
+[Asociación de las características del promotor con el ruido transcripcional	42](#asociación-de-las-características-del-promotor-con-el-ruido-transcripcional)
 
-[Análisis de enriquecimiento funcional de la unión de TFs	41](#análisis-de-enriquecimiento-funcional-de-la-unión-de-tfs)
+[Análisis de enriquecimiento funcional de la unión de TFs	43](#análisis-de-enriquecimiento-funcional-de-la-unión-de-tfs)
 
-[Promotores alternativos	42](#promotores-alternativos)
+[Promotores alternativos	44](#promotores-alternativos)
 
-[Clasificación de promotores alternativos	42](#clasificación-de-promotores-alternativos)
+[Clasificación de promotores alternativos	44](#clasificación-de-promotores-alternativos)
 
-[**Resultados	43**](#resultados)
+[**Resultados	46**](#resultados)
 
-[Estimación masiva de las propiedades transcripcionales de promotores basales humanos	43](#estimación-masiva-de-las-propiedades-transcripcionales-de-promotores-basales-humanos)
+[Estimación masiva de las propiedades transcripcionales de promotores basales humanos	46](#estimación-masiva-de-las-propiedades-transcripcionales-de-promotores-basales-humanos)
 
-[Efectos del promotor sobre la fuerza transcripcional	48](#efectos-del-promotor-sobre-la-fuerza-transcripcional)
+[Efectos del promotor sobre la fuerza transcripcional	51](#efectos-del-promotor-sobre-la-fuerza-transcripcional)
 
-[Islas CpG	48](#islas-cpg)
+[Islas CpG	51](#islas-cpg)
 
-[TATA-box	49](#tata-box)
+[TATA-box	52](#tata-box)
 
-[CCAAT y GC-box	51](#ccaat-y-gc-box)
+[CCAAT y GC-box	54](#ccaat-y-gc-box)
 
-[Panorama de las características de secuencia	52](#heading=h.fykgtbklfuod)
+[Efecto de la secuencia a lo largo del promotor	55](#efecto-de-la-secuencia-a-lo-largo-del-promotor)
 
-[**Referencias	55**](#referencias)
+[Panorama de las características de secuencia	56](#panorama-de-las-características-de-secuencia)
+
+[**Referencias	61**](#referencias)
 
 # 
 
@@ -457,6 +459,8 @@ La frecuencia nucleotídica y su identidad en sitios específicos fue evaluada c
 
 La frecuencia nucleotídica se evaluó también posición por posición respecto del TSS, en todos los promotores y por separado en los promotores con y sin isla CpG (Fig. M12). Este perfil confirma, en primer lugar, que los fragmentos están alineados con precisión al TSS anotado. En la posición −1 predominan las pirimidinas, principalmente C (\~57%), y en la posición 0, las purinas, principalmente A (\~50%), que corresponde al dinucleótido pirimidina-purina característico de los sitios de inicio de la transcripción. Junto con la coincidencia entre el TSS de EPD y el sitio de inicio más utilizado según los datos de CAGE (Fig. M10C), esto indica que la posición anotada es una referencia adecuada para analizar la ubicación de los elementos de secuencia. En segundo lugar, alrededor de la posición −30 se observa un enriquecimiento en A y T, más marcado en los promotores sin isla CpG, compatible con la presencia de la TATA-box en su ubicación canónica. Por último, ambos grupos difieren en su composición. En los promotores con isla CpG, el contenido de G y C aumenta hacia el TSS y la frecuencia del dinucleótido CpG se acerca a la esperada según su contenido de C y G. En los promotores sin isla, en cambio, la composición es más homogénea a lo largo del fragmento y el dinucleótido CpG está fuertemente reducido respecto de lo esperado. 
 
+Los sitios de unión de YY1 y de CREB (elemento de respuesta a AMPc, CRE) se identificaron con las matrices de JASPAR 2024 (colección CORE de vertebrados, no redundante; Rauluseviciute et al., 2024\) MA0095 (YY1) y MA0018.5 (CREB1). Las matrices se recorrieron sobre ambas hebras de cada fragmento con la función `scan_sequences` del paquete universalmotif (Tremblay, 2024\), usando un pseudoconteo de 1 y una composición de fondo uniforme. Se consideró que había un sitio cuando el puntaje relativo era de al menos 0,85. El puntaje relativo se define como (puntaje − mínimo)/(máximo − mínimo) de la matriz de pesos en log2, y vale 1 para la secuencia óptima y 0 para la peor posible (la misma definición que usa TFBSTools). La E-box del tipo CAGGTR (R \= A o G) coincide con los sitios de unión descriptos para los represores ZEB1/2 y SNAI \[cita ZEB\]; en JASPAR, sus 6-meros se parecen más a SNAI2 y SCRT2. Se definió por la presencia de CAGGTA o CAGGTG en cualquiera de las dos hebras del fragmento. Por último, se consideró que un promotor tenía un tramo poli(dA:dT) proximal cuando contenía al menos un tramo de 8 o más A o de 8 o más T consecutivas centrado entre las posiciones −100 y −1 respecto del TSS. Un tramo de A en una hebra es un tramo de T en la otra, por lo que buscar en una sola hebra equivale a buscar en ambas. 
+
 Para identificar la TATA-box utilizamos la regla con la que EPD la anota:  la matriz de peso posicional de Bucher (1990), derivada del alineamiento de 389 TATA-boxes, con pesos que asignan valor 0 a la base más frecuente de cada posición y valores negativos a las demás. El puntaje de una secuencia es la suma de los pesos de sus 15 posiciones, por lo que el máximo posible es 0\. Un promotor se considera con TATA-box cuando la matriz alcanza un puntaje igual o superior a −8,17 en la misma hebra, con su posición de referencia (la segunda T del núcleo TATA) entre −31 y −26 respecto del TSS. Aplicando esta regla sobre los fragmentos de la *library* reprodujimos exactamente la anotación de EPD. La misma matriz y el mismo corte, aplicados a todas las posiciones de ambas hebras, nos permitieron además identificar coincidencias fuera de la ventana canónica (ver Dependencia posicional de la TATA-box). 
 
 Por último, buscamos los elementos de reconocimiento de TFIIB que flanquean a la TATA-box. En cada promotor con TATA-box canónica ubicamos el núcleo TATAWAWR, que corresponde a las posiciones 2 a 9 de la matriz; cuando había más de una coincidencia canónica, usamos la de mayor puntaje. Consideramos que un promotor presentaba BREu (Lagrange et al. 1998\) si los 7 nt inmediatamente río arriba del núcleo coincidían con el consenso SSRCGCC, y BREd (Deng y Roberts 2005\) si los 7 nt inmediatamente río abajo coincidían con el consenso RTDKKKK. Usamos dos criterios: uno estricto, con coincidencia exacta, y uno laxo, que admitía una posición fuera del consenso. Entre los promotores con TATA-box canónica, comparamos la actividad de los que presentaban cada elemento con la de los que no presentaban ninguno, con el test de Wilcoxon y el estimador de Hodges-Lehmann con su IC 95%, en cada réplica por separado. 
@@ -554,6 +558,29 @@ Para el perfil por posición, dividimos el fragmento en ventanas de 10 pb, aline
 Para evaluar el efecto del contenido de A/T, ajustamos en cada réplica tres modelos lineales del percentil de actividad en función de la categoría: sin covariables, con el contenido de A/T de la región proximal (−50 a −1) como covariable, y con el contenido de A/T proximal y el del fragmento completo. Como control de la especificidad del motivo, generamos 10 matrices permutando al azar el orden de las posiciones de la matriz original, que conservan su composición pero no el orden del motivo. Las buscamos con el mismo corte y la misma posición de referencia, y repetimos con ellas el perfil por posición en la misma hebra.
 
 Para la relación con el puntaje, tomamos para cada promotor el mejor puntaje de la matriz en la ventana canónica de la misma hebra, sin aplicar corte. Agrupamos los promotores en intervalos fijos y no acumulados de puntaje, más estrechos por encima de −10, y calculamos el percentil de actividad medio de cada intervalo con su IC 95%. Como control, repetimos el análisis con el mejor puntaje en una ventana del mismo tamaño alejada del TSS (−131 a −126).
+
+### Búsqueda de motivos (6-meros)
+
+Para buscar elementos de secuencia asociados a la actividad sin partir de motivos conocidos, se contó la presencia de cada 6-mero en los fragmentos. Cada 6-mero se agrupó con su complemento reverso, lo que da 2080 6-meros canónicos. Se analizaron los 2071 presentes en entre el 1% y el 99% de los promotores. Para cada 6-mero se comparó la actividad de los promotores que lo contenían con la de los que no, mediante una prueba de Wilcoxon. El efecto se estimó con el estimador de Hodges-Lehmann y su intervalo de confianza del 95%, por separado para cada réplica, y los valores p se corrigieron por comparaciones múltiples con el método de Benjamini-Hochberg.
+
+Para estimar cuánto del efecto de los 6-meros se explica por su composición, se ajustó un modelo lineal por réplica. El modelo predice el efecto de cada 6-mero a partir de su número de dinucleótidos CpG, como variable categórica (0, 1 o 2 o más), y de su contenido de G+C. El modelo se ajustó sobre todos los promotores y, por separado, dentro de los promotores con y sin isla CpG. Para reducir el efecto de la composición, el análisis principal se hizo dentro de cada grupo de isla CpG. Dentro de cada grupo se consideraron destacados los 6-meros con un valor p ajustado menor a 0.05 en ambas réplicas y con efectos del mismo signo.
+
+Cada 6-mero se asignó a un motivo cuando él o su complemento reverso contenía el núcleo correspondiente:
+
+* TATA-box: TATAW (W \= A o T)  
+* CCAAT-box: CCAAT o CAATC (parte del sitio extendido CCAATCAG)  
+* CRE: TGACG o GACGTC  
+* YY1: AAATGG, AATGGC o AAAATG  
+* E-box: CAGGT  
+* GC-box: GGGCGG o GGCGGG
+
+Como apoyo de la asignación, cada 6-mero se representó como una matriz de un único sitio y se comparó con las 879 matrices de JASPAR 2024 con la función `compare_motifs` de universalmotif, exigiendo una superposición mínima de 6 posiciones. La matriz de JASPAR más parecida se usó solo para confirmar la asignación, no para definirla.
+
+### Análisis de aditividad
+
+Para cada promotor se contó el número de elementos asociados a mayor actividad: isla CpG, TATA-box y CCAAT-box según la anotación de EPD, sitio de YY1 y CRE (definidos en «Elementos de secuencia del promotor basal»). También se contó el número de características asociadas a menor actividad: TSS no canónico, E-box CAGGTR y tramo poli(dA:dT) proximal. Se excluyeron la GC-box, por su alta coocurrencia con las islas CpG, y el Inr fuerte, porque no mejoraba el ajuste del modelo (ΔR² ≈ 0,001). También se excluyeron los elementos transponibles, cuyo efecto desaparecía al ajustar por la presencia de isla CpG. Las categorías con menos de 100 promotores en alguna réplica se agruparon con la categoría vecina. El efecto de cada categoría respecto de la categoría sin elementos se estimó con el estimador de Hodges-Lehmann y su intervalo de confianza del 95%, mediante una prueba de Wilcoxon con corrección de Benjamini-Hochberg dentro de cada réplica. La asociación entre el número de elementos y la actividad se evaluó con la correlación de Spearman.
+
+Para evaluar la aditividad se ajustó, por réplica, un modelo lineal de la actividad media con los cinco elementos positivos como efectos principales. Ese modelo se comparó con uno que además incluía las diez interacciones de a pares, mediante una prueba F. Las interacciones individuales se corrigieron por comparaciones múltiples con el método de Benjamini-Hochberg. La escala de actividad está acotada (entre 1 y 6), lo que puede generar interacciones aparentes cerca de sus extremos. Por eso los mismos modelos se ajustaron también con el percentil de actividad dentro de cada réplica como respuesta, y solo se consideraron robustas las interacciones significativas en ambas escalas. La varianza máxima que podría explicar un predictor de la actividad se estimó a partir de la correlación de Pearson entre réplicas para los promotores medidos en ambas. Si cada réplica es la actividad verdadera más un error independiente, un predictor perfecto alcanzaría un R² aproximadamente igual a esa correlación
 
 ### Asociación de las características del promotor con el ruido transcripcional {#asociación-de-las-características-del-promotor-con-el-ruido-transcripcional}
 
@@ -698,7 +725,7 @@ Fig. R2.7 – CCAAT-box, GC-box e islas CpG
 
 #### 
 
-#### Efecto de la secuencia a lo largo del promotor
+#### Efecto de la secuencia a lo largo del promotor {#efecto-de-la-secuencia-a-lo-largo-del-promotor}
 
 Los análisis anteriores evaluaron elementos conocidos, definidos de antemano. Para explorar sin hipótesis previas si la secuencia influye sobre la actividad de manera dependiente de la posición, estimamos el efecto de cada base en cada posición del fragmento. En cada posición comparamos la actividad de los promotores que tienen una determinada base con la de los que no la tienen, ajustando por el contenido de G+C local para no confundir el efecto de la base con el de la composición de su entorno (ver Métodos; Fig. R2.8). A lo largo de casi todo el fragmento, los efectos fueron pequeños (menos de 4 puntos de percentil de actividad) y siguieron un patrón general: la G tendió a asociarse con mayor actividad y la T con menor. Este patrón casi desapareció al analizar por separado los promotores con y sin isla CpG, lo que indica que refleja la composición de las islas más que un efecto posicional.
 
@@ -714,15 +741,33 @@ Evaluamos luego cada una de las configuraciones posibles del TSS: los cuatro din
 
 Estos resultados dependen de la precisión de la anotación de EPD, ya que el sitio de inicio no se determinó en el reportero. En teoría, un TSS no canónico puede reflejar tanto un sitio de inicio intrínsecamente menos eficiente como un sitio mal anotado. Por otro lado, los fragmentos se extienden solo hasta la posición \+15, por lo que no incluyen los elementos río abajo del promotor basal que suelen cooperar con el iniciador.
 
-#### Panorama de las características de secuencia
+#### Búsqueda de motivos de novo
+
+El perfil por posición solo detecta elementos que ocupan una posición fija respecto del TSS. Para identificar, sin hipótesis previas, secuencias asociadas con la actividad en cualquier posición del fragmento, evaluamos el efecto de la presencia de cada una de las 2.080 secuencias posibles de 6 pb, considerando cada una junto con su complemento reverso (ver Métodos). En el conjunto de los promotores, el efecto de cada secuencia dependió en gran medida de su composición. Las secuencias sin dinucleótidos CpG tendieron a asociarse con menor actividad, y el efecto aumentó con el número de CpG (Fig. R2.10A). En conjunto, el número de CpG y el contenido de G+C de cada secuencia explicaron alrededor del 60% de la variación de sus efectos (R² \= 0,60 y 0,61 para las réplicas 1 y 2). La composición característica de las islas CpG domina así el paisaje de efectos de la secuencia, en línea con lo observado al analizar las islas (Fig. R2.1). Dentro de los promotores con y sin isla CpG, en cambio, esa proporción cayó al 7–11%. Por eso, si bien se mantiene una cierta asociación menor, para identificar motivos específicos, analizamos ambos grupos por separado. 
+
+Dentro de los promotores con isla CpG, las secuencias con mayor efecto positivo y consistente en ambas réplicas correspondieron casi exclusivamente a motivos conocidos de promotores (Fig. R2.10B). Las de mayor efecto fueron variantes de la TATA-box (TATAAA y TATATA; HL ≈ 0,3), seguidas por varias secuencias que forman la CCAAT-box. Que una búsqueda sin hipótesis previas recupere estos dos elementos refuerza los resultados de las secciones anteriores. Aparecieron además dos motivos que no habíamos evaluado. El primero es el elemento de respuesta a AMPc (CRE, TGACGT), reconocido por los factores de la familia CREB/ATF. El segundo son secuencias que contienen el núcleo del sitio de unión de YY1 (AAATGG, AATGGC), un factor con dedos de zinc frecuente en los promotores de genes de expresión amplia. Ambos son elementos característicos de los promotores humanos \[CITA\], y su asociación positiva con la actividad concuerda con su papel conocido como activadores. En los promotores sin isla CpG, con menos promotores y menor concordancia entre réplicas, sólo se destacaron secuencias correspondientes a la CCAAT-box y la GC-box. 
+
+Entre las secuencias asociadas con menor actividad en los promotores con isla CpG, la señal más clara correspondió a una E-box del tipo CAGGTR (CAGGTG y CAGGTA; HL entre −0,06 y −0,11), similar a los sitios de unión de los represores ZEB y SNAI. Esta secuencia está presente en alrededor del 20% de los promotores con isla CpG, y su frecuencia disminuye de forma gradual con la actividad: pasa de alrededor del 23% en los promotores menos activos a 13–15% en los más activos, en ambas réplicas (Fig. R2.10C). Dado que varias proteínas reconocen E-boxes de este tipo, no es posible atribuir el efecto a un factor en particular, pero estos resultados identifican a la E-box CAGGTR como un candidato a elemento con efecto negativo sobre la actividad del promotor basal.
+
+Fig. R2.10 – Búsqueda de motivos sin hipótesis previa
+
+#### Panorama de las características de secuencia {#panorama-de-las-características-de-secuencia}
 
 Para poner estos resultados en perspectiva, evaluamos con el mismo procedimiento todas las características de secuencia anotadas en la *library* (ver Métodos; Fig. R2.10). Los cuatro elementos analizados en detalle (islas CpG, TATA-box, CCAAT-box y GC-box) son los que muestran las asociaciones más fuertes con la actividad (HL entre 0,13 y 0,30). El contenido de G+C elevado (tercil superior) se asoció también con mayor actividad, pero con un efecto mucho menor (0,08 y 0,09). Esto concuerda con lo observado antes: lo que se asocia con la actividad es el enriquecimiento en dinucleótidos CpG, más que la composición general (Fig. R2.1C).
 
 El iniciador TCT también se asoció positivamente con la actividad (0,05 y 0,07), aunque se trata de un elemento particular. Es característico de los promotores de los genes de proteínas ribosomales, cuya transcripción depende de una maquinaria específica (Parry et al. 2010; Wang et al. 2014\). En nuestra *library*, el 77–78% de los promotores de proteínas ribosomales contiene un TCT, y estos promotores se encuentran entre los más activos (percentil de actividad medio de 73 y 76, frente a alrededor de 50 en el resto). Sin embargo, constituyen menos del 4% de los promotores con TCT, y al excluirlos el efecto del TCT se reduce a la mitad (0,03 y 0,05). El TCT parece asociarse con una mayor actividad sobre todo en el contexto de los genes de proteínas ribosomales.
 
-En sentido opuesto, los promotores que se solapan con elementos transponibles mostraron una menor actividad (−0,09 y −0,13), en particular los que contienen SINE y LINE. Esto es compatible con que se trate de promotores de origen más reciente o sometidos a una menor presión selectiva para su función. Las repeticiones de baja complejidad, en cambio, no se asociaron con la actividad. Por último, las características del TSS se comportaron como se describió en la sección anterior.
+En sentido opuesto, los promotores que se solapan con elementos transponibles mostraron una menor actividad (−0,09 y −0,13), en particular los que contienen SINE y LINE. Esto es compatible con que se trate de promotores de origen más reciente o sometidos a una menor presión selectiva para su función. Los tractos poli(dA:dT) largos (8 pb o más), poco frecuentes en la *library* (alrededor del 4% de los promotores), también se asociaron con una menor actividad cuando se ubicaban en la región proximal (−100 a −1; HL \= −0,20 y −0,21). Este efecto no se explica por su frecuente asociación con elementos transponibles, en particular con las colas ricas en A de los elementos Alu, ya que se mantuvo al excluir esos promotores (−0,19 y −0,18). El resultado contrasta con lo descrito en levaduras, donde estos tractos desfavorecen la formación de nucleosomas y favorecen la expresión (Raveh-Sadka et al. 2012). Las repeticiones de baja complejidad, en cambio, no se asociaron con la actividad. 
 
-> Fig. R2.10 – Panorama de las características de secuencia
+Fig. R2.10 – Panorama de las características de secuencia
+
+Por último, evaluamos si los efectos de los elementos asociados a mayor actividad se combinan de forma aditiva. Para esto contamos cuántos de cinco elementos positivos contenía cada promotor: isla CpG, TATA-box, CCAAT-box, sitio de YY1 y CRE. La actividad aumentó de forma gradual con el número de elementos, sin señales de saturación (Figura R2.12A). En comparación con los promotores sin ninguno, los que tenían uno, dos o tres o más elementos mostraron efectos de 0,17, 0,30 y 0,53 en la réplica 1, y de 0,19, 0,37 y 0,67 en la réplica 2 (ρ de Spearman \= 0,25 y 0,23).Un modelo lineal con los cinco elementos como efectos principales explicó el 8,4% y el 7,3% de la varianza de la actividad en cada réplica. Agregar todas las interacciones de a pares lo elevó apenas a 8,8% y 7,8%, y ninguna interacción fue significativa de forma consistente en ambas réplicas al usar tanto la actividad media como su percentil como respuesta. Estos resultados son compatibles con una combinación aproximadamente aditiva de los efectos de estos elementos. 
+
+Las características asociadas a menor actividad también se sumaron: TSS no canónico, E-box CAGGTR y tramo poli(dA:dT) proximal. Respecto de los promotores sin ninguna, los que tenían una o dos o más mostraron efectos de −0,10 y −0,20 en la réplica 1, y de −0,12 y −0,26 en la réplica 2\. Al combinar ambos conteos, la presencia de características negativas se asoció a menor actividad en todos los niveles de elementos positivos (Figura R2.12B). Además, las tres características mantuvieron efectos negativos significativos al incluirlas junto con los elementos positivos en el modelo lineal, por lo que su efecto no se explica por una menor frecuencia de elementos positivos en los promotores que las contienen. 
+
+En conjunto, estos resultados muestran que los elementos del promotor basal contribuyen a la actividad de forma independiente y aproximadamente aditiva, aunque explican una parte modesta de su variación, lo que sugiere que otros determinantes, presentes en la secuencia o en el contexto genómico de origen de cada promotor, también contribuyen a su actividad. 
+
+Fig  2.11 aditividad
 
 Para profundizar en la relación mecanística entre la secuencia del promotor *core*, la actividad y la unión de TF, evaluamos cómo la actividad promotora se relaciona con el reclutamiento de más de 900 factores de transcripción (TF) en el *locus* del promotor endógeno, medido a través de datos de ChIP-seq de la base de datos ReMap (45) (Fig. S3).
 
