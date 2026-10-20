@@ -7,7 +7,7 @@
 #
 # Datos: activity_stats_highconf + prom_df (type == "promoter"), cada
 # replica por separado. var_rank_sw con add_noise_rank() sobre el set
-# completo de cada replica (igual que ruido_cgi_tata); add_noise_rank()
+# completo de cada replica (igual que ruido_cgi); add_noise_rank()
 # descarta el resto de n %% 100 promotores de menor actividad, por eso n =
 # 9800 / 11600. Isla CpG = CGI_frag. Percentil de actividad = 100 *
 # percent_rank(mean) dentro de cada replica (igual que motivos_cgi_actividad).
@@ -97,7 +97,7 @@ media_ci <- function(y) {
   tibble(n = n, media = m, ic95_inf = m - h, ic95_sup = m + h)
 }
 
-# AUC con el mismo metodo que ruido_cgi_tata (roc_curve/noise_auc) + IC y
+# AUC con el mismo metodo que ruido_cgi (roc_curve/noise_auc) + IC y
 # p-valor de DeLong (pROC, como ruido_summary). direction = "<": AUC =
 # P(ruido | feature TRUE > ruido | feature FALSE), misma convencion que
 # roc_curve() (AUC > 0.5 = la feature se asocia a ruido alto).
