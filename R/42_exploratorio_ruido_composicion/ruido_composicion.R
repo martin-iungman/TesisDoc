@@ -500,6 +500,8 @@ noise_roc_by_tercil <- function(data, feature, titulo) {
 
 ggsave(file.path(out_dir, "p5_ROC_CGI_tercil.jpg"), noise_roc_by_tercil(data, "CGI_frag", "Curva ROC - Isla CpG"), width = 6, height = 6, units = "in")
 ggsave(file.path(out_dir, "p5_ROC_TATA_tercil.jpg"), noise_roc_by_tercil(data, "TATA_EPD", "Curva ROC - TATA-box"), width = 6, height = 6, units = "in")
+# ROC con todos los promotores juntos (formato de ROC_CGI de ruido_cgi)
+ggsave(file.path(out_dir, "p5_ROC_gc_alto.jpg"), noise_roc(data, "gc_alto", "Curva ROC - Alto G+C"), width = 7, height = 6.75, units = "in")
 ggsave(file.path(out_dir, "p5_ROC_gc_alto_tercil.jpg"), noise_roc_by_tercil(data, "gc_alto", "Curva ROC - Alto G+C"), width = 6, height = 6, units = "in")
 
 feat_lab <- c(CGI_frag = "Isla CpG", gc_alto = "Alto G+C (tercil superior)", TATA_EPD = "TATA-box")
