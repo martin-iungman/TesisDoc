@@ -7,9 +7,11 @@
 # motiva el desacople esta en correccion_sesgo_muestreo (panel B).
 #
 # A: construccion (Rep 1) - scatter media vs. varianza con los bins de
-#    actividad en bandas alternadas y un bin intermedio resaltado; a la
-#    derecha, los 100 promotores de ese bin ordenados por varianza con el
-#    rango asignado (1-100).
+#    actividad en bandas alternadas y un bin intermedio resaltado; al
+#    medio, los 100 promotores de ese bin ordenados por varianza con el
+#    rango asignado (1-100); a la derecha, la distribucion entre gates de
+#    dos promotores de ejemplo del bin (rangos 10 y 90: baja y alta
+#    varianza a igual actividad), que se resaltan tambien en A, B y C.
 # B: resultado (Rep 1) - var_rank_sw vs. bin de actividad (formato de
 #    noise_scatter() sin colorear por feature) con mediana por bin y
 #    loess, plano alrededor de 50.
@@ -23,8 +25,8 @@
 # Actividad para terciles/quintiles = promedio del percentil de mean en
 # ambas replicas (percent_rank dentro del set unido).
 #
-# Requiere: data/processed/activity_stats_highconf.tsv (ver
-# R/01_activity_stats). Run from the TesisDoc repo root.
+# Requiere: data/processed/activity_stats_highconf.tsv y
+# data/processed/data_long.tsv (ver R/01_activity_stats). Run from the TesisDoc repo root.
 
 library(tidyverse)
 library(ggpubr)
@@ -42,6 +44,15 @@ data <- add_noise_rank(stats_highconf)
 rep1 <- data %>% filter(rep == "Rep 1")
 bin_sel <- ceiling(max(rep1$mean_sw) / 2)
 clr_sel <- "#AD343E"
+
+# promotores de ejemplo dentro de ese bin: baja y alta varianza a igual
+# actividad (rangos 10 y 90, tipicos y no extremos)
+rangos_ej <- c("Baja varianza" = 10, "Alta varianza" = 90)
+clr_ej <- c("Baja varianza" = "#E3A21A", "Alta varianza" = "#6A3D9A")
+ejemplos <- rep1 %>%
+  filter(mean_sw == bin_sel, var_rank_sw %in% rangos_ej) %>%
+  mutate(tipo = factor(names(rangos_ej)[match(var_rank_sw, rangos_ej)], levels = names(rangos_ej))) %>%
+  arrange(tipo)
 
 # --- Panel A: construccion ----------------------------------------------
 
@@ -68,6 +79,7 @@ panel_a_izq <- ggplot() +
   ) +
   geom_point(data = filter(rep1, mean_sw != bin_sel), aes(mean, var), size = 0.3, col = "grey55") +
   geom_point(data = filter(rep1, mean_sw == bin_sel), aes(mean, var), size = 0.8, col = clr_sel) +
+  geom_point(data = ejemplos, aes(mean, var), shape = 21, size = 4, stroke = 0.8, fill = clr_ej[ejemplos$tipo]) +
   labs(
     x = "Media", y = "Varianza",
     title = paste0("Bins de 100 promotores por actividad\n(bin ", bin_sel, " resaltado)")
@@ -89,12 +101,39 @@ panel_a_der <- bin_df %>%
     "text", x = min(bin_df$var), y = 52, label = "rango de varianza\ndentro del bin",
     hjust = -0.08, col = "grey30", size = 4.5
   ) +
+  geom_point(data = ejemplos, aes(var, var_rank_sw), inherit.aes = FALSE, shape = 21, size = 4.5, stroke = 0.8, fill = clr_ej[ejemplos$tipo]) +
+  geom_text(
+    data = ejemplos, aes(var, var_rank_sw, label = name), inherit.aes = FALSE,
+    hjust = -0.2, vjust = c(1.6, -0.9), size = 4.5, col = clr_ej[ejemplos$tipo], fontface = "bold"
+  ) +
   labs(x = "Varianza", y = "Rango de varianza (1-100)", title = paste0("Bin ", bin_sel, " ordenado por varianza")) +
   theme_pubr(base_size = 16)
 
-panel_a <- panel_a_izq | panel_a_der
+# distribucion de lecturas normalizadas entre gates de los dos ejemplos
+dist_ej <- read_tsv("data/processed/data_long.tsv", show_col_types = FALSE) %>%
+  filter(rep == "Rep 1", seq_id %in% ejemplos$seq_id) %>%
+  select(-name) %>%
+  group_by(seq_id) %>%
+  mutate(frac = counts_norm / sum(counts_norm)) %>%
+  ungroup() %>%
+  left_join(select(ejemplos, seq_id, name, mean, var, var_rank_sw, tipo), by = "seq_id") %>%
+  mutate(lab = fct_reorder(sprintf("%s (rango %d)
+varianza %s", name, var_rank_sw, format(round(var, 2), decimal.mark = ",")), var_rank_sw))
 
-ggsave(file.path(out_dir, "panel_a_construccion.jpg"), panel_a, width = 13, height = 6, units = "in")
+panel_a_dist <- dist_ej %>%
+  ggplot(aes(factor(sample), frac, fill = tipo)) +
+  geom_col(width = 0.75, show.legend = FALSE) +
+  geom_vline(aes(xintercept = mean), linetype = "dashed", col = "grey30") +
+  facet_wrap(~lab, ncol = 1) +
+  scale_fill_manual(values = clr_ej) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = "Gate de sorting", y = "Fracción de lecturas", title = "Distribución entre gates") +
+  theme_pubr(base_size = 16) +
+  theme(strip.text = element_text(size = 12))
+
+panel_a <- (panel_a_izq | panel_a_der | panel_a_dist) + plot_layout(widths = c(1.25, 1, 0.75))
+
+ggsave(file.path(out_dir, "panel_a_construccion.jpg"), panel_a, width = 18, height = 6.5, units = "in")
 
 # --- Panel B: desacople ----------------------------------------------------
 
@@ -106,6 +145,7 @@ panel_b <- rep1 %>%
   ggplot(aes(mean_sw, var_rank_sw)) +
   geom_point(size = 0.2, alpha = 0.5, col = "grey") +
   geom_point(data = bin_df, size = 0.8, col = clr_sel) +
+  geom_point(data = ejemplos, shape = 21, size = 4, stroke = 0.8, fill = clr_ej[ejemplos$tipo]) +
   geom_hline(yintercept = 50, linetype = "dashed", col = "grey40") +
   geom_line(data = mediana_bin, aes(y = var_rank_med), col = thesis_clr, linewidth = 0.6) +
   geom_smooth(method = "loess", se = FALSE, linewidth = 1.2, col = "#136869") +
@@ -159,9 +199,33 @@ panel_c_df <- bind_rows(
 
 write_tsv(panel_c_df, file.path(out_dir, "panel_c_reproducibilidad.tsv"))
 
+# los ejemplos de A son promotores individuales: se marca la columna del
+# decil de Rep 1 en que caen y su rango en ambas replicas (el de Rep 2 puede
+# quedar fuera de la escala de las medias por decil)
+ejemplos_c <- ejemplos %>%
+  select(seq_id, name, tipo) %>%
+  inner_join(wide, by = "seq_id") %>%
+  mutate(
+    decil = ceiling(var_rank_sw_r1 / 10),
+    lab = sprintf("%s
+rango %d (rép. 1) → %d (rép. 2)", name, var_rank_sw_r1, var_rank_sw_r2)
+  )
+c_lims <- panel_c_df %>% filter(direccion == "Rep 1 -> Rep 2") %>% summarise(ymin = min(ic95_inf), ymax = max(ic95_sup))
+
 panel_c <- panel_c_df %>%
   filter(direccion == "Rep 1 -> Rep 2") %>%
   ggplot(aes(decil, media, col = grupo)) +
+  annotate(
+    "rect", xmin = ejemplos_c$decil - 0.4, xmax = ejemplos_c$decil + 0.4, ymin = -Inf, ymax = Inf,
+    fill = clr_ej[ejemplos_c$tipo], alpha = 0.18
+  ) +
+  annotate(
+    "text", x = ejemplos_c$decil + ifelse(ejemplos_c$tipo == "Baja varianza", -0.35, 0.35),
+    y = ifelse(ejemplos_c$tipo == "Baja varianza", c_lims$ymax, c_lims$ymin),
+    hjust = ifelse(ejemplos_c$tipo == "Baja varianza", 0, 1),
+    vjust = ifelse(ejemplos_c$tipo == "Baja varianza", 1, 0),
+    label = ejemplos_c$lab, col = clr_ej[ejemplos_c$tipo], size = 4.2, fontface = "bold"
+  ) +
   geom_hline(yintercept = 50, linetype = "dashed", col = "grey40") +
   geom_errorbar(aes(ymin = ic95_inf, ymax = ic95_sup), width = 0.25, linewidth = 0.6) +
   geom_line(aes(linewidth = grupo == "Todos")) +
@@ -184,7 +248,7 @@ compuesta <- wrap_elements(full = panel_a) / (panel_b | panel_c) +
   plot_annotation(tag_levels = "A") &
   theme(plot.tag = element_text(size = 22, face = "bold"))
 
-ggsave(file.path(out_dir, "metrica_ruido.jpg"), compuesta, width = 16, height = 13, units = "in")
+ggsave(file.path(out_dir, "metrica_ruido.jpg"), compuesta, width = 18, height = 13.5, units = "in")
 
 # --- Estadisticos -------------------------------------------------------------
 
@@ -239,6 +303,13 @@ estadisticos <- bind_rows(
 )
 
 write_tsv(estadisticos, file.path(out_dir, "metrica_ruido_estadisticos.tsv"))
+
+data %>%
+  filter(seq_id %in% ejemplos$seq_id) %>%
+  left_join(select(ejemplos, seq_id, tipo), by = "seq_id") %>%
+  select(tipo, seq_id, name, rep, mean, var, mean_sw, var_rank_sw) %>%
+  arrange(tipo, rep) %>%
+  write_tsv(file.path(out_dir, "metrica_ruido_ejemplos.tsv"))
 print(estadisticos, n = Inf)
 
 message("Figuras guardadas en ", out_dir)
