@@ -1,0 +1,23 @@
+categoria	estadistico	variable	subgrupo	valor	n
+entre_replicas	pearson	mean	todos	0.8598462811381263	10381
+entre_replicas	spearman	mean	todos	0.660825073886276	10381
+entre_replicas	pearson	var	todos	0.3090246401928752	10381
+entre_replicas	spearman	var	todos	0.2557505139620529	10381
+entre_replicas	pearson	var_rank_sw	todos	0.20516244161868902	10381
+entre_replicas	spearman	var_rank_sw	todos	0.20556309551919905	10381
+dentro_replica	spearman	mean~var	Rep 1	0.20818225085679956	11200
+dentro_replica	spearman	mean~var_rank_sw	Rep 1	4.771924274027795e-6	11200
+dentro_replica	spearman	mean~var	Rep 2	0.42020374263540416	13300
+dentro_replica	spearman	mean~var_rank_sw	Rep 2	3.191149896990282e-4	13300
+concordancia	P(>=75 | >=75)	var_rank_sw	Rep 1 -> Rep 2	0.3868060562364816	2774
+concordancia	P(<=25 | >=75)	var_rank_sw	Rep 1 -> Rep 2	0.16222062004325882	2774
+concordancia	P(>=75 | >=75)	var_rank_sw	Rep 2 -> Rep 1	0.3782164258019034	2837
+concordancia	P(<=25 | >=75)	var_rank_sw	Rep 2 -> Rep 1	0.16672541416989778	2837
+entre_replicas_por_quintil	spearman	var_rank_sw	quintil 1	0.12328460852199019	2077
+entre_replicas_por_quintil	spearman	var_rank_sw	quintil 2	0.16805444733311856	2076
+entre_replicas_por_quintil	spearman	var_rank_sw	quintil 3	0.22022093476956675	2076
+entre_replicas_por_quintil	spearman	var_rank_sw	quintil 4	0.1858258247133708	2076
+entre_replicas_por_quintil	spearman	var_rank_sw	quintil 5	0.3439170228368357	2076
+entre_replicas_por_tercil	spearman	var_rank_sw	tercil 1	0.13841909669140764	3461
+entre_replicas_por_tercil	spearman	var_rank_sw	tercil 2	0.21778584900436448	3460
+entre_replicas_por_tercil	spearman	var_rank_sw	tercil 3	0.2740562043522403	3460
