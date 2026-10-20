@@ -4,8 +4,9 @@
 # actividad media, agrupando promotores en bins de 100 segun su rank de
 # actividad. Una figura por motivo (CCAAT-box y GC-box juntos) - antes era
 # una sola figura (tata_cgi_actividad, 12 paneles). Las islas CpG se definen
-# por la composicion del fragmento (CGI_frag), y cgi_actividad suma un panel
-# con la razon CpG o/e como variable continua (cgi_oe_deciles.jpg).
+# por la composicion del fragmento (CGI_frag), y cgi_actividad suma paneles
+# con la razon CpG o/e y el contenido G+C como variables continuas
+# (cgi_oe_deciles.jpg, cgi_gc_deciles.jpg y cgi_composicion_deciles.jpg).
 # Tablas de soporte del texto: tata_estratificado_cgi.tsv (tata_actividad),
 # ccaat_gcbox_estratificado_cgi.tsv, motivos_prevalencia_cgi.tsv y
 # ccaat_gcbox_combinacion.tsv (ccaat_gcbox_cgi, que grafica esas tres tablas:
@@ -19,6 +20,7 @@
 
 library(tidyverse)
 library(ggpubr)
+library(patchwork)
 source("R/functions/fig_paths.R")
 
 out_dir_cgi <- fig_dir("cgi_actividad")
@@ -101,35 +103,54 @@ ggsave(file.path(out_dir_cgi, "cgi_scatter.jpg"), panel_cgi_scatter, width = 12,
 ggsave(file.path(out_dir_cgi, "cgi_violin_rep1.jpg"), violin_by_motif(data, "Rep 1", "CGI_frag", "Isla CpG"), width = 9, height = 6.75, units = "in")
 ggsave(file.path(out_dir_cgi, "cgi_violin_rep2.jpg"), violin_by_motif(data, "Rep 2", "CGI_frag", "Isla CpG"), width = 9, height = 6.75, units = "in")
 
-# Razon CpG o/e como variable continua: percentil de actividad media
-# (dentro de cada replica) por decil de cpg_oe. Punto = media del decil,
-# barra = IC 95%; linea punteada vertical = umbral 0.6 de CGI_frag.
-cgi_oe_data <- data %>%
-  filter(!is.na(cpg_oe)) %>%
+# Composicion del fragmento como variable continua: percentil de actividad
+# media (dentro de cada replica) por decil de la razon CpG o/e (cpg_oe,
+# cgi_oe_deciles.jpg) y del contenido G+C (g_c, cgi_gc_deciles.jpg); juntos
+# en cgi_composicion_deciles.jpg. Punto = media del decil, barra = IC 95%;
+# linea discontinua vertical = umbral de CGI_frag (0.6 / 50%). Misma escala
+# Y en ambos paneles - mismo formato que ruido_composicion (deciles de
+# composicion vs. ruido).
+comp_data <- data %>%
+  filter(!is.na(cpg_oe), !is.na(g_c)) %>%
   group_by(rep) %>%
-  mutate(act_pct = 100 * percent_rank(mean), oe_decil = ntile(cpg_oe, 10)) %>%
+  mutate(act_pct = 100 * percent_rank(mean)) %>%
   ungroup()
-cgi_oe_rho <- cgi_oe_data %>%
-  group_by(rep) %>%
-  summarise(rho = cor(cpg_oe, mean, method = "spearman"), .groups = "drop") %>%
-  mutate(label = sprintf("rho == %.2f", rho))
-panel_cgi_oe_deciles <- cgi_oe_data %>%
-  group_by(rep, oe_decil) %>%
-  summarise(oe = median(cpg_oe), m = mean(act_pct), se = sd(act_pct) / sqrt(n()), .groups = "drop") %>%
-  ggplot(aes(oe, m)) +
-  geom_hline(yintercept = 50, linetype = "dotted", col = "grey60") +
-  geom_vline(xintercept = 0.6, linetype = "dashed", col = "grey40") +
-  geom_errorbar(aes(ymin = m - 1.96 * se, ymax = m + 1.96 * se), width = 0, col = "#216869") +
-  geom_line(col = "#216869") +
-  geom_point(col = "#14AFB2", size = 3) +
-  geom_text(data = cgi_oe_rho, aes(x = -Inf, y = Inf, label = label), parse = TRUE,
-    hjust = -0.2, vjust = 1.5, size = 9, inherit.aes = FALSE) +
-  theme_pubclean() +
-  theme(text = element_text(size = 30), panel.spacing = unit(3, "lines")) +
-  facet_wrap(~rep) +
-  labs(x = "Razón CpG o/e del fragmento (mediana del decil)", y = "Percentil de\nactividad media") +
-  ggtitle("Razón CpG observado/esperado")
+deciles_actividad <- function(var) {
+  comp_data %>%
+    group_by(rep) %>%
+    mutate(decil = ntile(.data[[var]], 10)) %>%
+    group_by(rep, decil) %>%
+    summarise(x = median(.data[[var]]), m = mean(act_pct), se = sd(act_pct) / sqrt(n()), .groups = "drop") %>%
+    mutate(ymin = m - 1.96 * se, ymax = m + 1.96 * se)
+}
+dec_oe <- deciles_actividad("cpg_oe")
+dec_gc <- deciles_actividad("g_c")
+y_lims_comp <- range(c(dec_oe$ymin, dec_oe$ymax, dec_gc$ymin, dec_gc$ymax, 50))
+panel_comp_deciles <- function(dec, var, umbral, titulo, xlab) {
+  rho <- comp_data %>%
+    group_by(rep) %>%
+    summarise(rho = cor(.data[[var]], mean, method = "spearman"), .groups = "drop") %>%
+    mutate(label = sprintf("rho == %.2f", rho))
+  ggplot(dec, aes(x, m)) +
+    geom_hline(yintercept = 50, linetype = "dotted", col = "grey60") +
+    geom_vline(xintercept = umbral, linetype = "dashed", col = "grey40") +
+    geom_errorbar(aes(ymin = ymin, ymax = ymax), width = 0, col = "#216869") +
+    geom_line(col = "#216869") +
+    geom_point(col = "#14AFB2", size = 3) +
+    geom_text(data = rho, aes(x = -Inf, y = Inf, label = label), parse = TRUE,
+      hjust = -0.2, vjust = 1.5, size = 9, inherit.aes = FALSE) +
+    scale_y_continuous(limits = y_lims_comp) +
+    theme_pubclean() +
+    theme(text = element_text(size = 30), panel.spacing = unit(3, "lines")) +
+    facet_wrap(~rep) +
+    labs(x = xlab, y = "Percentil de\nactividad media") +
+    ggtitle(titulo)
+}
+panel_cgi_oe_deciles <- panel_comp_deciles(dec_oe, "cpg_oe", 0.6, "Razón CpG observado/esperado", "Razón CpG o/e del fragmento (mediana del decil)")
+panel_cgi_gc_deciles <- panel_comp_deciles(dec_gc, "g_c", 0.5, "Contenido G+C", "Contenido G+C del fragmento (mediana del decil)")
 ggsave(file.path(out_dir_cgi, "cgi_oe_deciles.jpg"), panel_cgi_oe_deciles, width = 12, height = 6.75, units = "in")
+ggsave(file.path(out_dir_cgi, "cgi_gc_deciles.jpg"), panel_cgi_gc_deciles, width = 12, height = 6.75, units = "in")
+ggsave(file.path(out_dir_cgi, "cgi_composicion_deciles.jpg"), panel_cgi_oe_deciles / panel_cgi_gc_deciles, width = 12, height = 13.5, units = "in")
 
 # Correlaciones de Spearman de la actividad media con la razon CpG o/e y con
 # el contenido de G+C del fragmento, por replica: en todos los promotores y
