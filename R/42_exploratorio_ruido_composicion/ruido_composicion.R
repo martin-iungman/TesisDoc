@@ -23,7 +23,9 @@
 #       grupo, con var_rank_sw original y re-calculado dentro del subgrupo.
 #   p4  modelos lineales (a)-(f), coeficientes estandarizados, R2 y F de
 #       modelos anidados, para ruido y para actividad.
-#   p5  por tercil de actividad: Spearman, AUC de CGI_frag (y TATA_EPD para
+#   p5  por tercil de actividad: Spearman, AUC de CGI_frag, gc_alto (tercil
+#       superior de g_c por replica, mismo criterio que "Alto contenido G+C" de
+#       build_tidy_features) y TATA_EPD (para
 #       comparar) con roc_curve()/noise_auc() + IC DeLong (pROC), curvas ROC
 #       en el formato de ROC_TATA_expr, y AUC por decil de actividad.
 #   p6  reproducibilidad entre replicas por tercil de actividad, AUC sobre
@@ -62,7 +64,10 @@ preparar <- function(df) {
   df %>%
     add_noise_rank() %>%
     group_by(rep) %>%
-    mutate(act_pct = 100 * percent_rank(mean), tercil = ntile(act_pct, 3), decil_act = ntile(act_pct, 10)) %>%
+    mutate(
+      act_pct = 100 * percent_rank(mean), tercil = ntile(act_pct, 3), decil_act = ntile(act_pct, 10),
+      gc_alto = as.numeric(cut_number(g_c, n = 3)) == 3
+    ) %>%
     ungroup()
 }
 
@@ -436,23 +441,38 @@ p5_rho <- d_largo %>%
   mutate(grupo = replace_na(grupo, "Todos"))
 write_tsv(p5_rho, file.path(out_dir, "p5_spearman_por_tercil.tsv"))
 
+FEATS_AUC <- c("CGI_frag", "gc_alto", "TATA_EPD")
+auc_feats <- function(df) map(FEATS_AUC, ~ auc_ci(df, .x) %>% mutate(feature = .x)) %>% list_rbind()
+
 p5_auc <- data %>%
   group_by(rep, tercil) %>%
-  group_modify(~ bind_rows(auc_ci(.x, "CGI_frag") %>% mutate(feature = "CGI_frag"), auc_ci(.x, "TATA_EPD") %>% mutate(feature = "TATA_EPD"))) %>%
+  group_modify(~ auc_feats(.x)) %>%
   ungroup() %>%
   mutate(tercil = factor(tercil_lab[as.character(tercil)], levels = tercil_lab)) %>%
   bind_rows(
     data %>% group_by(rep) %>%
-      group_modify(~ bind_rows(auc_ci(.x, "CGI_frag") %>% mutate(feature = "CGI_frag"), auc_ci(.x, "TATA_EPD") %>% mutate(feature = "TATA_EPD"))) %>%
+      group_modify(~ auc_feats(.x)) %>%
       ungroup() %>% mutate(tercil = "Todos")
   )
 write_tsv(p5_auc, file.path(out_dir, "p5_auc_por_tercil.tsv"))
 
 p5_auc_decil <- data %>%
   group_by(rep, decil_act) %>%
-  group_modify(~ bind_rows(auc_ci(.x, "CGI_frag") %>% mutate(feature = "CGI_frag"), auc_ci(.x, "TATA_EPD") %>% mutate(feature = "TATA_EPD"))) %>%
+  group_modify(~ auc_feats(.x)) %>%
   ungroup()
 write_tsv(p5_auc_decil, file.path(out_dir, "p5_auc_por_decil_actividad.tsv"))
+
+# Alto G+C dentro y fuera de las islas CpG (corte de tercil global de cada
+# replica): separa el efecto del G+C del de la isla, que se solapan (la
+# mayoria de los promotores de alto G+C tienen isla).
+p5_auc_gc_isla <- data %>%
+  mutate(grupo = grupo_lab(CGI_frag)) %>%
+  bind_rows(mutate(., tercil = 0L)) %>%
+  group_by(rep, grupo, tercil) %>%
+  group_modify(~ auc_ci(.x, "gc_alto")) %>%
+  ungroup() %>%
+  mutate(tercil = ifelse(tercil == 0, "Todos", tercil_lab[as.character(tercil)]))
+write_tsv(p5_auc_gc_isla, file.path(out_dir, "p5_auc_gc_alto_por_isla.tsv"))
 
 # Curvas ROC por tercil de actividad, en el formato de noise_roc_by_expr()
 # (ROC_TATA_expr): color = replica, linetype = nivel de actividad.
@@ -480,21 +500,24 @@ noise_roc_by_tercil <- function(data, feature, titulo) {
 
 ggsave(file.path(out_dir, "p5_ROC_CGI_tercil.jpg"), noise_roc_by_tercil(data, "CGI_frag", "Curva ROC - Isla CpG"), width = 6, height = 6, units = "in")
 ggsave(file.path(out_dir, "p5_ROC_TATA_tercil.jpg"), noise_roc_by_tercil(data, "TATA_EPD", "Curva ROC - TATA-box"), width = 6, height = 6, units = "in")
+ggsave(file.path(out_dir, "p5_ROC_gc_alto_tercil.jpg"), noise_roc_by_tercil(data, "gc_alto", "Curva ROC - Alto G+C"), width = 6, height = 6, units = "in")
 
-feat_lab <- c(CGI_frag = "Isla CpG", TATA_EPD = "TATA-box")
+feat_lab <- c(CGI_frag = "Isla CpG", gc_alto = "Alto G+C (tercil superior)", TATA_EPD = "TATA-box")
 p5_auc_plot <- p5_auc %>%
   mutate(tercil = factor(tercil, levels = c(tercil_lab, "Todos"))) %>%
-  ggplot(aes(tercil, AUC, col = rep)) +
+  mutate(feature = factor(feature, levels = FEATS_AUC)) %>%
+  ggplot(aes(tercil, AUC_pROC, col = rep)) +
   geom_hline(yintercept = 0.5, linetype = "dashed", col = "grey40") +
   geom_pointrange(aes(ymin = ic95_inf, ymax = ic95_sup), position = position_dodge(0.4)) +
   facet_wrap(~feature, labeller = labeller(feature = feat_lab)) +
   scale_color_manual(values = clr_rep) +
   labs(x = "Tercil de actividad", y = "AUC (ruido alto) - IC95 DeLong", col = "", title = "Efecto sobre el ruido por nivel de actividad") +
   theme_pubr(base_size = 16)
-ggsave(file.path(out_dir, "p5_auc_por_tercil.jpg"), p5_auc_plot, width = 9, height = 5.5, units = "in")
+ggsave(file.path(out_dir, "p5_auc_por_tercil.jpg"), p5_auc_plot, width = 13, height = 5.5, units = "in")
 
 p5_auc_decil_plot <- p5_auc_decil %>%
-  ggplot(aes(decil_act, AUC, col = rep)) +
+  mutate(feature = factor(feature, levels = FEATS_AUC)) %>%
+  ggplot(aes(decil_act, AUC_pROC, col = rep)) +
   geom_hline(yintercept = 0.5, linetype = "dashed", col = "grey40") +
   geom_pointrange(aes(ymin = ic95_inf, ymax = ic95_sup), position = position_dodge(0.4)) +
   geom_line(position = position_dodge(0.4)) +
@@ -503,7 +526,7 @@ p5_auc_decil_plot <- p5_auc_decil %>%
   scale_color_manual(values = clr_rep) +
   labs(x = "Decil de actividad", y = "AUC (ruido alto) - IC95 DeLong", col = "", title = "Efecto sobre el ruido por decil de actividad") +
   theme_pubr(base_size = 16)
-ggsave(file.path(out_dir, "p5_auc_por_decil_actividad.jpg"), p5_auc_decil_plot, width = 11, height = 5.5, units = "in")
+ggsave(file.path(out_dir, "p5_auc_por_decil_actividad.jpg"), p5_auc_decil_plot, width = 15, height = 5.5, units = "in")
 
 # =============================================================================
 # p6 - Reproducibilidad del rango de ruido por nivel de actividad
@@ -567,6 +590,7 @@ cat("\n== p4 F ==\n"); print(p4_f %>% mutate(across(where(is.double), ~ signif(.
 cat("\n== p4 cor(cpg_oe, g_c) ==\n"); print(p4_cor_pred)
 cat("\n== p5 Spearman por tercil ==\n"); print(p5_rho %>% filter(grupo == "Todos") %>% select(tercil, rep, variable, rho, ic95_inf, ic95_sup), n = Inf)
 cat("\n== p5 AUC por tercil ==\n"); print(p5_auc %>% select(feature, rep, tercil, n, prevalencia, AUC, AUC_pROC, ic95_inf, ic95_sup, pval), n = Inf)
+cat("\n== p5 AUC alto G+C por isla ==\n"); print(p5_auc_gc_isla %>% select(rep, grupo, tercil, n, prevalencia, AUC_pROC, ic95_inf, ic95_sup, pval), n = Inf)
 cat("\n== p6 reproducibilidad ==\n"); print(p6_repro %>% select(tercil, grupo, n, rho, ic95_inf, ic95_sup), n = Inf)
 cat("\n== p6 AUC consenso / atenuacion ==\n"); print(p6_auc %>% select(tercil, ruido, n, AUC_pROC, ic95_inf, ic95_sup, confiabilidad, AUC_corr_atenuacion), n = Inf)
 
