@@ -61,6 +61,8 @@ p2 <- qpcr_panel(df, "rep_2", "Rep 1", TRUE)
 p3 <- qpcr_panel(df, "rep_3", "Rep 2", FALSE)
 
 combined <- cowplot::plot_grid(p2, p3, p1, nrow = 1)
-ggsave(file.path(out_dir, paste0(slug, ".jpg")), combined, width = 12, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0(slug, ".", ext)), combined, width = 12, height = 6.75, units = "in")
+}
 
 message("Figura guardada en ", out_dir)
