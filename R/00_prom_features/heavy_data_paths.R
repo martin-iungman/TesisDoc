@@ -95,3 +95,17 @@ path_procap_plus_r1 <- file.path(translib, "External_data/PRO-seq/ENCFF305ZQS_pl
 path_procap_minus_r1 <- file.path(translib, "External_data/PRO-seq/ENCFF757CGN__minus_rep1.bigWig")
 path_procap_plus_r2 <- file.path(translib, "External_data/PRO-seq/ENCFF762BKL_plus_rep2.bigWig")
 path_procap_minus_r2 <- file.path(translib, "External_data/PRO-seq/ENCFF367WUV_minus_rep2.bigWig")
+
+# G4-CUT&Tag (Flag-BG4) en HEK293T, GSE178668 (PMID 34400476): bigWig en
+# RPM, hg38 (~1.2GB en total). Solo hay bigWig en GEO, sin picos. Usado en
+# R/00_prom_features/build_g4_cuttag.R. Descargados con:
+#   https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM5395nnn/GSM5395699/suppl/GSM5395699_CUT-Tag-BG4.bw
+#   https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM5401nnn/GSM5401689/suppl/GSM5401689_CUT-Tag-BG4-rep2.bw
+#   https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM5395nnn/GSM5395700/suppl/GSM5395700_CUT-Tag-IgG.bw
+path_g4_cuttag_bg4_r1 <- file.path(translib, "External_data/G4_CUTTag/GSM5395699_CUT-Tag-BG4.bw")
+path_g4_cuttag_bg4_r2 <- file.path(translib, "External_data/G4_CUTTag/GSM5401689_CUT-Tag-BG4-rep2.bw")
+path_g4_cuttag_igg <- file.path(translib, "External_data/G4_CUTTag/GSM5395700_CUT-Tag-IgG.bw")
+# ATAC-seq de HEK293T de la misma serie (GSM5395701, 24MB; normalizado con
+# spike-in de E. coli), para separar G4 plegado de accesibilidad:
+#   https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM5395nnn/GSM5395701/suppl/GSM5395701_ATAC-293T.bw
+path_atac_hek293t <- file.path(translib, "External_data/G4_CUTTag/GSM5395701_ATAC-293T.bw")
