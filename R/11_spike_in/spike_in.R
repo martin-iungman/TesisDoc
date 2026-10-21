@@ -35,12 +35,14 @@ p <- spikes %>%
   scale_y_log10(labels = scales::label_number(), breaks = 10^(-2:2)) +
   scale_color_manual(values = clrs[c(3, 4, 6)]) +
   facet_wrap(~rep) +
-  ylab("Counts relativizados (log)") +
-  xlab("Muestra") +
+  ylab("Abundancia relativa al Spike-In 2 (escala log)") +
+  xlab("Fracción") +
   labs(col = "Spike-In") +
   theme_pubclean() +
   theme(text = element_text(size = 15), panel.spacing = unit(3, "lines"))
 
-ggsave(file.path(out_dir, paste0(slug, ".jpg")), p, width = 9, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0(slug, ".", ext)), p, width = 9, height = 6.75, units = "in")
+}
 
 message("Figura guardada en ", out_dir)
