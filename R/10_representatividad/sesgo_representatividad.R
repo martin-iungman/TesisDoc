@@ -2,9 +2,9 @@
 # figura vigente)
 # Panel A: venn de comparacion con el reportero de splicing pre-sorting
 #   (proyecto 2022) + test de Fisher de asociacion.
-# Panel B/C: sesgo de contenido G+C en las lecturas secuenciadas
-#   (2 representaciones alternativas: lineal y de barras) y violin de
-#   G+C para promotores secuenciados vs no secuenciados.
+# Panel B: violin de G+C para promotores detectados vs no detectados.
+# Panel C: sesgo de contenido G+C en las lecturas secuenciadas
+#   (2 representaciones alternativas: lineal y de barras).
 #
 # Requiere: data/processed/prom_df.tsv, data/processed/activity_stats_full.tsv,
 # data/processed/data_long.tsv (ver R/00_prom_features y R/01_activity_stats)
@@ -102,7 +102,7 @@ fisher_result <- tibble(
   fisher.test()
 message("Fisher test (splicing x transcripcional): p = ", format.pval(fisher_result$p.value), ", OR = ", round(fisher_result$estimate, 3))
 
-# --- Panel B: sesgo de G+C en lecturas secuenciadas -----------------------
+# --- Panel C: sesgo de G+C en lecturas secuenciadas -----------------------
 
 tmp <- bind_rows(prom_df %>% mutate(rep = "Rep 1"), prom_df %>% mutate(rep = "Rep 2")) %>%
   left_join(full_stats, by = c("seq_id", "rep")) %>%
@@ -120,7 +120,7 @@ tmp <- tmp %>%
   mutate(sum_rel = sum / sum(sum), n_rel = n / sum(n)) %>%
   select(sum_rel, bin_gc, n_rel, rep)
 
-panel_b_lineal <- tmp %>%
+panel_c_lineal <- tmp %>%
   pivot_longer(c(sum_rel, n_rel), values_to = "counts", names_to = "data") %>%
   ggplot(aes(bin_gc, counts, col = data)) +
   geom_line() +
@@ -130,9 +130,9 @@ panel_b_lineal <- tmp %>%
   scale_color_manual(values = clrs[c(3, 5)], labels = c("Distribución uniforme", "Observada")) +
   theme_pubr() +
   theme(legend.title = element_blank(), legend.position = "top", panel.spacing = unit(3, "lines"))
-ggsave(file.path(out_dir, "panel_b_gc_bias_lineal.jpg"), panel_b_lineal, width = 9, height = 6.75, units = "in")
+ggsave(file.path(out_dir, "panel_c_gc_bias_lineal.jpg"), panel_c_lineal, width = 9, height = 6.75, units = "in")
 
-panel_b_bars <- tmp %>%
+panel_c_bars <- tmp %>%
   ggplot(aes(x = bin_gc)) +
   geom_col(aes(y = n_rel, fill = "Distribución uniforme")) +
   geom_col(aes(y = sum_rel, fill = "Distribución observada"), alpha = 0.5) +
@@ -158,12 +158,12 @@ panel_b_bars <- tmp %>%
     plot.margin = margin(5.5, 30, 5.5, 5.5)
   )
 for (ext in c("jpg", "pdf")) {
-  ggsave(file.path(out_dir, paste0("panel_b_gc_bias_bars.", ext)), panel_b_bars, width = 13, height = 6.75, units = "in")
+  ggsave(file.path(out_dir, paste0("panel_c_gc_bias_bars.", ext)), panel_c_bars, width = 13, height = 6.75, units = "in")
 }
 
-# --- Panel C: violin de G+C, secuenciados vs no --------------------------
+# --- Panel B: violin de G+C, secuenciados vs no --------------------------
 
-panel_c <- prom_df %>%
+panel_b <- prom_df %>%
   select(seq_id, g_c) %>%
   unique() %>%
   left_join(full_stats, by = "seq_id") %>%
@@ -174,7 +174,7 @@ panel_c <- prom_df %>%
   theme_pubr() +
   theme(text = element_text(size = 25))
 for (ext in c("jpg", "pdf")) {
-  ggsave(file.path(out_dir, paste0("panel_c_gc_bias_violin.", ext)), panel_c, width = 6, height = 6.75, units = "in")
+  ggsave(file.path(out_dir, paste0("panel_b_gc_bias_violin.", ext)), panel_b, width = 6, height = 6.75, units = "in")
 }
 
-message("Paneles guardados en ", out_dir, ". Panel B tiene 2 versiones alternativas (lineal/bars) - definir cual usar.")
+message("Paneles guardados en ", out_dir, ". Panel C tiene 2 versiones alternativas (lineal/bars) - definir cual usar.")
