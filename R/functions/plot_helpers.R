@@ -364,11 +364,10 @@ feature_groups <- tribble(
 
 # Carga y parsea los .cells.csv (export FlowJo) de la validacion por
 # citometria de 8 promotores individuales + 2 controles (Control="US",
-# Strong) - compartido por R1.5 (densidad_promotores_individuales) y R1.6
-# (distribuciones_expresion). El orden del vector de nombres tiene que
-# coincidir con el orden en que unique(df$prom_name) devuelve los
-# short_name - fragil pero heredado tal cual de
-# transcriptional_library/Tesis/tesis.R.
+# Strong=CMV) - compartido por densidad_promotores_individuales y
+# distribuciones_expresion. Los nombres se asignan por el prefijo del
+# archivo (antes se asignaban por orden, lo que cruzaba "US" y "strong":
+# el CMV quedaba como "Control" y viceversa).
 load_citometry_stable_validation <- function(path_citometry_stable_validation) {
   files <- list.files(path_citometry_stable_validation, pattern = ".cells", full.names = TRUE, recursive = TRUE)
   prom_name <- files %>%
@@ -378,10 +377,21 @@ load_citometry_stable_validation <- function(path_citometry_stable_validation) {
   names(df) <- str_replace_all(names(df), "-", "_")
   df$prom_name <- str_remove(df$sample_name, " -.+$")
 
-  name_df <- tibble(
-    short_name = unique(df$prom_name),
-    name = c("BTG1_1", "ETS1_1", "KIAA0753_1", "LSM1_1", "METAP2_1", "PPP1R14B_3", "TMEM87A_1", "ZKSCAN2_1", "Control", "Strong")
+  name_df <- tribble(
+    ~short_name, ~name,
+    "BTG", "BTG1_1",
+    "ETS", "ETS1_1",
+    "KIA", "KIAA0753_1",
+    "LSM", "LSM1_1",
+    "MET", "METAP2_1",
+    "PPP", "PPP1R14B_3",
+    "TME", "TMEM87A_1",
+    "ZK", "ZKSCAN2_1",
+    "US", "Control",
+    "strong", "Strong"
   )
+  sin_nombre <- setdiff(unique(df$prom_name), name_df$short_name)
+  if (length(sin_nombre) > 0) stop("Muestras de citometria sin nombre asignado: ", paste(sin_nombre, collapse = ", "))
   inner_join(name_df, df, by = c("short_name" = "prom_name"))
 }
 
