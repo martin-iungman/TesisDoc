@@ -49,7 +49,8 @@ qpcr_panel <- function(data, rep_id, title, show_ylab) {
     geom_point(shape = 1, size = 5, colour = "black") +
     ggtitle(title) +
     scale_y_log10() +
-    ylab(if (show_ylab) "ARN EGFP (Veces de cambio respecto a la Población 0)" else "") +
+    xlab("Fracción") +
+    ylab(if (show_ylab) "ARNm de EGFP (veces de cambio respecto de la fracción 0)" else "") +
     rcartocolor::scale_color_carto_d(palette = "Emrld") +
     theme_pubr() +
     theme(legend.position = "none")
