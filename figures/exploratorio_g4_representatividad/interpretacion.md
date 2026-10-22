@@ -20,25 +20,26 @@ El texto para Resultados está en `texto_resultados.md`. La figura principal es
 **Sorting.** Lecturas de la codificante: −0,70 / −0,68 log10. La molde no
 pierde (+0,04 / +0,02). Retención de la codificante contra Sin G4 por paso:
 - Library → detectado: −21 / −21 pp.
-- Detectado → sum_counts ≥ 100: −10 / −6 pp.
-- Filtros de consistencia: −1 a −2 pp.
-- Library → alta confianza: −19 / −20 pp (OR 0,41 / 0,42). La molde, en
-  cambio, +5 / +4 pp (OR 1,25 / 1,20).
+- Detectado → cuentas mínimas (≥ 100 lecturas y > 1000 normalizadas): −11 / −6 pp.
+- Filtros de consistencia: −3 / −1 pp.
+- Library → alta confianza: −19 / −19 pp (OR 0,41 / 0,42). La molde, en
+  cambio, +5 / +4 pp (OR 1,24 / 1,21).
 
 **Actividad** (HL contra Sin G4 apareado, alta confianza):
 
 | Clase | Rep 1 | Rep 2 | Robustez |
 |---|---|---|---|
-| Solo molde | −0,078 | −0,089 | Igual sin filtros de consistencia y con presort ≥ 100 lecturas |
-| Solo codificante | −0,017 (n.s.) | 0,000 (n.s.) | Igual en los mismos escenarios |
-| Codificante vs. molde | +0,066 | +0,098 | — |
+| Solo molde | −0,082 | −0,062 | Igual sin filtros de consistencia y con presort ≥ 100 lecturas |
+| Solo codificante | −0,056 | −0,024 (n.s.) | Rep 1 pasa a n.s. sin filtros de consistencia (−0,021) y con presort ≥ 100 lecturas (−0,042) |
+| Codificante vs. molde | +0,039 | +0,051 | — |
 
-Con el patrón canónico, la codificante da −0,046 en Rep 1 (p ajustado 0,02)
-y −0,017 en Rep 2 (n.s.).
+Con el patrón canónico, la codificante da −0,072 en Rep 1 y −0,047 en Rep 2
+(ambas significativas), igual que la molde (−0,067 / −0,061), y codificante vs.
+molde ≈ 0 (n.s.).
 
 **Otros datos.**
-- Spearman entre lecturas y actividad: ρ = 0,16 / 0,09.
+- Spearman entre lecturas y actividad: ρ = 0,35 / 0,22.
 - Solo el peor caso extremo (todos los promotores perdidos de más con
   actividad mínima) vuelve negativo el efecto de la codificante.
-- Prevalencia estandarizada por G+C: codificante 15,4% → 10,3% / 11,0%;
-  molde 12,1% → 13,6% / 13,5%.
+- Prevalencia estandarizada por G+C: codificante 15,4% → 10,4% / 11,0%;
+  molde 12,1% → 13,8% / 13,5%.

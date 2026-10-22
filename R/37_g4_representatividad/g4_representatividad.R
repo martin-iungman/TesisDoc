@@ -12,7 +12,8 @@
 #      Es la unica medida previa al sorting; no es un paso anidado de esta
 #      medicion sino un control del pool independiente de la actividad.
 #   2. Detectado en el sorting: lecturas > 0 en alguna compuerta (por replica).
-#   3. sum_counts >= 100 (activity_stats.tsv; por replica).
+#   3. Cuentas minimas: sum_counts >= 100 y sum_norm_counts > 1000
+#      (activity_stats.tsv; por replica).
 #   4. Mediana consistente entre replicas (activity_stats_consistent.tsv).
 #   5. Alta confianza: ademas no bimodal (activity_stats_highconf.tsv).
 # Las etapas 2-5 son anidadas dentro de cada replica (R/01_activity_stats).
@@ -48,7 +49,7 @@
 #      (IC 95%) y p de Wilcoxon por bin y global.
 #   C. ¿Puede la perdida sesgar el efecto de los G4 sobre la actividad? HL
 #      (IC 95%) de la actividad media en: alta confianza (referencia);
-#      sum_counts >= 100 sin filtros de consistencia; solo promotores con
+#      cuentas minimas sin filtros de consistencia; solo promotores con
 #      >= 100 lecturas en el presort 2022 (umbral fijo); y un peor caso en
 #      el que los promotores que cada clase pierde "de mas" respecto de Sin
 #      G4 del mismo bin de G+C se reincorporan con la actividad minima (1).
@@ -85,7 +86,7 @@ G4_CLASES <- c("Sin G4", "Solo codificante", "Solo molde", "Ambas")
 CLR_CLASE <- c("Sin G4" = "grey45", "Solo codificante" = "#C0392B", "Solo molde" = "#2471A3")
 ETAPAS <- c(
   diseno = "Library diseñada", presort = "Presort 2022", detectado = "Detectado en el sorting",
-  conteos = "sum_counts ≥ 100", consistente = "Consistente entre réplicas", highconf = "Alta confianza"
+  conteos = "Cuentas mínimas", consistente = "Consistente entre réplicas", highconf = "Alta confianza"
 )
 GC_BREAKS <- seq(0.20, 1.00, by = 0.05)
 fmt2 <- function(x) formatC(x, format = "f", digits = 2, decimal.mark = ",")
@@ -375,7 +376,7 @@ peor_caso <- hc %>%
   )
 
 ESCENARIOS <- c(
-  "Alta confianza (referencia)", "sum_counts ≥ 100 (sin filtros de consistencia)",
+  "Alta confianza (referencia)", "Cuentas mínimas (sin filtros de consistencia)",
   "Alta confianza, presort ≥ 100 lecturas", "Peor caso: pérdidas en exceso con actividad mínima"
 )
 sesgo <- bind_rows(
