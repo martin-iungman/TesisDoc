@@ -95,13 +95,37 @@ violin_by_motif <- function(data, rep_id, motif, fill_label) {
     ylim(c(0.5, 7))
 }
 
+# Figura completa: por cada motivo, scatter arriba y los dos violines juntos
+# abajo (cada uno debajo de su replica). `motivos` es una lista de
+# list(scatter, violin_rep1, violin_rep2). letra_por = "motivo": cada
+# conjunto scatter + violines es un solo panel con una letra (A, B, ...);
+# letra_por = "panel": scatter y violines llevan letras separadas. Se guarda
+# en .jpg y .pdf.
+figura_motivos <- function(motivos, dir, name, letra_por = c("motivo", "panel")) {
+  letra_por <- match.arg(letra_por)
+  bloque <- function(m) {
+    violines <- wrap_elements(full = m$violin_rep1 + m$violin_rep2 + theme(axis.title.y = element_blank()))
+    if (letra_por == "panel") list(m$scatter, violines) else list(wrap_elements(full = m$scatter / violines))
+  }
+  filas <- unlist(lapply(motivos, bloque), recursive = FALSE)
+  figura <- wrap_plots(filas, ncol = 1) +
+    plot_annotation(tag_levels = "A") &
+    theme(plot.tag = element_text(size = 40, face = "bold"))
+  for (ext in c("jpg", "pdf")) {
+    ggsave(file.path(dir, paste0(name, ".", ext)), figura, width = 18, height = 15 * length(motivos), units = "in", limitsize = FALSE)
+  }
+}
+
 # --- TATA-box ---------------------------------------------------------
 
 panel_tata_scatter <- motif_scatter(data, "TATA_EPD", "Proporción de promotores\ncon TATA-box", "TATA-box")
 ggsave(file.path(out_dir_tata, "tata_scatter.jpg"), panel_tata_scatter, width = 12, height = 6.75, units = "in")
 
-ggsave(file.path(out_dir_tata, "tata_violin_rep1.jpg"), violin_by_motif(data, "Rep 1", "TATA_EPD", "TATA-box"), width = 9, height = 6.75, units = "in")
-ggsave(file.path(out_dir_tata, "tata_violin_rep2.jpg"), violin_by_motif(data, "Rep 2", "TATA_EPD", "TATA-box"), width = 9, height = 6.75, units = "in")
+panel_tata_violin_rep1 <- violin_by_motif(data, "Rep 1", "TATA_EPD", "TATA-box")
+panel_tata_violin_rep2 <- violin_by_motif(data, "Rep 2", "TATA_EPD", "TATA-box")
+ggsave(file.path(out_dir_tata, "tata_violin_rep1.jpg"), panel_tata_violin_rep1, width = 9, height = 6.75, units = "in")
+ggsave(file.path(out_dir_tata, "tata_violin_rep2.jpg"), panel_tata_violin_rep2, width = 9, height = 6.75, units = "in")
+figura_motivos(list(list(scatter = panel_tata_scatter, violin_rep1 = panel_tata_violin_rep1, violin_rep2 = panel_tata_violin_rep2)), out_dir_tata, "tata_actividad")
 
 # --- Isla CpG -----------------------------------------------------------
 # Usa CGI_frag (el fragmento de 252 pb cumple G+C >= 50% y CpG o/e > 0.6),
@@ -115,16 +139,7 @@ panel_cgi_violin_rep2 <- violin_by_motif(data, "Rep 2", "CGI_frag", "Isla CpG")
 ggsave(file.path(out_dir_cgi, "cgi_violin_rep1.jpg"), panel_cgi_violin_rep1, width = 9, height = 6.75, units = "in")
 ggsave(file.path(out_dir_cgi, "cgi_violin_rep2.jpg"), panel_cgi_violin_rep2, width = 9, height = 6.75, units = "in")
 
-# Figura completa: scatter (A) arriba y los dos violines juntos (B) abajo,
-# cada uno debajo de su replica.
-figura_cgi <- panel_cgi_scatter /
-  wrap_elements(full = panel_cgi_violin_rep1 + panel_cgi_violin_rep2 +
-    theme(axis.title.y = element_blank())) +
-  plot_annotation(tag_levels = "A") &
-  theme(plot.tag = element_text(size = 40, face = "bold"))
-for (ext in c("jpg", "pdf")) {
-  ggsave(file.path(out_dir_cgi, paste0("cgi_actividad.", ext)), figura_cgi, width = 18, height = 15, units = "in")
-}
+figura_motivos(list(list(scatter = panel_cgi_scatter, violin_rep1 = panel_cgi_violin_rep1, violin_rep2 = panel_cgi_violin_rep2)), out_dir_cgi, "cgi_actividad", letra_por = "panel")
 
 # Composicion del fragmento como variable continua: percentil de actividad
 # media (dentro de cada replica) por decil de la razon CpG o/e (cpg_oe,
@@ -213,16 +228,27 @@ print(cgi_cor, n = Inf)
 panel_ccaat_scatter <- motif_scatter(data, "CCAAT_EPD", "Proporción de promotores\ncon CCAAT-box", "CCAAT-box")
 ggsave(file.path(out_dir_ccaat_gcbox, "ccaat_scatter.jpg"), panel_ccaat_scatter, width = 12, height = 6.75, units = "in")
 
-ggsave(file.path(out_dir_ccaat_gcbox, "ccaat_violin_rep1.jpg"), violin_by_motif(data, "Rep 1", "CCAAT_EPD", "CCAAT-box"), width = 9, height = 6.75, units = "in")
-ggsave(file.path(out_dir_ccaat_gcbox, "ccaat_violin_rep2.jpg"), violin_by_motif(data, "Rep 2", "CCAAT_EPD", "CCAAT-box"), width = 9, height = 6.75, units = "in")
+panel_ccaat_violin_rep1 <- violin_by_motif(data, "Rep 1", "CCAAT_EPD", "CCAAT-box")
+panel_ccaat_violin_rep2 <- violin_by_motif(data, "Rep 2", "CCAAT_EPD", "CCAAT-box")
+ggsave(file.path(out_dir_ccaat_gcbox, "ccaat_violin_rep1.jpg"), panel_ccaat_violin_rep1, width = 9, height = 6.75, units = "in")
+ggsave(file.path(out_dir_ccaat_gcbox, "ccaat_violin_rep2.jpg"), panel_ccaat_violin_rep2, width = 9, height = 6.75, units = "in")
 
 # --- GC-box ---------------------------------------------------------------
 
 panel_gcbox_scatter <- motif_scatter(data, "GCbox_EPD", "Proporción de promotores\ncon GC-box", "GC-box")
 ggsave(file.path(out_dir_ccaat_gcbox, "gcbox_scatter.jpg"), panel_gcbox_scatter, width = 12, height = 6.75, units = "in")
 
-ggsave(file.path(out_dir_ccaat_gcbox, "gcbox_violin_rep1.jpg"), violin_by_motif(data, "Rep 1", "GCbox_EPD", "GC-box"), width = 9, height = 6.75, units = "in")
-ggsave(file.path(out_dir_ccaat_gcbox, "gcbox_violin_rep2.jpg"), violin_by_motif(data, "Rep 2", "GCbox_EPD", "GC-box"), width = 9, height = 6.75, units = "in")
+panel_gcbox_violin_rep1 <- violin_by_motif(data, "Rep 1", "GCbox_EPD", "GC-box")
+panel_gcbox_violin_rep2 <- violin_by_motif(data, "Rep 2", "GCbox_EPD", "GC-box")
+ggsave(file.path(out_dir_ccaat_gcbox, "gcbox_violin_rep1.jpg"), panel_gcbox_violin_rep1, width = 9, height = 6.75, units = "in")
+ggsave(file.path(out_dir_ccaat_gcbox, "gcbox_violin_rep2.jpg"), panel_gcbox_violin_rep2, width = 9, height = 6.75, units = "in")
+
+# Figura completa: CCAAT-box (A) arriba y GC-box (B) abajo, cada uno con su
+# scatter y sus violines
+figura_motivos(list(
+  list(scatter = panel_ccaat_scatter, violin_rep1 = panel_ccaat_violin_rep1, violin_rep2 = panel_ccaat_violin_rep2),
+  list(scatter = panel_gcbox_scatter, violin_rep1 = panel_gcbox_violin_rep1, violin_rep2 = panel_gcbox_violin_rep2)
+), out_dir_ccaat_gcbox, "ccaat_gcbox_actividad")
 
 # --- Tablas de soporte para el texto de Resultados -------------------------
 # Efecto (Wilcoxon + estimador de Hodges-Lehmann con IC 95%) de TATA-box,
