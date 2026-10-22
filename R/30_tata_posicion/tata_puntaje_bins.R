@@ -17,7 +17,7 @@
 # ventana control); la tabla los incluye a todos con su n.
 # Referencias: vertical en el corte de EPD (-8.17), horizontal en 50.
 #
-# Salida en fig_dir("tata_puntaje"): tata_puntaje_bins.jpg y
+# Salida en fig_dir("tata_puntaje"): tata_puntaje_bins.jpg/.pdf y
 # tata_puntaje_bins.tsv.
 #
 # Requiere: data/raw/library.bed, BSgenome.Hsapiens.UCSC.hg38,
@@ -99,4 +99,6 @@ panel <- ggplot(filter(por_bin, n >= N_MIN), aes(puntaje_mediana, act_pct_media,
   facet_wrap(~rep) +
   labs(x = "Mejor puntaje TATA en la ventana (mediana del bin)", y = "Percentil de\nactividad media", color = NULL) +
   ggtitle("TATA-box canónica según su puntaje")
-ggsave(file.path(out_dir, "tata_puntaje_bins.jpg"), panel, width = 16, height = 7.5, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("tata_puntaje_bins.", ext)), panel, width = 16, height = 7.5, units = "in", device = if (ext == "pdf") cairo_pdf else NULL)
+}

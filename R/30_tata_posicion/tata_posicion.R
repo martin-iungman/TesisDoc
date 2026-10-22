@@ -12,16 +12,16 @@
 # "sin motivo" = sin ninguna coincidencia >= corte en todo el fragmento, en
 # ninguna hebra (salvo en tata_puntaje_corte, ver abajo).
 #
-# Genera tres figuras (un .jpg por panel; sin figura combinada ni letras):
-#   tata_posicion (perfil por posicion):
-#   - tata_posicion_perfil.jpg: HL (IC 95%) por ventana de 10 pb (alineadas
+# Genera dos figuras (cada panel en .jpg y .pdf):
+#   tata_posicion (perfil por posicion + controles de composicion; figura
+#   completa con letras A-C en tata_posicion.jpg/.pdf):
+#   - A, tata_posicion_perfil: HL (IC 95%) por ventana de 10 pb (alineadas
 #      para que -33 a -24 contenga la ventana canonica), misma hebra / hebra
 #      opuesta, por replica, puntos rellenos si BH < 0.05; abajo, proporcion
 #      de promotores con coincidencia por ventana. Franja gris = -31 a -26.
-#   tata_controles (controles de composicion):
-#   - tata_controles_permutadas.jpg: perfil de la misma hebra con la matriz
+#   - B, tata_controles_permutadas: perfil de la misma hebra con la matriz
 #      real vs. 10 matrices con las columnas permutadas (misma composicion).
-#   - tata_controles_modelo_AT.jpg: coeficientes de cada clase vs. "sin
+#   - C, tata_controles_modelo_AT: coeficientes de cada clase vs. "sin
 #      motivo" (puntos de percentil) sin covariable / + A/T (-50 a -1) / + A/T
 #      proximal y del fragmento.
 #   tata_puntaje (efecto segun el puntaje; el panel por bins fijos de puntaje
@@ -54,7 +54,6 @@ select <- dplyr::select
 filter <- dplyr::filter
 
 dir_posicion <- fig_dir("tata_posicion")
-dir_controles <- fig_dir("tata_controles")
 dir_puntaje <- fig_dir("tata_puntaje")
 
 CORTE <- TATA_CORTE_EPD
@@ -75,6 +74,11 @@ canon_lab <- paste0(minus(CANON[1]), " a ", minus(CANON[2]))
 control_lab <- paste0(minus(CONTROL[1]), " a ", minus(CONTROL[2]))
 franja <- annotate("rect", xmin = CANON[1], xmax = CANON[2], ymin = -Inf, ymax = Inf, fill = "grey88")
 save_tsv <- function(x, dir, name) write_tsv(x, file.path(dir, name))
+save_jpg_pdf <- function(plot, dir, name, width, height) {
+  for (ext in c("jpg", "pdf")) {
+    ggsave(file.path(dir, paste0(name, ".", ext)), plot, width = width, height = height, units = "in", device = if (ext == "pdf") cairo_pdf else NULL)
+  }
+}
 
 # --- Busqueda ---------------------------------------------------------------
 
@@ -124,7 +128,7 @@ panel_perfil_prop <- ggplot(perfil, aes(win_center, 100 * prop, color = hebra)) 
   theme(legend.position = "none") +
   labs(x = "Posición de la coincidencia respecto del TSS (ventanas de 10 pb)", y = "% de promotores\ncon coincidencia")
 panel_perfil <- panel_perfil_efecto / panel_perfil_prop + plot_layout(heights = c(2.2, 1))
-ggsave(file.path(dir_posicion, "tata_posicion_perfil.jpg"), panel_perfil, width = 14, height = 10, units = "in")
+save_jpg_pdf(panel_perfil, dir_posicion, "tata_posicion_perfil", 14, 10)
 
 # --- matrices permutadas (misma hebra) -----------------------------------
 
@@ -149,7 +153,7 @@ panel_permutadas <- ggplot(perfil_perm, aes(win_center, estimate)) +
   th +
   labs(x = "Posición respecto del TSS (ventanas de 10 pb)", y = "Diferencia de actividad vs.\nsin motivo (HL)",
     subtitle = "Misma hebra: matriz real (color) vs. 10 permutadas (gris)")
-ggsave(file.path(dir_controles, "tata_controles_permutadas.jpg"), panel_permutadas, width = 10, height = 8, units = "in")
+save_jpg_pdf(panel_permutadas, dir_posicion, "tata_controles_permutadas", 10, 8)
 
 # --- dosis-respuesta por bins fijos de puntaje ----------------------------
 
@@ -201,7 +205,7 @@ panel_dosis <- ggplot(dosis_bins, aes(puntaje_medio, act_pct_media, color = vent
   facet_wrap(~rep, ncol = 1) +
   th +
   labs(x = "Mejor puntaje en la ventana (suma de pesos W; bins de 1 unidad)", y = "Percentil de actividad\n(media, IC 95%)", color = NULL)
-ggsave(file.path(dir_puntaje, "tata_puntaje_dosis.jpg"), panel_dosis, width = 10, height = 8, units = "in")
+save_jpg_pdf(panel_dosis, dir_puntaje, "tata_puntaje_dosis", 10, 8)
 
 # --- control por A/T (modelo lineal) --------------------------------------
 
@@ -233,7 +237,15 @@ panel_modelo_at <- ggplot(modelos, aes(estimate, clase, color = modelo)) +
   th +
   guides(color = guide_legend(nrow = 2)) +
   labs(x = "Coeficiente vs. «sin motivo» (puntos de percentil de actividad)", y = NULL, color = NULL)
-ggsave(file.path(dir_controles, "tata_controles_modelo_AT.jpg"), panel_modelo_at, width = 10, height = 8, units = "in")
+save_jpg_pdf(panel_modelo_at, dir_posicion, "tata_controles_modelo_AT", 10, 8)
+
+# Figura completa de tata_posicion: perfil (A) arriba, controles (B, C) abajo
+figura_posicion <- wrap_elements(full = panel_perfil) /
+  (wrap_elements(full = panel_permutadas) | wrap_elements(full = panel_modelo_at)) +
+  plot_layout(heights = c(10, 8)) +
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(size = 26, face = "bold"))
+save_jpg_pdf(figura_posicion, dir_posicion, "tata_posicion", 20, 18)
 
 # --- efecto canonico segun el corte, referencia fija -----------------------
 
@@ -267,15 +279,15 @@ panel_corte <- ggplot(barrido, aes(corte, estimate, color = rep)) +
     subtitle = paste0("TATA canónica según el corte; referencia: sin coincidencias ≥ −10\n(n = ",
       paste0(n_ref_corte$n_ref, " en ", n_ref_corte$rep, collapse = ", "), ")")
   )
-ggsave(file.path(dir_puntaje, "tata_puntaje_corte.jpg"), panel_corte, width = 10, height = 7, units = "in")
+save_jpg_pdf(panel_corte, dir_puntaje, "tata_puntaje_corte", 10, 7)
 
 # --- Tablas ----------------------------------------------------------------
 
 # Datos de cada panel
 save_tsv(perfil, dir_posicion, "efecto_por_ventana.tsv")
-save_tsv(bind_rows(perfil_real_misma %>% mutate(perm = "Matriz real", orden = paste(seq_len(ncol(TATA_W)), collapse = ",")), perfil_perm), dir_controles, "efecto_por_ventana_permutadas.tsv")
+save_tsv(bind_rows(perfil_real_misma %>% mutate(perm = "Matriz real", orden = paste(seq_len(ncol(TATA_W)), collapse = ",")), perfil_perm), dir_posicion, "efecto_por_ventana_permutadas.tsv")
 save_tsv(dosis_bins, dir_puntaje, "dosis_por_bin.tsv")
-save_tsv(modelos, dir_controles, "modelo_clase_AT.tsv")
+save_tsv(modelos, dir_posicion, "modelo_clase_AT.tsv")
 save_tsv(barrido, dir_puntaje, "efecto_por_corte.tsv")
 
 # clases x replica (vs. sin motivo)
@@ -342,4 +354,4 @@ opuesta <- bind_rows(
   )
 save_tsv(opuesta, dir_posicion, "hebra_opuesta_ventana_canonica.tsv")
 
-message("Figuras y tablas guardadas en ", paste(c(dir_posicion, dir_controles, dir_puntaje), collapse = ", "))
+message("Figuras y tablas guardadas en ", paste(c(dir_posicion, dir_puntaje), collapse = ", "))

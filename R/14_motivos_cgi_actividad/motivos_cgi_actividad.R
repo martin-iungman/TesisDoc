@@ -174,7 +174,10 @@ panel_cgi_gc_deciles <- panel_comp_deciles(dec_gc, "g_c", 0.5, "Contenido G+C", 
 ggsave(file.path(out_dir_cgi_deciles, "cgi_oe_deciles.jpg"), panel_cgi_oe_deciles, width = 12, height = 6.75, units = "in")
 ggsave(file.path(out_dir_cgi_deciles, "cgi_gc_deciles.jpg"), panel_cgi_gc_deciles, width = 12, height = 6.75, units = "in")
 for (ext in c("jpg", "pdf")) {
-  ggsave(file.path(out_dir_cgi_deciles, paste0("cgi_composicion_deciles.", ext)), panel_cgi_oe_deciles / panel_cgi_gc_deciles, width = 12, height = 13.5, units = "in")
+  # fila vacia intermedia para separar los dos paneles
+  ggsave(file.path(out_dir_cgi_deciles, paste0("cgi_composicion_deciles.", ext)),
+    panel_cgi_oe_deciles / plot_spacer() / panel_cgi_gc_deciles + plot_layout(heights = c(1, 0.08, 1)),
+    width = 12, height = 14.2, units = "in")
 }
 
 # Correlaciones de Spearman de la actividad media con la razon CpG o/e y con
