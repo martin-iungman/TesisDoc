@@ -48,7 +48,9 @@ panel_a <- df %>%
   labs(x = "Señal de fluorescencia de EGFP", y = "Densidad", fill = "Promotor", alpha = NULL) +
   scale_fill_manual(values = c(KIAA0753_1 = "#AD343E", TMEM87A_1 = "#FFB400"))
 
-ggsave(file.path(out_dir, "panel_a_densidad_ejemplo.jpg"), panel_a, width = 9, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("panel_a_densidad_ejemplo.", ext)), panel_a, width = 9, height = 6.75, units = "in")
+}
 
 # --- Panel B: histograma de reconstruccion, ambos promotores, solo Rep 2 --
 
@@ -65,7 +67,9 @@ panel_b <- gates_hist %>%
   labs(x = "Gate de fluorescencia EGFP", y = "Cuentas relativas", fill = "Promotor") +
   theme_pubclean(base_size = 20)
 
-ggsave(file.path(out_dir, "panel_b_histograma_gates_ejemplo.jpg"), panel_b, width = 9, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("panel_b_histograma_gates_ejemplo.", ext)), panel_b, width = 9, height = 6.75, units = "in")
+}
 
 # --- Panel C: correlacion library vs citometria (media) -------------------
 
@@ -93,14 +97,22 @@ panel_c <- density_mean %>%
   geom_errorbarh(aes(xmin = mean_hist - sd_mean_hist, xmax = mean_hist + sd_mean_hist), height = .05) +
   labs(x = "Media (Ensayo high-throughput)", y = "Media (Ensayo especifico)", col = "Promotor") +
   theme_bw() +
-  theme(text = element_text(size = 20)) +
+  theme(
+    text = element_text(size = 20),
+    # leyenda adentro, arriba a la izquierda
+    legend.position = "inside",
+    legend.position.inside = c(0.02, 0.98),
+    legend.justification = c(0, 1),
+    legend.background = element_blank()
+  ) +
   scale_color_manual(values = c(
     KIAA0753_1 = "#AD343E", TMEM87A_1 = "#FFB400", BTG1_1 = "#7FB800", METAP2_1 = "#D6741F",
     PPP1R14B_3 = "#1B8C8E", ZKSCAN2_1 = "#9EDBCB", LSM1_1 = "#0D2C54", ETS1_1 = "#25afe9"
   )) +
-  ylim(c(1.2, 1.8)) +
-  ggtitle("Validación de actividad")
+  ylim(c(1.2, 1.8))
 
-ggsave(file.path(out_dir, "panel_c_correlacion_media.jpg"), panel_c, width = 9, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("panel_c_correlacion_media.", ext)), panel_c, width = 9, height = 6.75, units = "in")
+}
 
 message("Paneles A, B y C guardados en ", out_dir, ".")
