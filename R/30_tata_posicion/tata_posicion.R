@@ -14,16 +14,17 @@
 #
 # Genera dos figuras (cada panel en .jpg y .pdf):
 #   tata_posicion (perfil por posicion + controles de composicion; figura
-#   completa con letras A-C en tata_posicion.jpg/.pdf):
+#   completa en tata_posicion.jpg/.pdf: A perfil, B modelo A/T, C permutadas):
 #   - A, tata_posicion_perfil: HL (IC 95%) por ventana de 10 pb (alineadas
 #      para que -33 a -24 contenga la ventana canonica), misma hebra / hebra
 #      opuesta, por replica, puntos rellenos si BH < 0.05; abajo, proporcion
 #      de promotores con coincidencia por ventana. Franja gris = -31 a -26.
-#   - B, tata_controles_permutadas: perfil de la misma hebra con la matriz
-#      real vs. 10 matrices con las columnas permutadas (misma composicion).
-#   - C, tata_controles_modelo_AT: coeficientes de cada clase vs. "sin
+#   - B, tata_controles_modelo_AT: coeficientes de cada clase vs. "sin
 #      motivo" (puntos de percentil) sin covariable / + A/T (-50 a -1) / + A/T
 #      proximal y del fragmento.
+#   - C, tata_controles_permutadas: perfil de la misma hebra con la matriz
+#      real (color) vs. 10 matrices con las columnas permutadas (gris; misma
+#      composicion).
 #   tata_puntaje (efecto segun el puntaje; el panel por bins fijos de puntaje
 #   lo genera R/30_tata_posicion/tata_puntaje_bins.R):
 #   - tata_puntaje_dosis.jpg: percentil de actividad medio (IC 95%) por bin de
@@ -67,7 +68,7 @@ col_misma <- "#216869"
 col_opuesta <- "#14AFB2"
 col_alto <- "#D6741F"
 col_bajo <- "#7FB800"
-th <- theme_pubclean(base_size = 16) +
+th <- theme_pubclean(base_size = 18) +
   theme(strip.text = element_text(face = "bold"), legend.position = "top")
 minus <- function(x) sub("^-", "−", format(x, trim = TRUE))
 canon_lab <- paste0(minus(CANON[1]), " a ", minus(CANON[2]))
@@ -151,8 +152,7 @@ panel_permutadas <- ggplot(perfil_perm, aes(win_center, estimate)) +
   facet_wrap(~rep, ncol = 1) +
   scale_x_continuous(breaks = seq(-200, 0, 50), labels = minus) +
   th +
-  labs(x = "Posición respecto del TSS (ventanas de 10 pb)", y = "Diferencia de actividad vs.\nsin motivo (HL)",
-    subtitle = "Misma hebra: matriz real (color) vs. 10 permutadas (gris)")
+  labs(x = "Posición respecto del TSS (ventanas de 10 pb)", y = "Diferencia de actividad vs.\nsin motivo (HL)")
 save_jpg_pdf(panel_permutadas, dir_posicion, "tata_controles_permutadas", 10, 8)
 
 # --- dosis-respuesta por bins fijos de puntaje ----------------------------
@@ -235,17 +235,19 @@ panel_modelo_at <- ggplot(modelos, aes(estimate, clase, color = modelo)) +
   scale_color_manual(values = setNames(c("grey55", col_opuesta, col_misma), modelos_lab)) +
   facet_wrap(~rep, ncol = 1) +
   th +
-  guides(color = guide_legend(nrow = 2)) +
-  labs(x = "Coeficiente vs. «sin motivo» (puntos de percentil de actividad)", y = NULL, color = NULL)
+  guides(color = guide_legend(nrow = 1)) +
+  labs(x = "Diferencia de percentil de actividad vs. sin motivo", y = NULL, color = NULL)
 save_jpg_pdf(panel_modelo_at, dir_posicion, "tata_controles_modelo_AT", 10, 8)
 
-# Figura completa de tata_posicion: perfil (A) arriba, controles (B, C) abajo
-figura_posicion <- wrap_elements(full = panel_perfil) /
-  (wrap_elements(full = panel_permutadas) | wrap_elements(full = panel_modelo_at)) +
-  plot_layout(heights = c(10, 8)) +
+# Figura completa de tata_posicion: perfil (A) arriba; modelo A/T (B) y
+# matrices permutadas (C) abajo
+# (fila vacia intermedia para separar A de B y C)
+figura_posicion <- wrap_elements(full = panel_perfil) / plot_spacer() /
+  (wrap_elements(full = panel_modelo_at) | wrap_elements(full = panel_permutadas)) +
+  plot_layout(heights = c(10, 0.8, 8)) +
   plot_annotation(tag_levels = "A") &
   theme(plot.tag = element_text(size = 26, face = "bold"))
-save_jpg_pdf(figura_posicion, dir_posicion, "tata_posicion", 20, 18)
+save_jpg_pdf(figura_posicion, dir_posicion, "tata_posicion", 20, 18.8)
 
 # --- efecto canonico segun el corte, referencia fija -----------------------
 

@@ -108,9 +108,12 @@ figura_motivos <- function(motivos, dir, name, letra_por = c("motivo", "panel"))
     if (letra_por == "panel") list(m$scatter, violines) else list(wrap_elements(full = m$scatter / violines))
   }
   filas <- unlist(lapply(motivos, bloque), recursive = FALSE)
-  figura <- wrap_plots(filas, ncol = 1) +
-    plot_annotation(tag_levels = "A") &
-    theme(plot.tag = element_text(size = 40, face = "bold"))
+  figura <- wrap_plots(filas, ncol = 1)
+  # con un solo panel no se pone letra
+  if (length(filas) > 1) {
+    figura <- figura + plot_annotation(tag_levels = "A") &
+      theme(plot.tag = element_text(size = 40, face = "bold"))
+  }
   for (ext in c("jpg", "pdf")) {
     ggsave(file.path(dir, paste0(name, ".", ext)), figura, width = 18, height = 15 * length(motivos), units = "in", limitsize = FALSE)
   }
