@@ -52,10 +52,10 @@ más decks con el tiempo). Cada una corresponde 1:1 a un archivo local
 >    **No escribas en `notas` el historial de numeración** (nada del
 >    estilo "Resync <fecha>: pasó de R2.7 a R2.8"): el cambio de número
 >    queda en el commit y en el resumen del paso 9, no en el CSV.
->    Sí actualizá, si cambiaron en el slide, `leyenda_lista` (`si` /
->    `no` / `desactualizada`, según si el slide tiene leyenda y si
->    coincide con la figura actual) y `archivos` (nombres de los
+>    Sí actualizá, si cambiaron en el slide, `archivos` (nombres de los
 >    archivos de imagen de la figura, sin path, separados por `; `).
+>    No toques `leyenda_lista` ni reportes el estado de las leyendas:
+>    eso lo maneja la rutina `sync-tesis-md` (`docs/rutina_sync_tesis.md`).
 > 6. Corré `Rscript R/maintenance/sync_figure_folders.R` para renombrar
 >    las carpetas de `figures/` según el CSV actualizado. Confirmá el
 >    resultado (qué se renombró, qué quedó igual).
