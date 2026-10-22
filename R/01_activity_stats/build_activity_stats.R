@@ -7,7 +7,8 @@
 # (cgi_actividad, tata_actividad, ccaat_gcbox_actividad).
 # Run from the TesisDoc repo root. Output: data/processed/data_long.tsv,
 # data/processed/activity_stats_full.tsv, data/processed/activity_stats.tsv
-# (post sum_counts>=100 filter only - NOT the bimodal/consistency filters,
+# (post minimum-counts filter only: sum_counts>=100 and sum_norm_counts>1000
+# - NOT the bimodal/consistency filters,
 # those are figure-specific and applied in R/05_correccion_sesgo and
 # R/13_filtros).
 
@@ -89,8 +90,10 @@ stats <- data_long %>%
 write_tsv(stats, "data/processed/activity_stats_full.tsv")
 message("Wrote data/processed/activity_stats_full.tsv with ", nrow(stats), " rows")
 
-# minimum-counts filter
-stats_filt <- stats %>% filter(sum_counts >= 100)
+# minimum-counts filter, per replicate: >=100 raw reads and >1000 normalized
+# counts (the latter as in transcriptional_library/Analysis/scripts/
+# activity_analysis.qmd and noise_analysis.qmd)
+stats_filt <- stats %>% filter(sum_counts >= 100, sum_norm_counts > 1000)
 write_tsv(stats_filt, "data/processed/activity_stats.tsv")
 message("Wrote data/processed/activity_stats.tsv with ", nrow(stats_filt), " rows")
 
