@@ -4,9 +4,11 @@
 # representatividad_library_venn y filtros_consistencia_replicas.
 #
 # Uso: venn_library(a, b, library_ids, "Réplica 1", "Réplica 2") devuelve
-# un ggplot; guardarlo con ggsave(..., width = 4.3, height = 4.3).
+# un ggplot; guardarlo con ggsave(..., width = 4.3, height = 4.3). text_scale
+# agranda los rotulos si se usa a mayor tamano (ej. dentro de una figura
+# compuesta).
 
-venn_library <- function(a, b, library_ids, label_a, label_b, label_library = "Library") {
+venn_library <- function(a, b, library_ids, label_a, label_b, label_library = "Library", text_scale = 1) {
   fuera <- setdiff(union(a, b), library_ids)
   if (length(fuera) > 0) warning(length(fuera), " secuencias detectadas no estan en la library")
   n <- c(
@@ -49,7 +51,7 @@ venn_library <- function(a, b, library_ids, label_a, label_b, label_library = "L
     }) +
     # bordes en una capa aparte para que la transparencia no los atenue
     ggplot2::geom_path(data = circles, ggplot2::aes(x, y, group = id), colour = "grey15", linewidth = 0.4) +
-    ggplot2::geom_text(data = labels, ggplot2::aes(x, y, label = label, size = size), colour = "grey35", lineheight = 0.9) +
+    ggplot2::geom_text(data = labels, ggplot2::aes(x, y, label = label, size = size * text_scale), colour = "grey35", lineheight = 0.9) +
     ggplot2::scale_size_identity() +
     ggplot2::coord_equal(xlim = c(-1.02, 1.02), ylim = c(-1.02, 1.02), expand = FALSE) +
     ggplot2::theme_void()
