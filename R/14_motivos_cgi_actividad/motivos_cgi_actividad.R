@@ -1,12 +1,15 @@
-# cgi_actividad, tata_actividad, ccaat_gcbox_actividad y ccaat_gcbox_cgi (ver
+# cgi_actividad, cgi_composicion_deciles, tata_actividad, ccaat_gcbox_actividad
+# y ccaat_gcbox_cgi (ver
 # docs/mapping_figuras.csv para el numero de figura vigente)
 # Efecto de la presencia de islas CpG, TATA-box, CCAAT-box y GC-box sobre la
 # actividad media, agrupando promotores en bins de 100 segun su rank de
 # actividad. Una figura por motivo (CCAAT-box y GC-box juntos) - antes era
 # una sola figura (tata_cgi_actividad, 12 paneles). Las islas CpG se definen
-# por la composicion del fragmento (CGI_frag), y cgi_actividad suma paneles
-# con la razon CpG o/e y el contenido G+C como variables continuas
-# (cgi_oe_deciles.jpg, cgi_gc_deciles.jpg y cgi_composicion_deciles.jpg).
+# por la composicion del fragmento (CGI_frag). cgi_actividad junta scatter
+# (arriba) y violines por replica (abajo) en cgi_actividad.jpg/.pdf; la razon
+# CpG o/e y el contenido G+C como variables continuas van en su propia figura
+# (cgi_composicion_deciles: cgi_oe_deciles.jpg, cgi_gc_deciles.jpg y
+# cgi_composicion_deciles.jpg/.pdf).
 # Tablas de soporte del texto: tata_estratificado_cgi.tsv (tata_actividad),
 # ccaat_gcbox_estratificado_cgi.tsv, motivos_prevalencia_cgi.tsv y
 # ccaat_gcbox_combinacion.tsv (ccaat_gcbox_cgi, que grafica esas tres tablas:
@@ -24,6 +27,7 @@ library(patchwork)
 source("R/functions/fig_paths.R")
 
 out_dir_cgi <- fig_dir("cgi_actividad")
+out_dir_cgi_deciles <- fig_dir("cgi_composicion_deciles")
 out_dir_tata <- fig_dir("tata_actividad")
 out_dir_ccaat_gcbox <- fig_dir("ccaat_gcbox_actividad")
 out_dir_ccaat_gcbox_cgi <- fig_dir("ccaat_gcbox_cgi")
@@ -72,17 +76,23 @@ motif_scatter <- function(data, motif, y_label, title) {
     ggtitle(title)
 }
 
+# Solo el p-valor en el grafico (test de Wilcoxon; el nombre del test va en
+# la leyenda de la figura). Mismo tamano de texto que motif_scatter.
 violin_by_motif <- function(data, rep_id, motif, fill_label) {
-  p <- ggviolin(data %>% filter(rep == rep_id),
+  d <- data %>% filter(rep == rep_id)
+  p_val <- wilcox.test(d$mean[d[[motif]]], d$mean[!d[[motif]]])$p.value
+  p_fmt <- format.pval(p_val, digits = 2)
+  p_label <- if (startsWith(p_fmt, "<")) paste("p <", trimws(sub("<", "", p_fmt, fixed = TRUE))) else paste("p =", p_fmt)
+  p <- ggviolin(d,
     x = motif, y = "mean", fill = motif, draw_quantiles = 0.5,
     add = "median_q1q3", palette = c("#14AFB2", "#216869"), alpha = 0.7
   )
-  p + stat_compare_means() +
+  p + annotate("text", x = 1.5, y = 6.8, label = p_label, size = 10) +
     theme_pubclean() +
     scale_x_discrete(labels = presence_labels) +
     labs(fill = fill_label, x = NULL, y = "Actividad media") +
-    theme(legend.position = "none", axis.ticks.x = element_blank(), text = element_text(size = 40)) +
-    ylim(c(0.5, 6.2))
+    theme(legend.position = "none", axis.ticks.x = element_blank(), text = element_text(size = 30)) +
+    ylim(c(0.5, 7))
 }
 
 # --- TATA-box ---------------------------------------------------------
@@ -100,8 +110,21 @@ ggsave(file.path(out_dir_tata, "tata_violin_rep2.jpg"), violin_by_motif(data, "R
 panel_cgi_scatter <- motif_scatter(data, "CGI_frag", "Proporción de promotores\ncon islas CpG", "Isla CpG")
 ggsave(file.path(out_dir_cgi, "cgi_scatter.jpg"), panel_cgi_scatter, width = 12, height = 6.75, units = "in")
 
-ggsave(file.path(out_dir_cgi, "cgi_violin_rep1.jpg"), violin_by_motif(data, "Rep 1", "CGI_frag", "Isla CpG"), width = 9, height = 6.75, units = "in")
-ggsave(file.path(out_dir_cgi, "cgi_violin_rep2.jpg"), violin_by_motif(data, "Rep 2", "CGI_frag", "Isla CpG"), width = 9, height = 6.75, units = "in")
+panel_cgi_violin_rep1 <- violin_by_motif(data, "Rep 1", "CGI_frag", "Isla CpG")
+panel_cgi_violin_rep2 <- violin_by_motif(data, "Rep 2", "CGI_frag", "Isla CpG")
+ggsave(file.path(out_dir_cgi, "cgi_violin_rep1.jpg"), panel_cgi_violin_rep1, width = 9, height = 6.75, units = "in")
+ggsave(file.path(out_dir_cgi, "cgi_violin_rep2.jpg"), panel_cgi_violin_rep2, width = 9, height = 6.75, units = "in")
+
+# Figura completa: scatter (A) arriba y los dos violines juntos (B) abajo,
+# cada uno debajo de su replica.
+figura_cgi <- panel_cgi_scatter /
+  wrap_elements(full = panel_cgi_violin_rep1 + panel_cgi_violin_rep2 +
+    theme(axis.title.y = element_blank())) +
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(size = 40, face = "bold"))
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir_cgi, paste0("cgi_actividad.", ext)), figura_cgi, width = 18, height = 15, units = "in")
+}
 
 # Composicion del fragmento como variable continua: percentil de actividad
 # media (dentro de cada replica) por decil de la razon CpG o/e (cpg_oe,
@@ -148,9 +171,11 @@ panel_comp_deciles <- function(dec, var, umbral, titulo, xlab) {
 }
 panel_cgi_oe_deciles <- panel_comp_deciles(dec_oe, "cpg_oe", 0.6, "Razón CpG observado/esperado", "Razón CpG o/e del fragmento (mediana del decil)")
 panel_cgi_gc_deciles <- panel_comp_deciles(dec_gc, "g_c", 0.5, "Contenido G+C", "Contenido G+C del fragmento (mediana del decil)")
-ggsave(file.path(out_dir_cgi, "cgi_oe_deciles.jpg"), panel_cgi_oe_deciles, width = 12, height = 6.75, units = "in")
-ggsave(file.path(out_dir_cgi, "cgi_gc_deciles.jpg"), panel_cgi_gc_deciles, width = 12, height = 6.75, units = "in")
-ggsave(file.path(out_dir_cgi, "cgi_composicion_deciles.jpg"), panel_cgi_oe_deciles / panel_cgi_gc_deciles, width = 12, height = 13.5, units = "in")
+ggsave(file.path(out_dir_cgi_deciles, "cgi_oe_deciles.jpg"), panel_cgi_oe_deciles, width = 12, height = 6.75, units = "in")
+ggsave(file.path(out_dir_cgi_deciles, "cgi_gc_deciles.jpg"), panel_cgi_gc_deciles, width = 12, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir_cgi_deciles, paste0("cgi_composicion_deciles.", ext)), panel_cgi_oe_deciles / panel_cgi_gc_deciles, width = 12, height = 13.5, units = "in")
+}
 
 # Correlaciones de Spearman de la actividad media con la razon CpG o/e y con
 # el contenido de G+C del fragmento, por replica: en todos los promotores y
