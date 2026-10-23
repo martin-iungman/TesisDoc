@@ -1,6 +1,5 @@
-# cgi_actividad, cgi_composicion_deciles, tata_actividad, ccaat_gcbox_actividad
-# y ccaat_gcbox_cgi (ver
-# docs/mapping_figuras.csv para el numero de figura vigente)
+# cgi_actividad, cgi_composicion_deciles, tata_actividad y ccaat_gcbox_actividad
+# (ver docs/mapping_figuras.csv para el numero de figura vigente)
 # Efecto de la presencia de islas CpG, TATA-box, CCAAT-box y GC-box sobre la
 # actividad media, agrupando promotores en bins de 100 segun su rank de
 # actividad. Una figura por motivo (CCAAT-box y GC-box juntos) - antes era
@@ -11,9 +10,11 @@
 # (cgi_composicion_deciles: cgi_oe_deciles.jpg, cgi_gc_deciles.jpg y
 # cgi_composicion_deciles.jpg/.pdf).
 # Tablas de soporte del texto: tata_estratificado_cgi.tsv (tata_actividad),
-# ccaat_gcbox_estratificado_cgi.tsv, motivos_prevalencia_cgi.tsv y
-# ccaat_gcbox_combinacion.tsv (ccaat_gcbox_cgi, que grafica esas tres tablas:
-# prevalencia, efecto con/sin isla CpG y combinaciones CCAAT-box x GC-box).
+# ccaat_gcbox_estratificado_cgi.tsv, motivos_prevalencia_cgi.tsv,
+# ccaat_gcbox_fisher_cgi.tsv y ccaat_gcbox_combinacion.tsv
+# (ccaat_gcbox_actividad, que ademas de scatter + violines por motivo grafica
+# prevalencia y efecto con/sin isla CpG; las combinaciones CCAAT-box x GC-box
+# quedan solo como tabla).
 # Ademas guarda cgi_correlaciones.tsv (Spearman de la actividad con cpg_oe y
 # g_c, en total y dentro de cada grupo de CGI_frag, por replica).
 #
@@ -30,7 +31,6 @@ out_dir_cgi <- fig_dir("cgi_actividad")
 out_dir_cgi_deciles <- fig_dir("cgi_composicion_deciles")
 out_dir_tata <- fig_dir("tata_actividad")
 out_dir_ccaat_gcbox <- fig_dir("ccaat_gcbox_actividad")
-out_dir_ccaat_gcbox_cgi <- fig_dir("ccaat_gcbox_cgi")
 
 stats_highconf <- read_tsv("data/processed/activity_stats_highconf.tsv", show_col_types = FALSE)
 prom_df <- read_tsv("data/processed/prom_df.tsv", show_col_types = FALSE) %>% filter(type == "promoter")
@@ -59,6 +59,13 @@ data <- data %>%
   bind_rows()
 
 presence_labels <- c("FALSE" = "Ausencia", "TRUE" = "Presencia")
+
+# Guarda un panel suelto en .jpg y .pdf.
+save_panel <- function(p, dir, name, width, height) {
+  for (ext in c("jpg", "pdf")) {
+    ggsave(file.path(dir, paste0(name, ".", ext)), p, width = width, height = height, units = "in")
+  }
+}
 
 motif_scatter <- function(data, motif, y_label, title) {
   data %>%
@@ -229,29 +236,22 @@ print(cgi_cor, n = Inf)
 # --- CCAAT-box ------------------------------------------------------------
 
 panel_ccaat_scatter <- motif_scatter(data, "CCAAT_EPD", "Proporción de promotores\ncon CCAAT-box", "CCAAT-box")
-ggsave(file.path(out_dir_ccaat_gcbox, "ccaat_scatter.jpg"), panel_ccaat_scatter, width = 12, height = 6.75, units = "in")
+save_panel(panel_ccaat_scatter, out_dir_ccaat_gcbox, "ccaat_scatter", 12, 6.75)
 
 panel_ccaat_violin_rep1 <- violin_by_motif(data, "Rep 1", "CCAAT_EPD", "CCAAT-box")
 panel_ccaat_violin_rep2 <- violin_by_motif(data, "Rep 2", "CCAAT_EPD", "CCAAT-box")
-ggsave(file.path(out_dir_ccaat_gcbox, "ccaat_violin_rep1.jpg"), panel_ccaat_violin_rep1, width = 9, height = 6.75, units = "in")
-ggsave(file.path(out_dir_ccaat_gcbox, "ccaat_violin_rep2.jpg"), panel_ccaat_violin_rep2, width = 9, height = 6.75, units = "in")
+save_panel(panel_ccaat_violin_rep1, out_dir_ccaat_gcbox, "ccaat_violin_rep1", 9, 6.75)
+save_panel(panel_ccaat_violin_rep2, out_dir_ccaat_gcbox, "ccaat_violin_rep2", 9, 6.75)
 
 # --- GC-box ---------------------------------------------------------------
 
 panel_gcbox_scatter <- motif_scatter(data, "GCbox_EPD", "Proporción de promotores\ncon GC-box", "GC-box")
-ggsave(file.path(out_dir_ccaat_gcbox, "gcbox_scatter.jpg"), panel_gcbox_scatter, width = 12, height = 6.75, units = "in")
+save_panel(panel_gcbox_scatter, out_dir_ccaat_gcbox, "gcbox_scatter", 12, 6.75)
 
 panel_gcbox_violin_rep1 <- violin_by_motif(data, "Rep 1", "GCbox_EPD", "GC-box")
 panel_gcbox_violin_rep2 <- violin_by_motif(data, "Rep 2", "GCbox_EPD", "GC-box")
-ggsave(file.path(out_dir_ccaat_gcbox, "gcbox_violin_rep1.jpg"), panel_gcbox_violin_rep1, width = 9, height = 6.75, units = "in")
-ggsave(file.path(out_dir_ccaat_gcbox, "gcbox_violin_rep2.jpg"), panel_gcbox_violin_rep2, width = 9, height = 6.75, units = "in")
-
-# Figura completa: CCAAT-box (A) arriba y GC-box (B) abajo, cada uno con su
-# scatter y sus violines
-figura_motivos(list(
-  list(scatter = panel_ccaat_scatter, violin_rep1 = panel_ccaat_violin_rep1, violin_rep2 = panel_ccaat_violin_rep2),
-  list(scatter = panel_gcbox_scatter, violin_rep1 = panel_gcbox_violin_rep1, violin_rep2 = panel_gcbox_violin_rep2)
-), out_dir_ccaat_gcbox, "ccaat_gcbox_actividad")
+save_panel(panel_gcbox_violin_rep1, out_dir_ccaat_gcbox, "gcbox_violin_rep1", 9, 6.75)
+save_panel(panel_gcbox_violin_rep2, out_dir_ccaat_gcbox, "gcbox_violin_rep2", 9, 6.75)
 
 # --- Tablas de soporte para el texto de Resultados -------------------------
 # Efecto (Wilcoxon + estimador de Hodges-Lehmann con IC 95%) de TATA-box,
@@ -315,18 +315,28 @@ ccaat_gcbox_combinacion <- bind_rows(
 )
 
 write_tsv(filter(motivos_estratificado_cgi, motivo == "TATA-box"), file.path(out_dir_tata, "tata_estratificado_cgi.tsv"))
-write_tsv(filter(motivos_estratificado_cgi, motivo != "TATA-box"), file.path(out_dir_ccaat_gcbox_cgi, "ccaat_gcbox_estratificado_cgi.tsv"))
-write_tsv(motivos_prevalencia_cgi, file.path(out_dir_ccaat_gcbox_cgi, "motivos_prevalencia_cgi.tsv"))
-write_tsv(ccaat_gcbox_combinacion, file.path(out_dir_ccaat_gcbox_cgi, "ccaat_gcbox_combinacion.tsv"))
+# asociacion de cada motivo con la isla CpG en la library completa (misma
+# base que motivos_prevalencia_cgi): test exacto de Fisher, OR con IC 95%
+motivos_fisher_cgi <- imap(motif_cols, function(col, motivo) {
+  d <- prom_df %>% filter(!is.na(CGI_frag))
+  ft <- fisher.test(table(d[[col]], d$CGI_frag))
+  tibble(motivo = motivo, OR = unname(ft$estimate), IC_inf = ft$conf.int[1], IC_sup = ft$conf.int[2], pval = ft$p.value)
+}) %>% list_rbind()
+
+write_tsv(filter(motivos_estratificado_cgi, motivo != "TATA-box"), file.path(out_dir_ccaat_gcbox, "ccaat_gcbox_estratificado_cgi.tsv"))
+write_tsv(motivos_prevalencia_cgi, file.path(out_dir_ccaat_gcbox, "motivos_prevalencia_cgi.tsv"))
+write_tsv(filter(motivos_fisher_cgi, motivo != "TATA-box"), file.path(out_dir_ccaat_gcbox, "ccaat_gcbox_fisher_cgi.tsv"))
+write_tsv(ccaat_gcbox_combinacion, file.path(out_dir_ccaat_gcbox, "ccaat_gcbox_combinacion.tsv"))
 print(motivos_estratificado_cgi, n = Inf)
 print(motivos_prevalencia_cgi)
+print(motivos_fisher_cgi)
 print(ccaat_gcbox_combinacion)
 
-# --- Figura ccaat_gcbox_cgi (a partir de las tablas de arriba) ----------------
+# --- Paneles de isla CpG de ccaat_gcbox_actividad (a partir de las tablas) ---
 
 col_grupo <- c("Todos" = "grey55", "Con isla CpG" = "#216869", "Sin isla CpG" = "#14AFB2")
 th_efecto <- theme_pubclean() +
-  theme(text = element_text(size = 24), strip.text = element_text(face = "bold"), legend.position = "top", panel.spacing = unit(2, "lines"))
+  theme(text = element_text(size = 30), strip.text = element_text(face = "bold"), legend.position = "top", panel.spacing = unit(2, "lines"))
 lab_hl <- "Diferencia de actividad media (HL, IC 95%)"
 
 # prevalencia de CCAAT-box y GC-box segun isla CpG (library completa)
@@ -342,7 +352,7 @@ panel_prevalencia <- motivos_prevalencia_cgi %>%
   theme(text = element_text(size = 30), legend.position = "top") +
   labs(x = NULL, y = "% de promotores\ncon el motivo", fill = NULL) +
   ggtitle("Prevalencia según isla CpG")
-ggsave(file.path(out_dir_ccaat_gcbox_cgi, "ccaat_gcbox_prevalencia_cgi.jpg"), panel_prevalencia, width = 12, height = 6.75, units = "in")
+save_panel(panel_prevalencia, out_dir_ccaat_gcbox, "ccaat_gcbox_prevalencia_cgi", 12, 8)
 
 # efecto de cada motivo en todos / con / sin isla CpG, por replica
 efecto_cgi <- motivos_estratificado_cgi %>%
@@ -352,7 +362,7 @@ panel_efecto_cgi <- ggplot(efecto_cgi, aes(HL, grupo, color = grupo)) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
   geom_linerange(aes(xmin = IC_inf, xmax = IC_sup), linewidth = 1.2) +
   geom_point(size = 3.5) +
-  geom_text(aes(x = Inf, label = paste0("n = ", n_motivo)), hjust = 1.05, vjust = -0.6, size = 6, color = "grey30") +
+  geom_text(aes(x = Inf, label = paste0("n = ", n_motivo)), hjust = 1.05, vjust = -0.6, size = 8, color = "grey30") +
   scale_color_manual(values = col_grupo, breaks = names(col_grupo)) +
   scale_x_continuous(expand = expansion(mult = c(0.05, 0.3))) +
   facet_grid(motivo ~ rep, switch = "y") +
@@ -360,30 +370,29 @@ panel_efecto_cgi <- ggplot(efecto_cgi, aes(HL, grupo, color = grupo)) +
   theme(strip.placement = "outside") +
   labs(x = lab_hl, y = NULL, color = NULL) +
   ggtitle("Efecto según isla CpG")
-ggsave(file.path(out_dir_ccaat_gcbox_cgi, "ccaat_gcbox_efecto_cgi.jpg"), panel_efecto_cgi, width = 14, height = 8, units = "in")
+save_panel(panel_efecto_cgi, out_dir_ccaat_gcbox, "ccaat_gcbox_efecto_cgi", 16, 10)
 
-# combinaciones vs. ninguno; rombo vacio = suma solo CCAAT + solo GC-box
-# (referencia de aditividad) junto a "Ambos"
-combinacion_plot <- ccaat_gcbox_combinacion %>%
-  mutate(
-    grupo = factor(grupo, levels = c("Todos", "Con isla CpG"), labels = c("Todos los promotores", "Con isla CpG")),
-    combinacion = factor(combinacion, levels = rev(c("Solo CCAAT-box", "Solo GC-box", "Ambos")))
-  )
-combinacion_suma <- combinacion_plot %>%
-  group_by(rep, grupo) %>%
-  summarise(suma = sum(HL[combinacion %in% c("Solo CCAAT-box", "Solo GC-box")]), .groups = "drop") %>%
-  mutate(combinacion = factor("Ambos", levels = levels(combinacion_plot$combinacion)))
-panel_combinacion <- ggplot(combinacion_plot, aes(HL, combinacion)) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-  geom_linerange(aes(xmin = IC_inf, xmax = IC_sup), linewidth = 1.2, color = "#216869") +
-  geom_point(size = 3.5, color = "#216869") +
-  geom_point(data = combinacion_suma, aes(suma, combinacion, shape = "Suma solo CCAAT-box + solo GC-box"),
-    position = position_nudge(y = 0.25), size = 4.5, stroke = 1.5, color = "#14AFB2") +
-  scale_shape_manual(values = 5) +
-  facet_grid(rep ~ grupo) +
-  th_efecto +
-  labs(x = paste0(lab_hl, "\nvs. ningún motivo"), y = NULL, shape = NULL) +
-  ggtitle("Combinaciones de CCAAT-box y GC-box")
-ggsave(file.path(out_dir_ccaat_gcbox_cgi, "ccaat_gcbox_combinacion.jpg"), panel_combinacion, width = 14, height = 8, units = "in")
+# --- Figura completa ccaat_gcbox_actividad -----------------------------------
+# Grilla 2x2: arriba A: CCAAT-box y B: GC-box (scatter + sus dos violines =
+# una sola letra cada uno, como en figura_motivos); abajo C: prevalencia
+# segun isla CpG y D: efecto segun isla CpG. Las combinaciones CCAAT-box x
+# GC-box quedan solo como tabla (ccaat_gcbox_combinacion.tsv).
+# violines mas bajos que el scatter; abajo C angosta (2 barras por motivo) y
+# D ancha (facetas motivo x replica).
+bloque_motivo <- function(scatter, v1, v2) {
+  wrap_elements(full = scatter / wrap_elements(full = v1 + v2 + theme(axis.title.y = element_blank())) +
+    plot_layout(heights = c(1, 0.65)))
+}
+figura_ccaat_gcbox <- wrap_plots(
+  A = bloque_motivo(panel_ccaat_scatter, panel_ccaat_violin_rep1, panel_ccaat_violin_rep2),
+  B = bloque_motivo(panel_gcbox_scatter, panel_gcbox_violin_rep1, panel_gcbox_violin_rep2),
+  C = wrap_elements(full = panel_prevalencia),
+  D = wrap_elements(full = panel_efecto_cgi),
+  design = "AAABBB\nCCDDDD", heights = c(13, 11)
+) + plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(size = 40, face = "bold"))
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir_ccaat_gcbox, paste0("ccaat_gcbox_actividad.", ext)), figura_ccaat_gcbox, width = 34, height = 24, units = "in")
+}
 
-message("Figuras guardadas en ", paste(c(out_dir_cgi, out_dir_tata, out_dir_ccaat_gcbox, out_dir_ccaat_gcbox_cgi), collapse = ", "))
+message("Figuras guardadas en ", paste(c(out_dir_cgi, out_dir_tata, out_dir_ccaat_gcbox), collapse = ", "))
