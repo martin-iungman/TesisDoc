@@ -69,9 +69,11 @@
 #   secuencia_r2.tsv            R2 del modelo solo secuencia y VIF maximo
 #   secuencia_crudo_vs_ajustado.jpg
 # Ademas guarda el panel B de la figura de tesis summary_features_endogeno
-# (fig_dir("summary_features_endogeno"), summary_endo_ajustado_secuencia.jpg):
-# crudo vs. ajustado por secuencia, sin el ajustado completo. El panel A
-# (summary_endo.jpg) lo genera R/15_summary_features/summary_features.R.
+# (fig_dir("summary_features_endogeno"), summary_endo_ajustado_secuencia.jpg/.pdf):
+# crudo vs. ajustado por secuencia, sin el ajustado completo, y arma la
+# figura completa summary_features_endogeno.jpg/.pdf (A + B). El panel A
+# (summary_endo) lo genera R/15_summary_features/summary_features.R, que
+# hay que correr antes (deja data/processed/panel_summary_endo.rds).
 #   cpg_oe_distribucion.tsv, cpg_oe_distribucion.jpg
 #
 # Requiere: data/processed/activity_stats_highconf.tsv y
@@ -80,6 +82,7 @@
 library(tidyverse)
 library(ggpubr)
 library(fastDummies)
+library(patchwork)
 source("R/functions/plot_helpers.R")
 source("R/functions/fig_paths.R")
 
@@ -440,11 +443,26 @@ panel_b <- efectos_seq %>%
   scale_y_continuous(breaks = seq_along(orden_seq), labels = orden_seq, expand = expansion(add = 0.5)) +
   scale_colour_manual(values = colores_b, breaks = niveles_b) +
   scale_fill_manual(values = c(colores_b, "no" = "white"), guide = "none") +
-  theme_pubr(base_size = 18) +
+  theme_pubr(base_size = 20) +
   theme(legend.position = "top", panel.grid.major.y = element_line(colour = "#eeeeee"), strip.background = element_blank()) +
   labs(x = "Efecto sobre el percentil de actividad", y = NULL, colour = NULL)
 
-ggsave(file.path(fig_dir("summary_features_endogeno"), "summary_endo_ajustado_secuencia.jpg"), panel_b, width = 13.5, height = 8, units = "in", dpi = 300)
+dir_endo <- fig_dir("summary_features_endogeno")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(dir_endo, paste0("summary_endo_ajustado_secuencia.", ext)), panel_b, width = 13.5, height = 8, units = "in", dpi = 300)
+}
+
+# Figura completa de summary_features_endogeno: A = summary_endo (lo genera
+# R/15_summary_features/summary_features.R y lo deja en
+# data/processed/panel_summary_endo.rds; correr ese script antes), B = panel_b.
+panel_a <- readRDS("data/processed/panel_summary_endo.rds")
+figura_endo <- wrap_elements(full = panel_a) / wrap_elements(full = panel_b) +
+  plot_layout(heights = c(6.75, 8)) +
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(size = 30, face = "bold"))
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(dir_endo, paste0("summary_features_endogeno.", ext)), figura_endo, width = 13.5, height = 15.5, units = "in", dpi = 300)
+}
 
 print(as.data.frame(ajuste_seq$r2))
 print(as.data.frame(efectos_seq %>% select(rep, caracteristica, estimate_crudo, estimate_secuencia, IC2.5_secuencia, IC97.5_secuencia, pBH_secuencia, sobrevive_secuencia, delta_r2, estimate_completo) %>% mutate(across(where(is.double), ~ signif(.x, 3)))))

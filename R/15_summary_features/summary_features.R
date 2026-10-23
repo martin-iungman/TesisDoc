@@ -49,7 +49,7 @@ write_tsv(wilcox_df, "data/processed/activity_summary.tsv")
 
 # --- Graficos resumen: seq y endo ------------------------------------------
 
-plot_summary <- function(df, features) {
+plot_summary <- function(df, features, y_label) {
   df %>%
     filter(feature %in% features, pval_corr < 0.05) %>%
     mutate(act = ifelse(sign(estimate) == 1, "Actividad alta", "Actividad baja")) %>%
@@ -64,7 +64,7 @@ plot_summary <- function(df, features) {
     scale_alpha_manual(values = c("Rep 1" = 1, "Rep 2" = 0.7)) +
     theme_pubr() +
     theme(text = element_text(size = 20), legend.position = "top") +
-    labs(fill = "Efecto", x = "Efecto sobre la actividad", y = "Features", alpha = "") +
+    labs(fill = "Efecto", x = "Efecto sobre la actividad", y = y_label, alpha = "") +
     geom_errorbarh(aes(xmax = P2.5, xmin = P97.5), position = position_dodge(1), height = 0.05, col = "#777777", linewidth = 1.5) +
     # -0.35: el IC de "Tracto poli(dA:dT) proximal" llega a -0.30 (Rep 2)
     xlim(c(-0.35, 0.55)) +
@@ -72,10 +72,19 @@ plot_summary <- function(df, features) {
     guides(alpha = "none")
 }
 
-panel_seq <- plot_summary(wilcox_df, vbles_split[[1]])
-ggsave(file.path(out_dir_seq, "summary_seq.jpg"), panel_seq, width = 13.5, height = 6.75, units = "in")
+save_jpg_pdf <- function(plot, dir, name, width, height) {
+  for (ext in c("jpg", "pdf")) {
+    ggsave(file.path(dir, paste0(name, ".", ext)), plot, width = width, height = height, units = "in")
+  }
+}
 
-panel_endo <- plot_summary(wilcox_df, vbles_split[[2]])
-ggsave(file.path(out_dir_endo, "summary_endo.jpg"), panel_endo, width = 13.5, height = 6.75, units = "in")
+panel_seq <- plot_summary(wilcox_df, vbles_split[[1]], "Elementos del promotor")
+save_jpg_pdf(panel_seq, out_dir_seq, "summary_seq", 13.5, 6.75)
+
+panel_endo <- plot_summary(wilcox_df, vbles_split[[2]], "Características del promotor")
+save_jpg_pdf(panel_endo, out_dir_endo, "summary_endo", 13.5, 6.75)
+# el panel A de summary_features_endogeno se guarda como objeto para que
+# R/40_contexto_ajustado/contexto_ajustado.R arme la figura completa (A + B)
+saveRDS(panel_endo, "data/processed/panel_summary_endo.rds")
 
 message("Figuras guardadas en ", out_dir_seq, " y ", out_dir_endo)
