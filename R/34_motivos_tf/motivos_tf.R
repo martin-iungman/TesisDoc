@@ -24,9 +24,9 @@
 # TSS de EPD = 0 en la posicion 237 (TATA_TSS_POS en R/functions/tata_scan.R).
 #
 # Figura de la tesis motivos_de_novo (numero vigente en docs/mapping_figuras.csv),
-# escrita via fig_dir(): kmeros_efecto_vs_cpg.jpg, kmeros_volcano_motivos.jpg,
-# ebox_zeb_scatter_cgi.jpg y kmeros_destacados.jpg (+ su tabla), en ese
-# orden. Todo lo demas (graficos y tablas)
+# escrita via fig_dir(): kmeros_efecto_vs_cpg, kmeros_volcano_motivos y
+# ebox_zeb_scatter_cgi (.jpg y .pdf), en ese orden, y la figura completa
+# motivos_de_novo.jpg/.pdf. kmeros_destacados es exploratorio. Todo lo demas (graficos y tablas)
 # es exploratorio y va a figures/exploratorio_motivos_tf/. Los calculos
 # costosos se cachean en data/processed/.
 # Requiere: data/processed/activity_stats_highconf.tsv, prom_df.tsv,
@@ -55,7 +55,8 @@ dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 path_fa <- "../promoter_MPRA/Library_data/data/promoters_wo_dupl_SpikeIns.fa"
 path_jaspar <- "data/external/JASPAR/JASPAR2024_CORE_vertebrates_non-redundant_pfms_jaspar.txt"
 cache_hits <- "data/processed/motivos_tf_jaspar_hits_v1.rds"
-cache_kmeros <- "data/processed/motivos_tf_kmeros_hl_v1.rds"
+# v2: recalculado con el filtro de >1000 cuentas normalizadas por replica
+cache_kmeros <- "data/processed/motivos_tf_kmeros_hl_v2.rds"
 
 TSS_POS <- TATA_TSS_POS
 REL_SCORE <- 0.85
@@ -92,6 +93,10 @@ th <- theme_pubclean(base_size = 13) +
   theme(strip.text = element_text(face = "bold"), legend.position = "top")
 minus <- function(x) sub("^-", "−", format(x, trim = TRUE))
 save_tsv <- function(x, name) write_tsv(x, file.path(out_dir, name))
+# paneles de la figura de la tesis: .jpg y .pdf
+save_fig <- function(p, dir, name, width, height) {
+  for (ext in c("jpg", "pdf")) ggsave(file.path(dir, paste0(name, ".", ext)), p, width = width, height = height, units = "in")
+}
 sig_lab <- function(p_adj) factor(if_else(!is.na(p_adj) & p_adj < 0.05, "BH < 0,05", "n.s."), c("BH < 0,05", "n.s."))
 
 forest <- function(res, y, color, valores_color, x_lab, facets = . ~ rep, dodge = 0.7) {
@@ -579,7 +584,7 @@ p_volc_m <- ggplot(volc_m, aes(estimate, -log10(p_adj))) +
   geom_vline(xintercept = 0, colour = "grey60") +
   geom_point(data = ~ filter(.x, familia == "Otro"), colour = "grey75", size = 0.7, alpha = 0.4) +
   geom_point(data = ~ filter(.x, familia != "Otro"), aes(colour = familia), size = 1.8, alpha = 0.9) +
-  ggrepel::geom_text_repel(data = rotulos_m, aes(label = kmero, colour = familia), size = 3.8, fontface = "bold",
+  ggrepel::geom_text_repel(data = rotulos_m, aes(label = kmero, colour = familia), size = 4.6, fontface = "bold",
     show.legend = FALSE, min.segment.length = 0, max.overlaps = Inf, box.padding = 0.4, seed = 1) +
   scale_colour_manual(values = col_familia, breaks = setdiff(names(col_familia), "Otro"), drop = FALSE, name = NULL) +
   guides(colour = guide_legend(override.aes = list(size = 3, alpha = 1))) +
@@ -593,7 +598,7 @@ p_volc_m <- ggplot(volc_m, aes(estimate, -log10(p_adj))) +
       "Rótulos: 6-meros consistentes en ambas réplicas (BH < 0,05, mismo signo) de alguna familia, más los 5 de mayor efecto de cada signo sin familia."
     )
   )
-ggsave(file.path(dir_novo, "kmeros_volcano_motivos.jpg"), p_volc_m, width = 14, height = 11, units = "in")
+save_fig(p_volc_m, dir_novo, "kmeros_volcano_motivos", 14, 11)
 
 # Grafico de puntos con IC de 6-meros destacados (consistentes en ambas
 # replicas con isla CpG, dos o tres por familia), con el HL de cada replica
@@ -625,7 +630,7 @@ destacados_k <- kmeros_efecto %>%
 stopifnot(n_distinct(destacados_k$kmero) == nrow(SELECCION_K))
 write_tsv(
   destacados_k %>% select(familia, kmero, rc, rep, grupo, n, n_ref, estimate, conf.low, conf.high, p, p_adj) %>% arrange(familia, kmero, grupo, rep),
-  file.path(dir_novo, "kmeros_destacados.tsv")
+  file.path(out_dir, "kmeros_destacados.tsv")
 )
 p_dest <- ggplot(destacados_k, aes(estimate, etiqueta, colour = rep, group = rep)) +
   geom_vline(xintercept = 0, linetype = "dashed", colour = "grey50") +
@@ -640,7 +645,8 @@ p_dest <- ggplot(destacados_k, aes(estimate, etiqueta, colour = rep, group = rep
     x = "Diferencia de actividad media con vs. sin el 6-mero\n(Hodges-Lehmann, IC 95%)", y = NULL,
     caption = "6-meros consistentes en ambas réplicas con isla CpG (BH < 0,05, mismo signo), dos o tres por familia. Rótulo: 6-mero / complemento reverso."
   )
-ggsave(file.path(dir_novo, "kmeros_destacados.jpg"), p_dest, width = 12, height = 11, units = "in")
+# exploratorio: grafico suelto, no forma parte de la figura de la tesis
+ggsave(file.path(out_dir, "kmeros_destacados.jpg"), p_dest, width = 12, height = 11, units = "in")
 
 conc <- kmeros_efecto %>%
   select(grupo, kmero, n_cpg, rep, estimate) %>%
@@ -698,7 +704,7 @@ p_cpg <- ggplot(hl_medio_k, aes(cpg, hl_medio)) +
     x = "CpG en el 6-mero", y = "Diferencia de actividad media con vs. sin el 6-mero\n(HL, media de las dos réplicas)",
     caption = "Un punto por 6-mero canónico. R²: variancia del efecto explicada por el número de CpG y el contenido de G+C del 6-mero."
   )
-ggsave(file.path(dir_novo, "kmeros_efecto_vs_cpg.jpg"), p_cpg, width = 13, height = 5.5, units = "in")
+save_fig(p_cpg, dir_novo, "kmeros_efecto_vs_cpg", 13, 5.5)
 
 # =============================================================================
 # Graficos con el formato de R2.2 (tata_actividad): YY1 y E-box tipo ZEB/SNAI
@@ -772,10 +778,13 @@ for (u in names(universos_r22)) {
   for (i in seq_len(nrow(motivos_r22))) {
     m <- motivos_r22[i, ]
     # el scatter de la E-box con isla CpG es el panel C de motivos_de_novo
-    dir_scatter <- if (m$archivo == "ebox_zeb" && u == "cgi") dir_novo else out_dir
-    ggsave(file.path(dir_scatter, paste0(m$archivo, "_scatter_", u, ".jpg")),
-      motif_scatter(d, m$col, m$y_lab, paste0(m$titulo, universos_r22[[u]]$sufijo)),
-      width = 12, height = 6.75, units = "in")
+    p_sc <- motif_scatter(d, m$col, m$y_lab, paste0(m$titulo, universos_r22[[u]]$sufijo))
+    if (m$archivo == "ebox_zeb" && u == "cgi") {
+      p_ebox_cgi <- p_sc
+      save_fig(p_sc, dir_novo, paste0(m$archivo, "_scatter_", u), 12, 6.75)
+    } else {
+      ggsave(file.path(out_dir, paste0(m$archivo, "_scatter_", u, ".jpg")), p_sc, width = 12, height = 6.75, units = "in")
+    }
     for (r in c("Rep 1", "Rep 2")) {
       ggsave(file.path(out_dir, paste0(m$archivo, "_violin_", str_remove(tolower(r), " "), "_", u, ".jpg")),
         violin_by_motif(d, r, m$col, m$titulo), width = 9, height = 6.75, units = "in")
@@ -792,3 +801,26 @@ save_tsv(
   })),
   "yy1_ebox_zeb_prevalencia.tsv"
 )
+
+# =============================================================================
+# Figura completa motivos_de_novo
+# =============================================================================
+# A: efecto segun CpG del 6-mero (ancho completo); B: volcano con / sin isla
+# CpG, a todo el ancho y alto para que se lean los rotulos; abajo C: E-box
+# ZEB/SNAI por bin de actividad (con isla CpG). Los 6-meros destacados
+# (kmeros_destacados) quedan como grafico exploratorio aparte. El
+# scatter de C se rearma con el mismo tamano de texto que el resto (en su
+# archivo suelto queda con el formato de tata_actividad).
+th_fig <- theme(text = element_text(size = 15), plot.caption = element_text(size = 11))
+fig_novo <- wrap_plots(
+  A = p_cpg + th_fig,
+  B = p_volc_m + th_fig + theme(legend.text = element_text(size = 15)),
+  C = p_ebox_cgi + theme(text = element_text(size = 15), panel.spacing = unit(1.5, "lines"), plot.title = element_text(size = 15)),
+  design = "AAAA
+BBBB
+CC##", heights = c(5.5, 12, 6.5)
+) + plot_annotation(tag_levels = "A") & theme(plot.tag = element_text(size = 24, face = "bold"))
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(dir_novo, paste0("motivos_de_novo.", ext)), fig_novo, width = 16, height = 24.5, units = "in")
+}
+message("Figura motivos_de_novo guardada en ", dir_novo)

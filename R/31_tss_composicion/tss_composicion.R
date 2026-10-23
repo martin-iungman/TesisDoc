@@ -250,7 +250,9 @@ panel_modelo <- modelo %>%
   facet_grid(. ~ rep) +
   th +
   labs(x = "Coeficiente de la característica sobre el percentil de actividad\n(modelo lineal, IC 95%)", y = NULL)
-ggsave(file.path(dir_tss, "tss_modelo.jpg"), panel_modelo, width = 11, height = 6, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(dir_tss, paste0("tss_modelo.", ext)), panel_modelo, width = 11, height = 6, units = "in")
+}
 
 # =============================================================================
 # PUNTO 2 - perfil posicional
@@ -320,7 +322,8 @@ ventana_control <- "Control (−130 a −110)"
 # replica x grupo x posicion en un cluster local y el resultado crudo (sin
 # BH) se guarda en data/processed/ para retocar graficos sin recalcular.
 # Borrar el .rds para forzar el recalculo.
-cache_perfiles <- "data/processed/tss_composicion_perfiles_v1.rds"
+# v2: recalculado con el filtro de >1000 cuentas normalizadas por replica
+cache_perfiles <- "data/processed/tss_composicion_perfiles_v2.rds"
 if (file.exists(cache_perfiles)) {
   crudo <- readRDS(cache_perfiles)
 } else {
@@ -448,7 +451,9 @@ ggsave(file.path(out_dir, "tss_perfil_YR.jpg"), p_yr_tss, width = 12, height = 9
 p_yr_tss_todos <- perfil_yr %>%
   filter(ventana == ventana_tss, grupo == "Todos") %>%
   lineas_pos("Posición p respecto del TSS (TSS = 0; punteadas en −1 y 0)", marcas = c(-1, 0), facets = . ~ rep, ylim = NULL)
-ggsave(file.path(dir_tss, "tss_perfil_YR_todos.jpg"), p_yr_tss_todos, width = 12, height = 4.5, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(dir_tss, paste0("tss_perfil_YR_todos.", ext)), p_yr_tss_todos, width = 12, height = 4.5, units = "in")
+}
 p_yr_ctl <- perfil_yr %>%
   filter(ventana == ventana_control) %>%
   lineas_pos("Posición p respecto del TSS (ventana control; misma escala que el TSS)")
@@ -855,7 +860,8 @@ ggsave(file.path(out_dir, "tss_perfil_efectos_promotor_cgi.jpg"),
 # -236 a +15, por replica x grupo de isla CpG; BH dentro de replica x grupo.
 # Son ~6000 Wilcoxon con IC: se reparten en un cluster local y el resultado
 # crudo (sin BH) se cachea en data/processed/ (borrar el .rds para recalcular).
-cache_hl <- "data/processed/tss_composicion_perfil_hl_v1.rds"
+# v2: recalculado con el filtro de >1000 cuentas normalizadas por replica
+cache_hl <- "data/processed/tss_composicion_perfil_hl_v2.rds"
 if (file.exists(cache_hl)) {
   efectos_hl <- readRDS(cache_hl)
 } else {
@@ -890,8 +896,10 @@ efectos_hl <- efectos_hl %>%
 write_tsv(efectos_hl, file.path(dir_perfil_efectos, "tss_perfil_efectos_promotor_hl.tsv"))
 
 y_lab_hl <- "Diferencia de actividad media\ncon vs. sin la base (HL)"
-ggsave(file.path(dir_perfil_efectos, "tss_perfil_efectos_promotor_hl.jpg"),
-  perfil_efectos_plot(filter(efectos_hl, grupo == "Todos"), . ~ rep, y_lab_hl), width = 14, height = 8, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(dir_perfil_efectos, paste0("tss_perfil_efectos_promotor_hl.", ext)),
+    perfil_efectos_plot(filter(efectos_hl, grupo == "Todos"), . ~ rep, y_lab_hl), width = 14, height = 8, units = "in")
+}
 ggsave(file.path(out_dir, "tss_perfil_efectos_promotor_hl_cgi.jpg"),
   perfil_efectos_plot(efectos_hl, grupo ~ rep, y_lab_hl), width = 14, height = 16, units = "in")
 
