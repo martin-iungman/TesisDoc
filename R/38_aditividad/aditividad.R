@@ -44,10 +44,13 @@
 #   negativos: violines, Spearman (puntaje sin agrupar) y HL de cada valor
 #   vs. puntaje 0 (BH dentro de replica).
 #
-# Cada replica por separado. Dos salidas son figura de la tesis (slug
+# Cada replica por separado. La figura de la tesis (slug
 # aditividad_elementos_promotor en docs/mapping_figuras.csv, carpeta via
-# fig_dir()): violines_n_elementos.jpg (Parte 1) y grilla_pos_x_neg.jpg
-# (Parte 4). El resto es exploratorio y va a figures/exploratorio_aditividad/.
+# fig_dir()) es aditividad_elementos_promotor.jpg/.pdf: A =
+# violines_n_elementos (Parte 1), B = grilla_pos_x_neg (Parte 4; un heatmap
+# por replica, cada uno con su propia escala de color); los dos paneles
+# tambien se guardan sueltos en .jpg y .pdf. El resto es exploratorio y va a
+# figures/exploratorio_aditividad/.
 # Requiere: data/processed/prom_df.tsv (con YY1_motif, CRE_motif,
 # Ebox_CAGGTR y polyAT_prox,
 # R/00_prom_features/build_prom_features.R) y
@@ -56,6 +59,7 @@
 
 library(tidyverse)
 library(ggpubr)
+library(patchwork)
 source("R/functions/tata_scan.R") # tata_hl_vs()
 source("R/functions/fig_paths.R")
 
@@ -72,6 +76,12 @@ MIN_CELDA <- 50
 th <- theme_pubclean(base_size = 16) +
   theme(strip.text = element_text(face = "bold"), legend.position = "none")
 save_tsv <- function(x, name) write_tsv(x, file.path(out_dir, name))
+save_fig <- function(plot, name, width, height) {
+  for (ext in c("jpg", "pdf")) {
+    ggsave(file.path(fig_out, paste0(name, ".", ext)), plot, width = width, height = height, units = "in",
+      device = if (ext == "pdf") cairo_pdf else NULL)
+  }
+}
 
 # --- Datos -------------------------------------------------------------------
 
@@ -176,7 +186,7 @@ save_tsv(r1$hl, "p1_hl_vs_0_elementos.tsv")
 save_tsv(r1$spearman, "p1_spearman_n_elementos.tsv")
 
 p1 <- violines(act, "cat_elem", . ~ rep, "Número de elementos (isla CpG, TATA, CCAAT, YY1, CRE)", "#216869")
-ggsave(file.path(fig_out, "violines_n_elementos.jpg"), p1, width = 12, height = 6, units = "in")
+save_fig(p1, "violines_n_elementos", 12, 6)
 
 # =============================================================================
 # PARTE 2 - motivos dentro de cada grupo de isla CpG
@@ -396,22 +406,33 @@ grilla <- act %>%
   group_by(rep, cat_elem, cat_neg) %>%
   summarise(n = n(), mediana = median(mean), media = mean(mean), .groups = "drop")
 save_tsv(grilla, "p4_grilla_pos_x_neg.tsv")
-p4a <- grilla %>%
-  filter(n >= MIN_CELDA) %>%
-  ggplot(aes(cat_elem, cat_neg, fill = mediana)) +
-  geom_tile(color = "white", linewidth = 0.8) +
-  geom_text(aes(label = sprintf("%.2f
-n=%d", mediana, n)), size = 3.6) +
-  facet_wrap(~rep) +
-  scale_fill_distiller(palette = "YlGnBu", direction = 1, name = "Actividad
+# Un heatmap por replica, cada uno con su propia escala de color (las
+# replicas tienen niveles de actividad distintos); se omiten celdas con
+# menos de MIN_CELDA promotores.
+heatmap_rep <- function(r) {
+  grilla %>%
+    filter(n >= MIN_CELDA, rep == r) %>%
+    ggplot(aes(cat_elem, cat_neg, fill = mediana)) +
+    geom_tile(color = "white", linewidth = 0.8) +
+    geom_text(aes(label = sprintf("%.2f
+n=%d", mediana, n)), size = 4.2) +
+    facet_wrap(~rep) +
+    scale_fill_distiller(palette = "YlGnBu", direction = 1, name = "Actividad
 mediana") +
-  labs(
-    x = "Elementos positivos (isla CpG, TATA, CCAAT, YY1, CRE)", y = "Características negativas
-(TSS no canónico, E-box, poli(dA:dT))",
-    caption = sprintf("Se omiten celdas con menos de %d promotores.", MIN_CELDA)
-  ) +
-  th + theme(legend.position = "right", panel.grid = element_blank())
-ggsave(file.path(fig_out, "grilla_pos_x_neg.jpg"), p4a, width = 13, height = 6, units = "in")
+    labs(x = "Elementos positivos
+(isla CpG, TATA, CCAAT, YY1, CRE)", y = "Características negativas
+(TSS no canónico, E-box, poli(dA:dT))") +
+    th + theme(legend.position = "right", panel.grid = element_blank())
+}
+p4a <- heatmap_rep("Rep 1") + (heatmap_rep("Rep 2") + theme(axis.title.y = element_blank()))
+save_fig(p4a, "grilla_pos_x_neg", 15, 6.5)
+
+# Figura completa: violines (A) arriba, heatmaps (B) abajo
+figura <- wrap_elements(full = p1) / wrap_elements(full = p4a) +
+  plot_layout(heights = c(6, 6.5)) +
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(size = 26, face = "bold"))
+save_fig(figura, "aditividad_elementos_promotor", 15, 13)
 
 # Puntaje neto = positivos - negativos
 cortes_punt <- agrupar_conteo(act, "puntaje")
