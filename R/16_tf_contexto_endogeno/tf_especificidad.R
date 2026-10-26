@@ -29,7 +29,7 @@
 # ordenadas, con IC por estadisticos de orden (aproximacion normal) - se
 # valida contra la tabla de R/17 al correr.
 #
-# Salidas (todas en fig_dir("tf_nfya_sp_contexto_endogeno"), no pisa las
+# Salidas (todas en figures/exploratorio_tf_contexto_endogeno/, no pisa las
 # tablas viejas): motivo_vs_tf_efecto_intersect.tsv/.jpg,
 # nfya_estratificado_ccaat_intersect.tsv/.jpg,
 # sp1_estratificado_gcbox_hek.tsv/.jpg, sp2_estratificado_ccaat_hek.tsv/.jpg,
@@ -50,7 +50,8 @@ library(coin)
 source("R/functions/plot_helpers.R")
 source("R/functions/fig_paths.R")
 
-out_dir <- fig_dir("tf_nfya_sp_contexto_endogeno")
+out_dir <- "figures/exploratorio_tf_contexto_endogeno" # exploratorio (no es figura de la tesis)
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
 remap_hits <- read_tsv("data/processed/remap_tf_hits.tsv", show_col_types = FALSE)
 stats_highconf <- read_tsv("data/processed/activity_stats_highconf.tsv", show_col_types = FALSE)
@@ -208,7 +209,9 @@ p <- motif_tf_df %>%
   labs(x = "Efecto sobre la actividad (Wilcoxon)", y = NULL, fill = NULL, alpha = NULL) +
   theme_pubr(base_size = 18) +
   theme(legend.position = "top")
-ggsave(file.path(out_dir, "motivo_vs_tf_efecto_intersect.jpg"), p, width = 10, height = 5, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("motivo_vs_tf_efecto_intersect.", ext)), p, width = 10, height = 5, units = "in")
+}
 
 # estratificados (mismo formato que motivo_tf_estratificado.R, + IC y %)
 stratified_tf <- function(tf_col, tf_label, motif_col, motif_label, file_stem) {
@@ -243,7 +246,9 @@ stratified_tf <- function(tf_col, tf_label, motif_col, motif_label, file_stem) {
     labs(x = paste0("Unión de ", tf_label, " (ReMap)"), y = "Actividad media") +
     theme_pubclean(base_size = 16) +
     theme(legend.position = "none")
-  ggsave(file.path(out_dir, paste0(file_stem, ".jpg")), p, width = 9, height = 7, units = "in")
+  for (ext in c("jpg", "pdf")) {
+    ggsave(file.path(out_dir, paste0(file_stem, ".", ext)), p, width = 9, height = 7, units = "in")
+  }
   effect
 }
 
@@ -451,7 +456,9 @@ p2a <- eff_all %>%
   labs(x = "Efecto de la unión sobre la actividad (Hodges-Lehmann)", y = "N° de factores (ReMap)", color = NULL) +
   theme_pubr(base_size = 15) +
   theme(legend.position = "none")
-ggsave(file.path(out_dir, "tf_efecto_distribucion_intersect.jpg"), p2a, width = 11, height = 7.5, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("tf_efecto_distribucion_intersect.", ext)), p2a, width = 11, height = 7.5, units = "in")
+}
 
 spec_panels <- tribble(
   ~universo, ~motivo, ~panel,
@@ -484,6 +491,8 @@ p2c <- spec %>%
   labs(x = "Efecto con motivo − efecto sin motivo (Hodges-Lehmann)", y = "N° de factores (ReMap)", color = NULL) +
   theme_pubr(base_size = 15) +
   theme(legend.position = "none")
-ggsave(file.path(out_dir, "tf_motivo_especificidad_intersect.jpg"), p2c, width = 11, height = 7.5, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("tf_motivo_especificidad_intersect.", ext)), p2c, width = 11, height = 7.5, units = "in")
+}
 
 message("Tablas y figuras guardadas en ", out_dir)

@@ -1,4 +1,5 @@
-# tf_nfya_sp_contexto_endogeno (ver docs/mapping_figuras.csv para el numero
+# EXPLORATORIO (antes figura tf_nfya_sp_contexto_endogeno; ya no es figura de la
+# tesis - la figura de NF-YA es nfy_especificidad) (ver docs/mapping_figuras.csv para el numero
 # de figura vigente)
 # Asociacion entre actividad transcripcional (bins de 100 promotores,
 # ordenados por actividad media) y union de NFYA/SP1/SP2 segun ChIP-seq
@@ -25,7 +26,8 @@ source("R/functions/plot_helpers.R")
 source("R/functions/fig_paths.R")
 
 slug <- "tf_nfya_sp_contexto_endogeno"
-out_dir <- fig_dir(slug)
+out_dir <- "figures/exploratorio_tf_contexto_endogeno"
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
 remap_hits <- read_tsv("data/processed/remap_tf_hits.tsv", show_col_types = FALSE)
 stats_highconf <- read_tsv("data/processed/activity_stats_highconf.tsv", show_col_types = FALSE)
@@ -47,9 +49,15 @@ data_TF <- data %>%
   left_join(binary_df, by = "seq_id") %>%
   mutate(across(any_of(c("NFYA", "SP1", "SP2")), ~ replace_na(.x, FALSE)))
 
-ggsave(file.path(out_dir, "NFYA_scatter.jpg"), tf_scatter(data_TF, "NFYA", "Unión a NFYA"), width = 9, height = 6.75, units = "in")
-ggsave(file.path(out_dir, "SP1_scatter.jpg"), tf_scatter(data_TF, "SP1", "Unión a SP1"), width = 9, height = 6.75, units = "in")
-ggsave(file.path(out_dir, "SP2_scatter.jpg"), tf_scatter(data_TF, "SP2", "Unión a SP2"), width = 9, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("NFYA_scatter.", ext)), tf_scatter(data_TF, "NFYA", "Unión a NFYA"), width = 9, height = 6.75, units = "in")
+}
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("SP1_scatter.", ext)), tf_scatter(data_TF, "SP1", "Unión a SP1"), width = 9, height = 6.75, units = "in")
+}
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("SP2_scatter.", ext)), tf_scatter(data_TF, "SP2", "Unión a SP2"), width = 9, height = 6.75, units = "in")
+}
 
 # --- Union restringida a HEK293 (SP1, SP2) ---------------------------------
 
@@ -64,8 +72,12 @@ data_TF_hek <- data %>%
   left_join(hek_df, by = "seq_id") %>%
   mutate(across(any_of(c("SP1", "SP2")), ~ replace_na(.x, FALSE)))
 
-ggsave(file.path(out_dir, "SP1_scatter_hek.jpg"), tf_scatter(data_TF_hek, "SP1", "Unión a SP1 - HEK293"), width = 9, height = 6.75, units = "in")
-ggsave(file.path(out_dir, "SP2_scatter_hek.jpg"), tf_scatter(data_TF_hek, "SP2", "Unión a SP2 - HEK293"), width = 9, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("SP1_scatter_hek.", ext)), tf_scatter(data_TF_hek, "SP1", "Unión a SP1 - HEK293"), width = 9, height = 6.75, units = "in")
+}
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("SP2_scatter_hek.", ext)), tf_scatter(data_TF_hek, "SP2", "Unión a SP2 - HEK293"), width = 9, height = 6.75, units = "in")
+}
 
 # --- NFYA: interseccion entre lineas celulares (venn + union consistente) --
 
@@ -94,10 +106,12 @@ data_TF_nfya_intersect <- data %>%
   select(seq_id, rep, mean, mean_sw) %>%
   mutate(NFYA = seq_id %in% nfya_intersect_proms)
 
-ggsave(
-  file.path(out_dir, "NFYA_scatter_intersect.jpg"),
-  tf_scatter(data_TF_nfya_intersect, "NFYA", paste0("Unión a NFYA - ", paste(names(venn_list), collapse = ", "))),
-  width = 9, height = 6.75, units = "in"
-)
+for (ext in c("jpg", "pdf")) {
+  ggsave(
+    file.path(out_dir, paste0("NFYA_scatter_intersect.", ext)),
+    tf_scatter(data_TF_nfya_intersect, "NFYA", paste0("Unión a NFYA - ", paste(names(venn_list), collapse = ", "))),
+    width = 9, height = 6.75, units = "in"
+  )
+}
 
 message("Figuras guardadas en ", out_dir)

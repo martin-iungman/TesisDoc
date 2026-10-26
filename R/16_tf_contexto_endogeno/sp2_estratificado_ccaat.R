@@ -10,7 +10,8 @@ library(tidyverse)
 library(ggpubr)
 source("R/functions/fig_paths.R")
 
-out_dir <- fig_dir("tf_nfya_sp_contexto_endogeno")
+out_dir <- "figures/exploratorio_tf_contexto_endogeno" # exploratorio (no es figura de la tesis)
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
 remap_hits <- read_tsv("data/processed/remap_tf_hits.tsv", show_col_types = FALSE)
 stats_highconf <- read_tsv("data/processed/activity_stats_highconf.tsv", show_col_types = FALSE)
@@ -49,6 +50,8 @@ p <- ggplot(data, aes(SP2, mean, fill = SP2)) +
   labs(x = "Unión de SP2 (ReMap)", y = "Actividad media") +
   theme_pubclean(base_size = 16) +
   theme(legend.position = "none")
-ggsave(file.path(out_dir, "sp2_estratificado_ccaat.jpg"), p, width = 9, height = 7, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("sp2_estratificado_ccaat.", ext)), p, width = 9, height = 7, units = "in")
+}
 
 message("Figura guardada en ", out_dir)

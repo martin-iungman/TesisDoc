@@ -6,7 +6,7 @@
 # replica) via wilcox_effect_summary() - no se filtra por significancia,
 # para ver los 5-7 features lado a lado.
 #
-# Sale en la carpeta de tf_nfya_sp_contexto_endogeno, no es una
+# Sale en figures/exploratorio_tf_contexto_endogeno/, no es una
 # figura nueva en mapping_figuras.csv.
 #
 # Requiere: data/processed/remap_tf_hits.tsv, activity_stats_highconf.tsv
@@ -17,7 +17,8 @@ library(coin)
 source("R/functions/plot_helpers.R")
 source("R/functions/fig_paths.R")
 
-out_dir <- fig_dir("tf_nfya_sp_contexto_endogeno")
+out_dir <- "figures/exploratorio_tf_contexto_endogeno" # exploratorio (no es figura de la tesis)
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
 remap_hits <- read_tsv("data/processed/remap_tf_hits.tsv", show_col_types = FALSE)
 stats_highconf <- read_tsv("data/processed/activity_stats_highconf.tsv", show_col_types = FALSE)
@@ -79,6 +80,8 @@ p <- wilcox_df %>%
   labs(x = "Efecto sobre la actividad (Wilcoxon)", y = NULL, fill = NULL, alpha = NULL) +
   theme_pubr(base_size = 18) +
   theme(legend.position = "top")
-ggsave(file.path(out_dir, "motivo_vs_tf_efecto.jpg"), p, width = 10, height = 6, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("motivo_vs_tf_efecto.", ext)), p, width = 10, height = 6, units = "in")
+}
 
 message("Figura guardada en ", out_dir)

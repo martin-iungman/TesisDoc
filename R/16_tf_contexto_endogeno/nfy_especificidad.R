@@ -18,7 +18,7 @@
 # efecto y para con - sin CCAAT-box), nfy_top10_ccaat.tsv, nfy_top10_ventana.tsv.
 #
 # NO recalcula efectos: reutiliza las tablas de tf_especificidad.R (misma
-# carpeta de scripts), guardadas en fig_dir("tf_nfya_sp_contexto_endogeno"):
+# carpeta de scripts), guardadas en figures/exploratorio_tf_contexto_endogeno/:
 # tf_efecto_todos_intersect.tsv y tf_motivo_especificidad_intersect.tsv.
 # Correr tf_especificidad.R antes si no existen. Solo el scatter necesita
 # remap_tf_hits.tsv / activity_stats_highconf.tsv / prom_df.tsv.
@@ -26,15 +26,23 @@
 
 library(tidyverse)
 library(ggpubr)
+library(patchwork)
 source("R/functions/plot_helpers.R")
 source("R/functions/fig_paths.R")
 
 out_dir <- fig_dir("nfy_especificidad")
-src_dir <- fig_dir("tf_nfya_sp_contexto_endogeno", create = FALSE)
+src_dir <- "figures/exploratorio_tf_contexto_endogeno"
 
 cov_window <- 0.25
 nfy_defs <- c("NFYA_intersect", "NFYA") # ambas definiciones de NF-YA, fuera de la referencia
 nfy_clr <- "#D6741F"
+
+save_jpg_pdf <- function(plot, name, width, height) {
+  for (ext in c("jpg", "pdf")) {
+    ggsave(file.path(out_dir, paste0(name, ".", ext)), plot, width = width, height = height, units = "in",
+      device = if (ext == "pdf") cairo_pdf else NULL)
+  }
+}
 
 pct_of <- function(x, ref) 100 * mean(ref <= x)
 rank_of <- function(x, ref) sum(ref > x) + 1L
@@ -62,11 +70,8 @@ rm(remap_hits)
 data_nfya <- data %>%
   select(seq_id, rep, mean, mean_sw) %>%
   mutate(NFYA = seq_id %in% nfya_intersect)
-ggsave(
-  file.path(out_dir, "nfya_scatter_intersect.jpg"),
-  tf_scatter(data_nfya, "NFYA", "Unión a NF-YA (HeLa-S3 ∩ Hep-G2 ∩ K-562)"),
-  width = 9, height = 6.75, units = "in"
-)
+p_scatter <- tf_scatter(data_nfya, "NFYA", "Unión a NF-YA (HeLa-S3 ∩ Hep-G2 ∩ K-562)")
+save_jpg_pdf(p_scatter, "nfya_scatter_intersect", 9, 6.75)
 
 # =========================================================================
 # Efecto vs. cobertura (universo cualquier linea)
@@ -125,12 +130,12 @@ p_cov <- ggplot(ref_eff, aes(n_unidos, estimate)) +
   scale_x_log10() +
   scale_y_continuous(expand = expansion(mult = c(0.05, 0.15))) +
   labs(
-    x = "Promotores unidos (ReMap, escala log10)", y = "Efecto de la unión sobre la actividad (Hodges-Lehmann)",
+    x = "Promotores unidos (ReMap, escala log10)", y = "Efecto de la unión sobre\nla actividad (Hodges-Lehmann)",
     caption = "Punto naranja: NF-YA ∩ (HeLa-S3 ∩ Hep-G2 ∩ K-562). Sombreado: ventana de cobertura ±25%. Rangos: posición / n de factores comparados."
   ) +
-  theme_pubr(base_size = 15) +
+  theme_pubr(base_size = 16) +
   theme(plot.caption = element_text(size = 10))
-ggsave(file.path(out_dir, "tf_efecto_vs_cobertura.jpg"), p_cov, width = 12, height = 6, units = "in")
+save_jpg_pdf(p_cov, "tf_efecto_vs_cobertura", 12, 6)
 
 # =========================================================================
 # Especificidad por CCAAT-box (universo cualquier linea)
@@ -182,9 +187,19 @@ p_spec <- ggplot(spec_plot, aes(dif_con_sin, fill = grupo)) +
   scale_fill_manual(values = c("Resto de los factores" = "grey80", "Ventana de cobertura ±25%" = "#F2B680")) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
   labs(x = "Efecto con CCAAT-box − efecto sin CCAAT-box (Hodges-Lehmann)", y = "N° de factores (ReMap)", fill = NULL) +
-  theme_pubr(base_size = 15) +
+  theme_pubr(base_size = 16) +
   theme(legend.position = "top")
-ggsave(file.path(out_dir, "tf_especificidad_ccaat.jpg"), p_spec, width = 9, height = 7.5, units = "in")
+save_jpg_pdf(p_spec, "tf_especificidad_ccaat", 9, 7.5)
+
+# Figura completa: scatter (A) y efecto vs. cobertura (B) a la izquierda, uno
+# sobre otro (los dos con Rep 1 | Rep 2 lado a lado); con - sin CCAAT-box (C)
+# a la derecha, a lo alto
+figura <- wrap_elements(full = p_scatter) + wrap_elements(full = p_cov) + wrap_elements(full = p_spec) +
+  plot_layout(design = "AC
+BC", widths = c(12, 8)) +
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(size = 26, face = "bold"))
+save_jpg_pdf(figura, "nfy_especificidad", 20, 13)
 
 # =========================================================================
 # Resumen de percentiles (NF-YA ∩)
