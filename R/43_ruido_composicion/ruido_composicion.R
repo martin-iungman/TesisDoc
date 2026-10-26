@@ -73,9 +73,14 @@ panel_deciles <- function(dec, var, umbral, titulo, xlab) {
 panel_cpg <- panel_deciles(dec_cpg, "cpg_oe", 0.6, "Razón CpG observado/esperado", "Razón CpG o/e del fragmento (mediana del decil)")
 panel_gc <- panel_deciles(dec_gc, "g_c", 0.5, "Contenido G+C", "Contenido G+C del fragmento (mediana del decil)")
 
-ggsave(file.path(out_dir, "ruido_cpg_oe_deciles.jpg"), panel_cpg, width = 12, height = 6.75, units = "in")
-ggsave(file.path(out_dir, "ruido_gc_deciles.jpg"), panel_gc, width = 12, height = 6.75, units = "in")
-ggsave(file.path(out_dir, "ruido_composicion_deciles.jpg"), panel_cpg / panel_gc, width = 12, height = 13.5, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("ruido_cpg_oe_deciles.", ext)), panel_cpg, width = 12, height = 6.75, units = "in")
+  ggsave(file.path(out_dir, paste0("ruido_gc_deciles.", ext)), panel_gc, width = 12, height = 6.75, units = "in")
+  # fila vacia intermedia para separar los dos paneles (mismo formato que cgi_composicion_deciles)
+  ggsave(file.path(out_dir, paste0("ruido_composicion_deciles.", ext)),
+    panel_cpg / plot_spacer() / panel_gc + plot_layout(heights = c(1, 0.08, 1)),
+    width = 12, height = 14.2, units = "in")
+}
 
 # Correlaciones de Spearman del ruido con la razon CpG o/e y con el
 # contenido de G+C, por replica: en todos los promotores y dentro de los que

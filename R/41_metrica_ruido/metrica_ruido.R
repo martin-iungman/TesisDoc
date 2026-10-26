@@ -10,8 +10,9 @@
 #    actividad en bandas alternadas y un bin intermedio resaltado; al
 #    medio, los 100 promotores de ese bin ordenados por varianza con el
 #    rango asignado (1-100); a la derecha, la distribucion entre gates de
-#    dos promotores de ejemplo del bin (rangos 10 y 90: baja y alta
-#    varianza a igual actividad), que se resaltan tambien en A, B y C.
+#    dos promotores de ejemplo del bin (rangos cercanos a 10 y 90: baja y
+#    alta varianza a igual actividad, que quedan en el mismo extremo en la
+#    replica 2), que se resaltan tambien en A, B y C.
 # B: resultado (Rep 1) - var_rank_sw vs. bin de actividad (formato de
 #    noise_scatter() sin colorear por feature) con mediana por bin y
 #    loess, plano alrededor de 50.
@@ -40,19 +41,39 @@ out_dir <- fig_dir(slug)
 stats_highconf <- read_tsv("data/processed/activity_stats_highconf.tsv", show_col_types = FALSE)
 data <- add_noise_rank(stats_highconf)
 
-# bin de actividad resaltado en A y B: el bin mediano de Rep 1
+# bin de actividad resaltado en A y B: el de Rep 1 cuya media mediana esta
+# mas cerca de MEDIA_SEL
+MEDIA_SEL <- 3
 rep1 <- data %>% filter(rep == "Rep 1")
-bin_sel <- ceiling(max(rep1$mean_sw) / 2)
+bin_sel <- rep1 %>%
+  group_by(mean_sw) %>%
+  summarise(media = median(mean), .groups = "drop") %>%
+  slice_min(abs(media - MEDIA_SEL), n = 1, with_ties = FALSE) %>%
+  pull(mean_sw)
 clr_sel <- "#AD343E"
 
 # promotores de ejemplo dentro de ese bin: baja y alta varianza a igual
-# actividad (rangos 10 y 90, tipicos y no extremos)
+# actividad. Se busca el rango mas cercano a 10 / 90 en la replica 1 (tipicos
+# y no extremos) entre los que quedan en el mismo extremo en la replica 2
+# (rango <= 20 / >= 80), para que el ejemplo sea reproducible.
 rangos_ej <- c("Baja varianza" = 10, "Alta varianza" = 90)
+extremo_rep2 <- list("Baja varianza" = function(r) r <= 20, "Alta varianza" = function(r) r >= 80)
 clr_ej <- c("Baja varianza" = "#E3A21A", "Alta varianza" = "#6A3D9A")
-ejemplos <- rep1 %>%
-  filter(mean_sw == bin_sel, var_rank_sw %in% rangos_ej) %>%
-  mutate(tipo = factor(names(rangos_ej)[match(var_rank_sw, rangos_ej)], levels = names(rangos_ej))) %>%
+rango_rep2 <- data %>% filter(rep == "Rep 2") %>% select(seq_id, var_rank_rep2 = var_rank_sw)
+candidatos <- rep1 %>%
+  filter(mean_sw == bin_sel) %>%
+  inner_join(rango_rep2, by = "seq_id")
+ejemplos <- imap(rangos_ej, function(rango, tipo) {
+  candidatos %>%
+    filter(extremo_rep2[[tipo]](var_rank_rep2)) %>%
+    slice_min(abs(var_rank_sw - rango), n = 1, with_ties = FALSE) %>%
+    mutate(tipo = tipo)
+}) %>%
+  list_rbind() %>%
+  select(-var_rank_rep2) %>%
+  mutate(tipo = factor(tipo, levels = names(rangos_ej))) %>%
   arrange(tipo)
+stopifnot(nrow(ejemplos) == 2)
 
 # --- Panel A: construccion ----------------------------------------------
 
@@ -104,7 +125,7 @@ panel_a_der <- bin_df %>%
   geom_point(data = ejemplos, aes(var, var_rank_sw), inherit.aes = FALSE, shape = 21, size = 4.5, stroke = 0.8, fill = clr_ej[ejemplos$tipo]) +
   geom_text(
     data = ejemplos, aes(var, var_rank_sw, label = name), inherit.aes = FALSE,
-    hjust = -0.2, vjust = c(1.6, -0.9), size = 4.5, col = clr_ej[ejemplos$tipo], fontface = "bold"
+    hjust = c(-0.2, 1.2), vjust = c(1.6, 0.5), size = 4.5, col = clr_ej[ejemplos$tipo], fontface = "bold"
   ) +
   labs(x = "Varianza", y = "Rango de varianza (1-100)", title = paste0("Bin ", bin_sel, " ordenado por varianza")) +
   theme_pubr(base_size = 16)
@@ -133,7 +154,9 @@ panel_a_dist <- dist_ej %>%
 
 panel_a <- (panel_a_izq | panel_a_der | panel_a_dist) + plot_layout(widths = c(1.25, 1, 0.75))
 
-ggsave(file.path(out_dir, "panel_a_construccion.jpg"), panel_a, width = 18, height = 6.5, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("panel_a_construccion.", ext)), panel_a, width = 18, height = 6.5, units = "in")
+}
 
 # --- Panel B: desacople ----------------------------------------------------
 
@@ -152,7 +175,9 @@ panel_b <- rep1 %>%
   labs(x = "Bin de actividad media", y = "Rango de varianza (dentro del bin)", title = "Ruido desacoplado de la actividad") +
   theme_pubr(base_size = 16)
 
-ggsave(file.path(out_dir, "panel_b_desacople.jpg"), panel_b, width = 9, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("panel_b_desacople.", ext)), panel_b, width = 9, height = 6.75, units = "in")
+}
 
 # --- Datos unidos por seq_id ------------------------------------------------
 
@@ -240,7 +265,9 @@ panel_c <- panel_c_df %>%
   ) +
   theme_pubr(base_size = 16)
 
-ggsave(file.path(out_dir, "panel_c_reproducibilidad.jpg"), panel_c, width = 9, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("panel_c_reproducibilidad.", ext)), panel_c, width = 9, height = 6.75, units = "in")
+}
 
 # --- Figura compuesta ---------------------------------------------------------
 
@@ -248,7 +275,9 @@ compuesta <- wrap_elements(full = panel_a) / (panel_b | panel_c) +
   plot_annotation(tag_levels = "A") &
   theme(plot.tag = element_text(size = 22, face = "bold"))
 
-ggsave(file.path(out_dir, "metrica_ruido.jpg"), compuesta, width = 18, height = 13.5, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("metrica_ruido.", ext)), compuesta, width = 18, height = 13.5, units = "in")
+}
 
 # --- Estadisticos -------------------------------------------------------------
 
