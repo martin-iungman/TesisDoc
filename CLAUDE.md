@@ -111,8 +111,10 @@ docs/rutina_resync_figuras.md       prompt para resincronizar numeración
   en `docs/mapping_figuras.csv` (estado, leyenda_lista, script,
   archivos, notas) en el mismo cambio. `archivos` = nombres de los
   archivos de imagen de la figura, sin path, separados por `; `.
-  `leyenda_lista` = `si` / `no` / `desactualizada` (según el slide del
-  deck). Si `estado` es `revisar`, `notas` empieza con "Revisar:
+  `leyenda_lista` = `si` (leyenda completa en `docs/tesis.md`) /
+  `desactualizada` (hay leyenda pero incompleta) / `no` (no hay
+  leyenda); la actualiza la rutina `sync-tesis-md` (ver
+  `docs/rutina_sync_tesis.md`). Si `estado` es `revisar`, `notas` empieza con "Revisar:
   <motivo concreto>".
 - En `notas` no se registra el historial de numeración ("pasó de R2.7
   a R2.8", "Resync <fecha>..."): eso queda en git. Tampoco referenciar
