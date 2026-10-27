@@ -136,7 +136,8 @@ roc_curve <- function(data, feature) {
     arrange(FPR)
 }
 
-# Area bajo la curva (regla del trapecio) de un roc_curve().
+# Area bajo la curva (regla del trapecio) de un roc_curve(). Aproximada (ver
+# noise_auc_exact); las figuras usan noise_auc_exact desde 2026-10-27.
 noise_auc <- function(roc) {
   total <- 0
   for (i in seq_len(nrow(roc) - 1)) {
@@ -164,11 +165,11 @@ noise_scatter <- function(data, feature, titulo, leyenda) {
 }
 
 # Curva ROC (una linea por replica, con AUC en el titulo) de una feature
-# booleana prediciendo var_rank_sw alto.
+# booleana prediciendo var_rank_sw alto, con la AUC exacta (noise_auc_exact).
 noise_roc <- function(data, feature, titulo) {
   data %>%
     group_split(rep) %>%
-    purrr::map(~ roc_curve(.x, feature) %>% mutate(rep = unique(.x$rep), AUC = noise_auc(.))) %>%
+    purrr::map(~ roc_curve(.x, feature) %>% mutate(rep = unique(.x$rep), AUC = noise_auc_exact(.x, feature))) %>%
     purrr::list_rbind() %>%
     ggplot(aes(FPR, TPR, col = rep)) +
     geom_line(linewidth = 1) +
