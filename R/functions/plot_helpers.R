@@ -184,14 +184,26 @@ noise_roc <- function(data, feature, titulo) {
     labs(col = "")
 }
 
-# Como noise_roc(), pero separando ademas por nivel de actividad (bajo el
-# percentil 75 de mean_sw vs. por encima) via linetype - una curva por
-# combinacion replica x nivel.
+# AUC exacta (Mann-Whitney, pROC) de una feature booleana prediciendo
+# var_rank_sw alto: P(ruido | TRUE > ruido | FALSE). noise_auc() la
+# subestima ~0.01 (los umbrales 1-99 omiten el tramo final de la curva) y
+# falla en subconjuntos chicos (celdas vacias -> NA -> tramos descartados).
+noise_auc_exact <- function(data, feature) {
+  f <- data[[feature]]
+  ok <- !is.na(f)
+  as.numeric(pROC::roc(controls = data$var_rank_sw[ok & !f], cases = data$var_rank_sw[ok & f], direction = "<", quiet = TRUE)$auc)
+}
+
+# Como noise_roc(), pero separando ademas por nivel de actividad (percentil
+# 75 de mean dentro de cada replica) via linetype - una curva por
+# combinacion replica x nivel, con la AUC exacta (noise_auc_exact).
 noise_roc_by_expr <- function(data, feature, titulo) {
   data %>%
-    mutate(expr_level = ifelse(mean_sw < 0.75 * max(mean_sw), "Baja actividad", "Alta actividad")) %>%
+    group_by(rep) %>%
+    mutate(expr_level = ifelse(percent_rank(mean) >= 0.75, "Alta actividad", "Baja actividad")) %>%
+    ungroup() %>%
     group_split(rep, expr_level) %>%
-    purrr::map(~ roc_curve(.x, feature) %>% mutate(rep = unique(.x$rep), expr_level = unique(.x$expr_level), AUC = noise_auc(.))) %>%
+    purrr::map(~ roc_curve(.x, feature) %>% mutate(rep = unique(.x$rep), expr_level = unique(.x$expr_level), AUC = noise_auc_exact(.x, feature))) %>%
     purrr::list_rbind() %>%
     ggplot(aes(FPR, TPR, col = rep, linetype = expr_level)) +
     geom_line(linewidth = 1) +
