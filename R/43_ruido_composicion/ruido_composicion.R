@@ -53,7 +53,8 @@ panel_deciles <- function(dec, var, umbral, titulo, xlab) {
   rho <- data %>%
     group_by(rep) %>%
     summarise(rho = cor(.data[[var]], var_rank_sw, method = "spearman"), .groups = "drop") %>%
-    mutate(label = sprintf("rho == %.2f", rho))
+    # numero como texto para que plotmath no recorte el cero final (-0.10)
+    mutate(label = sprintf('rho == %s"%.2f"', if_else(rho < 0, "-", ""), abs(rho)))
   ggplot(dec, aes(x, m)) +
     geom_hline(yintercept = 50, linetype = "dotted", col = "grey60") +
     geom_vline(xintercept = umbral, linetype = "dashed", col = "grey40") +
@@ -78,7 +79,8 @@ for (ext in c("jpg", "pdf")) {
   ggsave(file.path(out_dir, paste0("ruido_gc_deciles.", ext)), panel_gc, width = 12, height = 6.75, units = "in")
   # fila vacia intermedia para separar los dos paneles (mismo formato que cgi_composicion_deciles)
   ggsave(file.path(out_dir, paste0("ruido_composicion_deciles.", ext)),
-    panel_cpg / plot_spacer() / panel_gc + plot_layout(heights = c(1, 0.08, 1)),
+    panel_cpg / plot_spacer() / panel_gc + plot_layout(heights = c(1, 0.08, 1)) +
+      plot_annotation(tag_levels = "A") & theme(plot.tag = element_text(size = 40, face = "bold")),
     width = 12, height = 14.2, units = "in")
 }
 

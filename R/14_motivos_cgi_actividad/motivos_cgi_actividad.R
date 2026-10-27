@@ -201,7 +201,8 @@ ggsave(file.path(out_dir_cgi_deciles, "cgi_gc_deciles.jpg"), panel_cgi_gc_decile
 for (ext in c("jpg", "pdf")) {
   # fila vacia intermedia para separar los dos paneles
   ggsave(file.path(out_dir_cgi_deciles, paste0("cgi_composicion_deciles.", ext)),
-    panel_cgi_oe_deciles / plot_spacer() / panel_cgi_gc_deciles + plot_layout(heights = c(1, 0.08, 1)),
+    panel_cgi_oe_deciles / plot_spacer() / panel_cgi_gc_deciles + plot_layout(heights = c(1, 0.08, 1)) +
+      plot_annotation(tag_levels = "A") & theme(plot.tag = element_text(size = 40, face = "bold")),
     width = 12, height = 14.2, units = "in")
 }
 

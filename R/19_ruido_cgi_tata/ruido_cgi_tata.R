@@ -60,12 +60,12 @@ save_jpg_pdf(scatter_tata, out_dir_tata, "noise_scatter_TATA", 9, 6.75)
 save_jpg_pdf(roc_tata, out_dir_tata, "ROC_TATA", 7, 6.75)
 save_jpg_pdf(roc_tata_expr, out_dir_tata, "ROC_TATA_expr", 5, 5)
 
-# Figura completa: scatter (A) a la izquierda; curva ROC (B) y curva ROC por
-# nivel de actividad (C) a la derecha, una sobre otra
+# Figura completa: scatter (A), curva ROC (B) y curva ROC por nivel de
+# actividad (C) en una fila. Todo scatter de ruido vs. media va a 9 x 6.75 in
+# dentro de la figura, igual que en ruido_cgi.
 figura_tata <- scatter_tata + roc_tata + roc_tata_expr +
-  plot_layout(design = "AB
-AC", widths = c(9, 7)) +
+  plot_layout(widths = c(9, 7, 7)) +
   plot_annotation(tag_levels = "A") & tag_theme
-save_jpg_pdf(figura_tata, out_dir_tata, "ruido_tata", 16, 11)
+save_jpg_pdf(figura_tata, out_dir_tata, "ruido_tata", 23, 6.75)
 
 message("Figuras guardadas en ", out_dir_cgi, " y ", out_dir_tata)
