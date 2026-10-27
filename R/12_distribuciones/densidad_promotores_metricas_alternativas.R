@@ -1,4 +1,5 @@
-# Exploratorio: variantes de densidad_promotores_individuales que usan
+# Exploratorio: variantes de densidad_individual_promotores (extra de
+# distribuciones_expresion, R/12_distribuciones/densidad_promotores_individuales.R) que usan
 # todos los eventos de citometria.
 #
 # Con scale_x_log10() se descartan los eventos con senal compensada <= 0
@@ -14,7 +15,7 @@
 #
 # Salida en figures/exploratorio_densidad_promotores/ (no es una figura
 # numerada). Requiere los mismos datos de citometria que
-# densidad_promotores_individuales. Run from the TesisDoc repo root.
+# densidad_promotores_individuales.R. Run from the TesisDoc repo root.
 
 library(tidyverse)
 library(ggpubr)

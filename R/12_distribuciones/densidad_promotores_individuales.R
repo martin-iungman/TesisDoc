@@ -1,11 +1,7 @@
-# densidad_promotores_individuales (ver docs/mapping_figuras.csv para el
-# numero de figura vigente)
-# Densidad de fluorescencia EGFP (citometria) para cada uno de los 8
-# promotores validados individualmente, contra el control ("US"/Control)
-# de fondo.
-#
-# Resync 2026-07-29: separado de distribuciones_expresion (que paso a Fig.
-# R1.6) en su propia figura - antes era un panel "extra" sin numero propio.
+# Extra de distribuciones_expresion (no se usa en la tesis): densidad de
+# fluorescencia EGFP (citometria) para cada uno de los 8 promotores
+# validados individualmente, contra el control ("US"/Control) de fondo.
+# Se guarda en la carpeta de distribuciones_expresion.
 #
 # Requiere: ~519MB de datos de citometria leidos directo de
 # transcriptional_library (ver R/00_prom_features/heavy_data_paths.R).
@@ -17,7 +13,7 @@ source("R/functions/fig_paths.R")
 source("R/functions/plot_helpers.R")
 source("R/00_prom_features/heavy_data_paths.R")
 
-slug <- "densidad_promotores_individuales"
+slug <- "distribuciones_expresion"
 out_dir <- fig_dir(slug)
 
 df <- load_citometry_stable_validation(path_citometry_stable_validation)
