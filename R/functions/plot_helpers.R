@@ -157,7 +157,9 @@ noise_scatter <- function(data, feature, titulo, leyenda) {
     geom_point(size = 0.2, alpha = 0.5) +
     facet_wrap(~rep) +
     labs(x = "Bin de actividad media", y = "Rango de varianza (dentro del bin)", col = leyenda, title = titulo) +
-    scale_color_manual(values = c("grey", thesis_clr), guide = guide_legend(override.aes = list(size = 3))) +
+    # leyenda = NULL saca el titulo de la leyenda (cuando el titulo del plot ya nombra la feature)
+    scale_color_manual(name = leyenda, values = c("grey", thesis_clr), labels = function(x) if_else(x == "TRUE", "Presencia", "Ausencia"),
+      guide = guide_legend(override.aes = list(size = 3))) +
     ggnewscale::new_scale_color() +
     geom_smooth(aes(col = .data[[feature]]), se = FALSE, linewidth = 1.2, show.legend = FALSE) +
     scale_color_manual(values = c("#525252", "#136869")) +

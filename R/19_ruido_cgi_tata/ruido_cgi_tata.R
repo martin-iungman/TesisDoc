@@ -41,7 +41,7 @@ tag_theme <- theme(plot.tag = element_text(size = 24, face = "bold"))
 # Islas CpG definidas por la composicion del fragmento (CGI_frag: G+C >= 50%
 # y CpG o/e > 0.6), no por la anotacion genomica UCSC (CGI).
 
-scatter_cgi <- noise_scatter(data, "CGI_frag", "Ruido vs. actividad, por isla CpG", "Isla CpG")
+scatter_cgi <- noise_scatter(data, "CGI_frag", "Isla CpG", NULL)
 roc_cgi <- noise_roc(data, "CGI_frag", "Curva ROC - Isla CpG")
 save_jpg_pdf(scatter_cgi, out_dir_cgi, "noise_scatter_CGI", 9, 6.75)
 save_jpg_pdf(roc_cgi, out_dir_cgi, "ROC_CGI", 7, 6.75)
@@ -53,7 +53,7 @@ save_jpg_pdf(figura_cgi, out_dir_cgi, "ruido_cgi", 16, 6.75)
 
 # --- TATA-box ------------------------------------------------------------
 
-scatter_tata <- noise_scatter(data, "TATA_EPD", "Ruido vs. actividad, por TATA-box", "TATA-box")
+scatter_tata <- noise_scatter(data, "TATA_EPD", "TATA-box", NULL)
 roc_tata <- noise_roc(data, "TATA_EPD", "Curva ROC - TATA-box")
 roc_tata_expr <- noise_roc_by_expr(data, "TATA_EPD", "Curva ROC - TATA-box")
 save_jpg_pdf(scatter_tata, out_dir_tata, "noise_scatter_TATA", 9, 6.75)
