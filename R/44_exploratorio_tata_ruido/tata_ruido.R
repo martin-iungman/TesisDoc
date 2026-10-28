@@ -44,6 +44,13 @@
 #       distribucion del puntaje de las canonicas por actividad; Spearman
 #       puntaje-ruido dentro de las canonicas por estrato.
 #   p5  p4 dentro de los promotores con isla CpG (CGI_frag) y sin isla.
+#   p6  que distingue a las TATA fuertes (canonicas de puntaje alto, p4) de
+#       actividad baja de las de actividad alta: Fisher / Wilcoxon entre
+#       ellas y, como control, interaccion actividad x TATA fuerte sobre
+#       todos los promotores (variables del panorama de caracteristicas,
+#       Polycomb en ReMap, elementos de secuencia y composicion; H1-H4).
+#
+# Union de Polycomb: data/processed/remap_tf_hits.tsv.
 #
 # Salidas en figures/exploratorio_tata_ruido/ (sin fig_dir: no es figura de
 # la tesis). Requiere: data/raw/library.bed, BSgenome.Hsapiens.UCSC.hg38,
@@ -62,6 +69,7 @@ source("R/functions/tata_scan.R")
 
 select <- dplyr::select
 filter <- dplyr::filter
+rename <- dplyr::rename # S4Vectors la enmascara (build_tidy_features la usa)
 
 out_dir <- "figures/exploratorio_tata_ruido"
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
@@ -71,7 +79,7 @@ CANON <- TATA_CANON
 CONTROL <- TATA_CANON - 100
 UMBRAL_ALTO <- -5 # puntaje "alto" de p4 si da n razonables (ver abajo)
 LIMITES <- c(-Inf, -16, -14, -12, -10, CORTE, -7, -6, -5, Inf)
-ETIQUETAS <- c("< −16", "−16 a −14", "−14 a −12", "−12 a −10", "−10 a −8,17", "−8,17 a −7", "−7 a −6", "−6 a −5", "≥ −5")
+ETIQUETAS <- c("< −16", "−16 a −14", "−14 a −12", "−12 a −10", "−10 a −8.17", "−8.17 a −7", "−7 a −6", "−6 a −5", "≥ −5")
 N_MIN <- 20
 
 col_misma <- "#216869"
@@ -186,7 +194,7 @@ panel_perfil_auc <- ggplot(perfil, aes(win_center, AUC, color = hebra)) +
   geom_linerange(aes(ymin = conf.low, ymax = conf.high), position = dodge, alpha = 0.7) +
   geom_line(aes(group = seg), position = dodge, alpha = 0.6) +
   geom_point(aes(shape = sig), position = dodge, size = 2.2, fill = "white") +
-  scale_shape_manual(values = c(`TRUE` = 16, `FALSE` = 21), labels = c(`TRUE` = "BH < 0,05", `FALSE` = "n.s."), name = NULL) +
+  scale_shape_manual(values = c(`TRUE` = 16, `FALSE` = 21), labels = c(`TRUE` = "BH < 0.05", `FALSE` = "n.s."), name = NULL) +
   col_hebra +
   facet_grid(rep ~ .) +
   scale_x_continuous(breaks = seq(-240, 0, 20), labels = minus) +
@@ -331,7 +339,7 @@ panel_puntaje <- ggplot(filter(puntaje_bins, n >= N_MIN), aes(puntaje_mediana, A
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0) +
   geom_line() +
   geom_point(size = 3) +
-  annotate("text", x = CORTE, y = Inf, label = "−8,17 (EPD)", hjust = 1.05, vjust = 1.4, size = 5, color = "grey30") +
+  annotate("text", x = CORTE, y = Inf, label = "−8.17 (EPD)", hjust = 1.05, vjust = 1.4, size = 5, color = "grey30") +
   scale_color_manual(values = c("Canónica (−31 a −26)" = col_misma, "Control (−131 a −126)" = "grey55")) +
   scale_x_continuous(labels = function(x) sub("^-", "−", x), expand = expansion(add = c(1, 0.8))) +
   facet_wrap(~rep) +
@@ -447,5 +455,189 @@ panel_celdas <- function(df) {
 save_jpg(panel_celdas(filter(p4, corte_puntaje == CORTE_MEDIANA, grupo == "Todos")), "p4_puntaje_x_actividad", 10, 6.5)
 save_jpg(panel_celdas(filter(p4, corte_puntaje == UMBRAL_ALTO, grupo == "Todos")), "p4_puntaje_x_actividad_corte_menos5", 10, 6.5)
 save_jpg(panel_celdas(filter(p4, corte_puntaje == CORTE_MEDIANA, grupo != "Todos")), "p5_puntaje_x_actividad_por_isla", 10, 10)
+
+# --- p6: que distingue a las TATA fuertes de baja actividad ---------------------
+
+# TATA fuerte = canonica con puntaje >= mediana de las canonicas (las "Alto"
+# de p4). Para cada variable: TATA fuertes de actividad alta vs. baja
+# (Fisher / Wilcoxon, BH sobre todas las variables dentro de cada replica y
+# conjunto) y, como control, variable ~ actividad_alta * tata_fuerte sobre
+# todos los promotores (logistica / lineal): OR (o diferencia de medias) de
+# alta vs. baja en las TATA fuertes y en el resto, y p de la interaccion.
+# Variables: definiciones de build_tidy_features() (panorama de
+# caracteristicas; terciles calculados sobre todos los promotores de cada
+# replica), columnas de prom_df y union de Polycomb en ReMap (cualquier
+# muestra). "Polycomb (cualquiera)" = RING1, CBX8, JARID2, PHF19, EZH2 o
+# SUZ12; RNF2 (RING1B) se agrega aparte, fuera de "cualquiera".
+
+PC_TFS <- c("RING1", "CBX8", "JARID2", "PHF19", "EZH2", "SUZ12")
+remap_pc <- read_tsv("data/processed/remap_tf_hits.tsv", show_col_types = FALSE) %>%
+  filter(TF %in% c(PC_TFS, "RNF2")) %>%
+  distinct(seq_id, TF)
+
+hipotesis_vars <- tribble(
+  ~variable, ~hipotesis,
+  "Alta especificidad tisular", "H1", "Baja especificidad tisular", "H1",
+  "Promotores angostos", "H1", "Promotores anchos", "H1",
+  "No detectado (FANTOM5)", "H1", "Alta actividad en HEK293", "H1",
+  "Alta accesibilidad de cromatina (DNase-seq)", "H1",
+  "Alta conservación (16 a -50pb)", "H1", "Alta conservación (-50 a -150)", "H1", "Alta conservación (-150 a -235)", "H1",
+  "Sin actividad en ratón", "H1", "Promotor unidireccional", "H1", "Sin módulo cis-regulatorio", "H1",
+  "Polycomb (cualquiera)", "H1",
+  "ReMap: RING1", "H1", "ReMap: CBX8", "H1", "ReMap: JARID2", "H1", "ReMap: PHF19", "H1",
+  "ReMap: EZH2", "H1", "ReMap: SUZ12", "H1", "ReMap: RNF2", "H1",
+  "TSS no canónico", "H2", "E-box CAGGTR", "H2", "Tracto poli(dA:dT) proximal", "H2", "Elementos transponibles (TE_overlap > 0)", "H2",
+  "PyPu en -1/0", "H3", "Inr (EPD)", "H3", "TSS fuerte (Inr fuerte)", "H3",
+  "Isla CpG (CGI_frag)", "H4", "Contenido G+C", "H4", "CpG o/e", "H4",
+  "CCAAT-box", "Otros", "GC-box", "Otros", "YY1", "Otros", "CRE (CREB/ATF)", "Otros"
+) %>% mutate(hipotesis = factor(hipotesis, levels = c("H1", "H2", "H3", "H4", "Otros")))
+vars_cont <- c("Contenido G+C", "CpG o/e")
+
+endo_vars <- hipotesis_vars$variable[hipotesis_vars$hipotesis == "H1" & !str_detect(hipotesis_vars$variable, "Polycomb|ReMap")]
+tidy_endo <- build_tidy_features(data, keep = "seq_id") %>%
+  mutate(rep = as.character(rep), across(where(is.factor), ~ .x == "TRUE")) %>%
+  select(seq_id, rep, all_of(endo_vars))
+
+feat <- data %>%
+  transmute(
+    seq_id, rep, act_alta = actividad == "Alta",
+    tata_fuerte = clase == "Canónica" & score_canon >= CORTE_MEDIANA - TATA_TOL,
+    score_canon,
+    `Contenido G+C` = g_c, `CpG o/e` = cpg_oe,
+    `Isla CpG (CGI_frag)` = as.logical(CGI_frag),
+    `Elementos transponibles (TE_overlap > 0)` = replace_na(TE_overlap > 0, FALSE),
+    `E-box CAGGTR` = as.logical(Ebox_CAGGTR), `Tracto poli(dA:dT) proximal` = as.logical(polyAT_prox),
+    `TSS no canónico` = as.logical(other_TSS), `PyPu en -1/0` = as.logical(PyPu_TSS),
+    `Inr (EPD)` = as.logical(INR_EPD), `TSS fuerte (Inr fuerte)` = as.logical(INR_strong_TSS),
+    `CCAAT-box` = as.logical(CCAAT_EPD), `GC-box` = as.logical(GCbox_EPD),
+    YY1 = as.logical(YY1_motif), `CRE (CREB/ATF)` = as.logical(CRE_motif),
+    `Polycomb (cualquiera)` = seq_id %in% remap_pc$seq_id[remap_pc$TF %in% PC_TFS]
+  )
+for (tf in c(PC_TFS, "RNF2")) feat[[paste("ReMap:", tf)]] <- feat$seq_id %in% remap_pc$seq_id[remap_pc$TF == tf]
+feat <- left_join(feat, tidy_endo, by = c("seq_id", "rep"))
+
+# Concordancia del grupo de actividad de las TATA fuertes entre replicas
+conc <- feat %>%
+  filter(tata_fuerte) %>%
+  select(seq_id, rep, act_alta) %>%
+  pivot_wider(names_from = rep, values_from = act_alta)
+conc_tab <- conc %>%
+  summarise(
+    n_rep1 = sum(!is.na(`Rep 1`)), n_rep2 = sum(!is.na(`Rep 2`)), n_ambas = sum(!is.na(`Rep 1`) & !is.na(`Rep 2`)),
+    concordantes_alta = sum(`Rep 1` & `Rep 2`, na.rm = TRUE), concordantes_baja = sum(!`Rep 1` & !`Rep 2`, na.rm = TRUE),
+    discordantes = sum(`Rep 1` != `Rep 2`, na.rm = TRUE)
+  ) %>%
+  mutate(prop_concordantes = (concordantes_alta + concordantes_baja) / n_ambas)
+save_tsv(conc_tab, "p6_concordancia_actividad_tata_fuertes.tsv")
+show(conc_tab, "p6 concordancia del grupo de actividad de las TATA fuertes")
+show(count(feat, rep, tata_fuerte, act_alta), "p6 n por grupo")
+
+# Promotores (todos, no solo TATA) con el mismo grupo de actividad en ambas replicas
+ids_conc <- feat %>%
+  select(seq_id, rep, act_alta) %>%
+  pivot_wider(names_from = rep, values_from = act_alta) %>%
+  filter(!is.na(`Rep 1`), !is.na(`Rep 2`), `Rep 1` == `Rep 2`) %>%
+  pull(seq_id)
+
+or_glm <- function(dd) {
+  tab <- table(factor(dd$act_alta, c(TRUE, FALSE)), factor(dd$valor, c(TRUE, FALSE)))
+  if (any(tab == 0)) {
+    return(tibble(OR = NA_real_, OR_low = NA_real_, OR_high = NA_real_))
+  }
+  b <- coef(summary(glm(valor ~ act_alta, family = binomial, data = dd)))["act_altaTRUE", ]
+  tibble(OR = exp(b[1]), OR_low = exp(b[1] - 1.96 * b[2]), OR_high = exp(b[1] + 1.96 * b[2]))
+}
+compara_variable <- function(d, v) {
+  d <- d %>% mutate(valor = .data[[v]]) %>% filter(!is.na(valor))
+  s <- filter(d, tata_fuerte)
+  r <- filter(d, !tata_fuerte)
+  if (v %in% vars_cont) {
+    w <- wilcox.test(s$valor[s$act_alta], s$valor[!s$act_alta], exact = FALSE)
+    lm_dif <- function(dd) coef(lm(valor ~ act_alta, data = dd))[["act_altaTRUE"]]
+    tibble(
+      tipo = "continua",
+      fuerte_alta = median(s$valor[s$act_alta]), fuerte_baja = median(s$valor[!s$act_alta]),
+      dif_medianas_fuertes = fuerte_alta - fuerte_baja, p = w$p.value,
+      dif_medias_fuertes = lm_dif(s), dif_medias_resto = lm_dif(r),
+      p_interaccion = coef(summary(lm(valor ~ act_alta * tata_fuerte, data = d)))["act_altaTRUE:tata_fuerteTRUE", 4]
+    )
+  } else {
+    ft <- fisher.test(table(factor(s$act_alta, c(TRUE, FALSE)), factor(s$valor, c(TRUE, FALSE))))
+    m <- glm(valor ~ act_alta * tata_fuerte, family = binomial, data = d)
+    cf <- coef(summary(m))
+    tibble(
+      tipo = "binaria",
+      fuerte_alta = mean(s$valor[s$act_alta]), fuerte_baja = mean(s$valor[!s$act_alta]),
+      resto_alta = mean(r$valor[r$act_alta]), resto_baja = mean(r$valor[!r$act_alta]),
+      OR_fisher = unname(ft$estimate), OR_fisher_low = ft$conf.int[1], OR_fisher_high = ft$conf.int[2], p = ft$p.value,
+      p_interaccion = if ("act_altaTRUE:tata_fuerteTRUE" %in% rownames(cf)) cf["act_altaTRUE:tata_fuerteTRUE", 4] else NA_real_
+    ) %>%
+      bind_cols(or_glm(s) %>% rename_with(~ paste0(.x, "_fuertes"))) %>%
+      bind_cols(or_glm(r) %>% rename_with(~ paste0(.x, "_resto")))
+  }
+}
+p6 <- bind_rows(
+  feat %>% mutate(conjunto = "Todos"),
+  feat %>% filter(seq_id %in% ids_conc) %>% mutate(conjunto = "Actividad concordante entre réplicas")
+) %>%
+  group_by(conjunto, rep) %>%
+  group_modify(function(d, k) {
+    map_dfr(hipotesis_vars$variable, ~ compara_variable(d, .x) %>% mutate(variable = .x)) %>%
+      mutate(
+        n_fuerte_alta = sum(d$tata_fuerte & d$act_alta), n_fuerte_baja = sum(d$tata_fuerte & !d$act_alta),
+        p_adj = p.adjust(p, "BH"), p_interaccion_adj = p.adjust(p_interaccion, "BH")
+      )
+  }) %>%
+  ungroup() %>%
+  left_join(hipotesis_vars, by = "variable") %>%
+  select(conjunto, rep, hipotesis, variable, tipo, n_fuerte_alta, n_fuerte_baja, everything())
+
+# Puntaje de la TATA (solo existe en las TATA fuertes): alta vs. baja
+p6_puntaje <- bind_rows(
+  feat %>% mutate(conjunto = "Todos"),
+  feat %>% filter(seq_id %in% ids_conc) %>% mutate(conjunto = "Actividad concordante entre réplicas")
+) %>%
+  filter(tata_fuerte) %>%
+  group_by(conjunto, rep) %>%
+  summarise(
+    mediana_alta = median(score_canon[act_alta]), mediana_baja = median(score_canon[!act_alta]),
+    p = wilcox.test(score_canon[act_alta], score_canon[!act_alta], exact = FALSE)$p.value, .groups = "drop"
+  ) %>%
+  mutate(dif_medianas = mediana_alta - mediana_baja)
+save_tsv(p6, "p6_variables_tata_fuertes_alta_vs_baja.tsv")
+save_tsv(p6_puntaje, "p6_puntaje_tata_fuertes_alta_vs_baja.tsv")
+show(p6_puntaje, "p6 puntaje de las TATA fuertes, alta vs. baja actividad")
+show(p6 %>% filter(conjunto == "Todos", tipo == "binaria") %>%
+  select(rep, hipotesis, variable, fuerte_alta, fuerte_baja, OR_fisher, p_adj, resto_alta, resto_baja, OR_resto, p_interaccion, p_interaccion_adj), "p6 binarias (Todos)")
+show(p6 %>% filter(tipo == "continua") %>%
+  select(conjunto, rep, variable, fuerte_alta, fuerte_baja, dif_medianas_fuertes, p_adj, dif_medias_fuertes, dif_medias_resto, p_interaccion), "p6 continuas")
+show(p6 %>% filter(conjunto != "Todos", tipo == "binaria") %>%
+  select(rep, variable, n_fuerte_alta, n_fuerte_baja, fuerte_alta, fuerte_baja, OR_fisher, p_adj, OR_resto, p_interaccion), "p6 binarias (concordantes)")
+
+forest_p6 <- function(df) {
+  df %>%
+    filter(tipo == "binaria") %>%
+    select(rep, hipotesis, variable, p_interaccion_adj, starts_with("OR_") & (ends_with("_fuertes") | ends_with("_resto"))) %>%
+    pivot_longer(starts_with("OR_"), names_to = c(".value", "grupo"), names_pattern = "(OR|OR_low|OR_high)_(fuertes|resto)") %>%
+    mutate(
+      grupo = recode(grupo, fuertes = "TATA fuertes", resto = "Resto"),
+      variable = factor(variable, levels = rev(hipotesis_vars$variable)),
+      interaccion = if_else(p_interaccion_adj < 0.05, "Interacción BH < 0.05", "Interacción n.s.", missing = "Interacción n.s.")
+    ) %>%
+    filter(!is.na(OR)) %>%
+    ggplot(aes(OR, variable, color = grupo)) +
+    geom_vline(xintercept = 1, linetype = "dashed", color = "grey50") +
+    geom_linerange(aes(xmin = OR_low, xmax = OR_high), position = position_dodge(width = 0.6), linewidth = 0.9) +
+    geom_point(aes(shape = interaccion), position = position_dodge(width = 0.6), size = 2.6, fill = "white") +
+    scale_x_log10() +
+    scale_color_manual(values = c("TATA fuertes" = col_misma, "Resto" = "grey55")) +
+    scale_shape_manual(values = c("Interacción BH < 0.05" = 16, "Interacción n.s." = 21)) +
+    facet_grid(hipotesis ~ rep, scales = "free_y", space = "free_y") +
+    th +
+    theme(legend.box = "vertical") +
+    labs(x = "OR de actividad alta vs. baja (escala log, IC 95%)", y = NULL, color = NULL, shape = NULL)
+}
+save_jpg(forest_p6(filter(p6, conjunto == "Todos")), "p6_forest_alta_vs_baja", 13, 14)
+save_jpg(forest_p6(filter(p6, conjunto != "Todos")), "p6_forest_alta_vs_baja_concordantes", 13, 14)
 
 message("Salidas en ", out_dir)
