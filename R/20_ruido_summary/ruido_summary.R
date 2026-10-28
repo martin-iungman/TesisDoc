@@ -81,6 +81,8 @@ write_tsv(auc_df, file.path(out_dir, "ruido_summary_auc.tsv"))
 # pval_corr).
 
 panel <- plot_noise_auc_summary(auc_df)
-ggsave(file.path(out_dir, "summary_noise.jpg"), panel, width = 13.5, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("summary_noise.", ext)), panel, width = 13.5, height = 6.75, units = "in")
+}
 
 message("Figuras guardadas en ", out_dir)
