@@ -8,11 +8,11 @@ TATA de los promotores poco activos son más débiles o están mal posicionadas
 
 - **Script:** `R/44_exploratorio_tata_ruido/tata_ruido.R` (corre entero en
   unos minutos desde la raíz del repo; recalcula la búsqueda del motivo, que
-  tarda segundos). Puntos p0–p9, cada uno con prefijo en los archivos.
+  tarda segundos). Puntos p0–p10, cada uno con prefijo en los archivos.
 - **Salidas:** `figures/exploratorio_tata_ruido/` (sin `fig_dir()`, sin número).
 - **No es figura de la tesis:** no hay fila en `docs/mapping_figuras.csv` y no
   hay que agregarla.
-- Commits: `d7b4d1d` (p0–p5), `26b0c09` (p6), `ad2a3df` (p7), `c70c5bb` (p8), p9 en el commit que agrega esta sección.
+- Commits: `d7b4d1d` (p0–p5), `26b0c09` (p6), `ad2a3df` (p7), `c70c5bb` (p8), `17440d3` (p9), p10 en el commit que agrega esa sección.
 
 Números siempre como Rep 1 / Rep 2.
 
@@ -162,6 +162,26 @@ estrato (percentil 75 por réplica).
 - Lectura: el componente de composición A/T sobre el ruido vive en los
   promotores de baja actividad; en los de alta actividad el efecto es
   específico del motivo y de la posición canónica, como para la actividad.
+
+### p10 — `var_rank_sw ~ clase * actividad_alta + A/T` en un solo modelo
+Por réplica, sobre todos los promotores. Efecto de la canónica vs. sin motivo
+(rangos), baja / alta actividad:
+
+| Modelo | Baja | Alta | p interacción |
+|---|---|---|---|
+| Sin A/T | +2.6 / +2.6 | +10.2 / +10.8 | 0.002 / <0.001 |
+| + A/T proximal y del fragmento (pendiente común) | −0.9 / +0.1 (n.s.) | +7.6 / +8.7 | <0.001 / <0.001 |
+| + A/T × actividad (sensibilidad) | −1.1 / +0.1 (n.s.) | +8.3 / +8.5 | <0.001 / <0.001 |
+
+- El ajuste resta una cantidad parecida en ambos estratos (~2.5–3.5 rangos en
+  baja, ~2–2.6 en alta), pero en baja era todo el efecto y en alta es ~20–25%
+  (se retiene 75–81%).
+- Con A/T la diferencia entre estratos no se achica; la interacción se
+  mantiene o aumenta.
+- Clases no canónicas: con A/T quedan en ~0 en ambos estratos.
+- Lectura: A/T explica el pequeño efecto de baja actividad y una fracción
+  menor del de alta; el efecto específico de la TATA canónica existe solo en
+  alta actividad.
 
 ---
 

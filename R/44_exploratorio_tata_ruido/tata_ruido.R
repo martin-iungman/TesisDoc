@@ -56,6 +56,8 @@
 #       y estrato de actividad; ruido vs. Gini continuo.
 #   p9  p1 y p2 (perfil por ventana, clases, permutadas, modelo A/T) dentro
 #       de cada estrato de actividad (percentil 75 por replica).
+#   p10 var_rank_sw ~ clase * actividad_alta (+ A/T): si el ajuste por A/T
+#       reduce el efecto de la canonica por igual en ambos estratos.
 #
 # Union de Polycomb: data/processed/remap_tf_hits.tsv.
 #
@@ -944,5 +946,78 @@ panel_modelo_act <- modelos_act %>%
   guides(color = guide_legend(nrow = 1)) +
   labs(x = "Diferencia de rango de varianza vs. sin motivo del estrato", y = NULL, color = NULL)
 save_jpg(panel_modelo_act, "p9_modelo_AT_por_actividad", 14, 8)
+
+# --- p10: clase x actividad con ajuste por A/T en un solo modelo ---------------
+
+# var_rank_sw ~ clase * act_alta (+ A/T proximal y del fragmento), por replica,
+# sobre todos los promotores. Efecto de cada clase vs. sin motivo en baja
+# actividad (coeficiente de clase) y en alta (clase + interaccion, IC por
+# combinacion lineal con vcov); p de la interaccion = el efecto difiere entre
+# estratos. Modelos: sin A/T; con A/T de pendiente comun (el pedido); con A/T
+# x actividad (sensibilidad: pendientes de A/T distintas por estrato).
+
+modelos_int_lab <- c("Sin A/T", "+ A/T (pendiente común)", "+ A/T × actividad")
+d10 <- data %>%
+  mutate(at_prox = at_prox[seq_id], at_frag = 1 - g_c, clase = relevel(clase, ref = "Sin motivo"), act_alta = actividad == "Alta")
+formulas_int <- list(
+  var_rank_sw ~ clase * act_alta,
+  var_rank_sw ~ clase * act_alta + at_prox + at_frag,
+  var_rank_sw ~ clase * act_alta + (at_prox + at_frag) * act_alta
+) %>% set_names(modelos_int_lab)
+p10 <- d10 %>%
+  group_by(rep) %>%
+  group_modify(function(d, k) {
+    imap_dfr(formulas_int, function(f, nm) {
+      m <- lm(f, data = d)
+      b <- coef(m)
+      V <- vcov(m)
+      map_dfr(setdiff(TATA_CLASES, "Sin motivo"), function(cl) {
+        t_cl <- paste0("clase", cl)
+        t_int <- paste0(t_cl, ":act_altaTRUE")
+        se_alta <- sqrt(V[t_cl, t_cl] + V[t_int, t_int] + 2 * V[t_cl, t_int])
+        df_res <- m$df.residual
+        q <- qt(0.975, df_res)
+        tibble(
+          modelo = nm, clase = cl,
+          efecto_baja = b[[t_cl]], baja_low = b[[t_cl]] - q * sqrt(V[t_cl, t_cl]), baja_high = b[[t_cl]] + q * sqrt(V[t_cl, t_cl]),
+          p_baja = 2 * pt(-abs(b[[t_cl]] / sqrt(V[t_cl, t_cl])), df_res),
+          efecto_alta = b[[t_cl]] + b[[t_int]], alta_low = efecto_alta - q * se_alta, alta_high = efecto_alta + q * se_alta,
+          p_alta = 2 * pt(-abs(efecto_alta / se_alta), df_res),
+          interaccion = b[[t_int]], p_interaccion = coef(summary(m))[t_int, 4]
+        )
+      })
+    })
+  }) %>%
+  ungroup() %>%
+  mutate(modelo = factor(modelo, levels = modelos_int_lab), clase = factor(clase, levels = rev(setdiff(TATA_CLASES, "Sin motivo"))))
+save_tsv(p10, "p10_modelo_clase_x_actividad_AT.tsv")
+show(p10 %>% select(rep, modelo, clase, efecto_baja, baja_low, baja_high, p_baja, efecto_alta, alta_low, alta_high, p_alta, interaccion, p_interaccion), "p10 var_rank_sw ~ clase * actividad (+ A/T)")
+
+# Fraccion del efecto de la canonica que queda tras el ajuste, por estrato
+p10_retenido <- p10 %>%
+  filter(clase == "Canónica") %>%
+  select(rep, modelo, efecto_baja, efecto_alta) %>%
+  pivot_longer(c(efecto_baja, efecto_alta), names_to = "actividad", values_to = "efecto") %>%
+  group_by(rep, actividad) %>%
+  mutate(fraccion_del_sin_AT = efecto / efecto[modelo == "Sin A/T"]) %>%
+  ungroup()
+save_tsv(p10_retenido, "p10_fraccion_retenida_canonica.tsv")
+show(p10_retenido, "p10 efecto de la canonica retenido tras el ajuste por A/T")
+
+panel_p10 <- bind_rows(
+  p10 %>% transmute(rep, modelo, clase, actividad = "Actividad alta", efecto = efecto_alta, low = alta_low, high = alta_high, p_interaccion),
+  p10 %>% transmute(rep, modelo, clase, actividad = "Actividad baja", efecto = efecto_baja, low = baja_low, high = baja_high, p_interaccion)
+) %>%
+  mutate(actividad = factor(actividad, levels = c("Actividad alta", "Actividad baja"))) %>%
+  ggplot(aes(efecto, clase, color = modelo)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_linerange(aes(xmin = low, xmax = high), position = position_dodge(width = 0.6), linewidth = 1) +
+  geom_point(position = position_dodge(width = 0.6), size = 2.8) +
+  scale_color_manual(values = setNames(c("grey55", col_misma, col_opuesta), modelos_int_lab)) +
+  facet_grid(rep ~ actividad) +
+  th +
+  guides(color = guide_legend(nrow = 1)) +
+  labs(x = "Diferencia de rango de varianza vs. sin motivo (modelo clase × actividad)", y = NULL, color = NULL)
+save_jpg(panel_p10, "p10_modelo_clase_x_actividad_AT", 14, 8)
 
 message("Salidas en ", out_dir)

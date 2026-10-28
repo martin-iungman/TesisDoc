@@ -1,0 +1,13 @@
+rep	modelo	actividad	efecto	fraccion_del_sin_AT
+Rep 1	Sin A/T	efecto_baja	2.5596206544682505	1
+Rep 1	Sin A/T	efecto_alta	10.17988625936627	1
+Rep 1	+ A/T (pendiente común)	efecto_baja	-0.914442977844287	-0.3572572272566922
+Rep 1	+ A/T (pendiente común)	efecto_alta	7.595573324406425	0.7461353821530098
+Rep 1	+ A/T × actividad	efecto_baja	-1.1058006817694206	-0.4320174084542796
+Rep 1	+ A/T × actividad	efecto_alta	8.2491553440614	0.8103386554512384
+Rep 2	Sin A/T	efecto_baja	2.64359639353631	1
+Rep 2	Sin A/T	efecto_alta	10.76053235937001	1
+Rep 2	+ A/T (pendiente común)	efecto_baja	0.05990762121785784	0.02266140979929242
+Rep 2	+ A/T (pendiente común)	efecto_alta	8.658816271302465	0.8046828894820038
+Rep 2	+ A/T × actividad	efecto_baja	0.12197994296244996	0.046141666428618
+Rep 2	+ A/T × actividad	efecto_alta	8.471355529883965	0.7872617494158933
