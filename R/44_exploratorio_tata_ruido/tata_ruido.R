@@ -1134,4 +1134,18 @@ panel_barrido <- ggplot(p11_barrido, aes(corte, AUC, color = lado)) +
   labs(x = "Corte de actividad (percentil)", y = "AUC del ruido, TATA canónica\nvs. sin motivo (IC 95%)", color = NULL)
 save_jpg((panel_decil | panel_curva) / panel_barrido, "p11_efecto_vs_actividad_continua", 15, 11)
 
+# Respaldo en la carpeta de la figura tata_ruido_especificidad (no es panel de
+# la figura ni va a la tesis): AUC por decil de actividad, con el tema de esa
+# figura (theme_pubr 16), .jpg y .pdf + tabla.
+source("R/functions/fig_paths.R")
+dir_r35 <- fig_dir("tata_ruido_especificidad")
+respaldo_decil <- panel_decil +
+  theme_pubr(base_size = 16) +
+  theme(legend.position = "top")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(dir_r35, paste0("respaldo_auc_por_decil_actividad.", ext)), respaldo_decil,
+    width = 10, height = 6.5, units = "in", device = if (ext == "pdf") cairo_pdf else NULL)
+}
+write_tsv(p11_decil, file.path(dir_r35, "respaldo_auc_por_decil_actividad.tsv"))
+
 message("Salidas en ", out_dir)

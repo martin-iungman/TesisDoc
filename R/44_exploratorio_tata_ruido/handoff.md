@@ -207,6 +207,10 @@ actividad (percentil dentro de cada réplica).
   aparece de forma gradual entre ~P60 y ~P80. Un corte en P65–P70 separa un
   poco más limpio (abajo ~0.51–0.52). Recomendado para la tesis: mantener P75
   y mostrar la curva continua (deciles o spline) como respaldo.
+- El panel de deciles se guarda además como respaldo (no es panel de la
+  figura ni va a la tesis) en la carpeta de `tata_ruido_especificidad`:
+  `respaldo_auc_por_decil_actividad.jpg/.pdf/.tsv`, vía `fig_dir()`. No está
+  en la columna `archivos` del mapping.
 
 ---
 
