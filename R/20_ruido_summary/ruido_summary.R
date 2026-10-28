@@ -112,4 +112,104 @@ figura <- (panel_seq / panel_endo) +
   theme(legend.position = "top", plot.tag = element_text(size = 28, face = "bold"))
 save_jpg_pdf(figura, "summary_noise", 13.5, 2 + 0.45 * sum(n_feat + 3))
 
+# --- Modelo por feature: ruido ~ feature * actividad -----------------------
+# Todas las features juntas (sin separar seq/endo). Para cada feature y
+# replica: lm(var_rank_sw ~ feature * pct_act), con pct_act = percentil de
+# la actividad media dentro de la replica (0-1) centrado en 0.5. Asi:
+#   - efecto principal = diferencia en var_rank_sw (posicion 1-100 dentro
+#     del bin de actividad) entre promotores con y sin la feature, a
+#     actividad mediana;
+#   - interaccion = cuanto cambia ese efecto entre el percentil 0 y el 100
+#     de actividad.
+# Complementario, no va a la tesis: se guarda en
+# figures/exploratorio_ruido_feature_x_actividad/ (solo jpg).
+# BH sobre todos los tests (features x replicas x terminos). Se muestran las
+# features con algun termino significativo y del mismo signo en ambas
+# replicas; los terminos que no lo cumplen van en gris.
+
+expl_dir <- "figures/exploratorio_ruido_feature_x_actividad"
+dir.create(expl_dir, showWarnings = FALSE, recursive = TRUE)
+
+tidy_mod <- data %>%
+  group_by(rep) %>%
+  mutate(pct_act = percent_rank(mean) - 0.5) %>%
+  ungroup() %>%
+  build_tidy_features(keep = c("var_rank_sw", "pct_act"))
+
+terminos <- c(feat = "Efecto principal
+(a actividad mediana)", int = "Interacción con la actividad
+(cambio del efecto del percentil 0 al 100)")
+lm_df <- expand_grid(rep = repname, feature = vbles) %>%
+  pmap(function(rep, feature) {
+    df <- tidy_mod[tidy_mod$rep == rep, ]
+    df$f <- as.numeric(as.logical(df[[feature]]))
+    fit <- lm(var_rank_sw ~ f * pct_act, data = df)
+    co <- summary(fit)$coefficients[c("f", "f:pct_act"), , drop = FALSE]
+    ci <- confint(fit)[c("f", "f:pct_act"), , drop = FALSE]
+    tibble(
+      feature = feature, rep = rep, termino = c("feat", "int"), n_feature = sum(df$f, na.rm = TRUE),
+      estimate = co[, 1], ci_low = ci[, 1], ci_high = ci[, 2], pval = co[, 4]
+    )
+  }) %>%
+  list_rbind() %>%
+  mutate(pval_corr = p.adjust(pval, method = "BH"))
+write_tsv(lm_df, file.path(expl_dir, "ruido_feature_x_actividad_lm.tsv"))
+
+lm_plot <- lm_df %>%
+  group_by(feature, termino) %>%
+  mutate(consistente = all(pval_corr < 0.05) & n_distinct(sign(estimate)) == 1) %>%
+  group_by(feature) %>%
+  filter(any(consistente)) %>%
+  ungroup() %>%
+  mutate(
+    efecto = case_when(!consistente ~ "n.s.", estimate > 0 ~ "Más ruido", TRUE ~ "Menos ruido"),
+    termino = factor(terminos[termino], levels = terminos)
+  )
+orden <- lm_plot %>% filter(termino == terminos["feat"]) %>% group_by(feature) %>% summarise(m = mean(estimate)) %>% arrange(m) %>% pull(feature)
+
+panel_lm <- lm_plot %>%
+  mutate(feature = factor(feature, levels = orden), rep = factor(rep, levels = c("Rep 2", "Rep 1"))) %>%
+  ggplot(aes(x = estimate, y = feature, group = rep)) +
+  geom_col(orientation = "y", position = "dodge", aes(fill = efecto, alpha = rep)) +
+  geom_errorbarh(aes(xmin = ci_low, xmax = ci_high), position = position_dodge(0.9), height = 0.05, col = "#777777", linewidth = 1) +
+  geom_vline(xintercept = 0, linewidth = 0.4) +
+  facet_wrap(~termino, scales = "free_x") +
+  scale_alpha_manual(values = c("Rep 1" = 1, "Rep 2" = 0.7), breaks = c("Rep 1", "Rep 2")) +
+  scale_fill_manual(values = c("Más ruido" = "#D6741F", "Menos ruido" = "#7FB800", "n.s." = "grey75"), breaks = c("Más ruido", "Menos ruido", "n.s.")) +
+  theme_pubr(base_size = 20) +
+  theme(legend.position = "top", strip.background = element_blank(), strip.text = element_text(size = 20), panel.spacing = unit(2, "lines")) +
+  labs(fill = "Efecto", x = "Coeficiente (rango de varianza dentro del bin, 1-100)", y = "Características del promotor", alpha = "")
+ggsave(file.path(expl_dir, "ruido_feature_x_actividad.jpg"), panel_lm, width = 18, height = 2.5 + 0.55 * length(orden), units = "in")
+
+# Efecto predicho de cada feature a lo largo de la actividad
+# (efecto principal + interaccion * (percentil - 0.5)), con su banda de
+# confianza de 95%, para las mismas features.
+efecto_pred <- expand_grid(rep = repname, feature = orden) %>%
+  pmap(function(rep, feature) {
+    df <- tidy_mod[tidy_mod$rep == rep, ]
+    df$f <- as.numeric(as.logical(df[[feature]]))
+    fit <- lm(var_rank_sw ~ f * pct_act, data = df)
+    grid <- seq(-0.5, 0.5, by = 0.05)
+    L <- cbind(0, 1, 0, grid)
+    est <- drop(L %*% coef(fit))
+    se <- sqrt(rowSums((L %*% vcov(fit)) * L))
+    tibble(feature = feature, rep = rep, pct = grid + 0.5, est = est, lo = est - 1.96 * se, hi = est + 1.96 * se)
+  }) %>%
+  list_rbind()
+
+panel_pred <- efecto_pred %>%
+  mutate(feature = factor(feature, levels = rev(orden))) %>%
+  ggplot(aes(pct * 100, est, col = rep, fill = rep)) +
+  geom_hline(yintercept = 0, linewidth = 0.4, col = "grey50") +
+  geom_ribbon(aes(ymin = lo, ymax = hi), alpha = 0.2, col = NA) +
+  geom_line(linewidth = 1) +
+  facet_wrap(~feature, labeller = label_wrap_gen(25)) +
+  scale_color_manual(values = c("Rep 1" = "black", "Rep 2" = "grey55")) +
+  scale_fill_manual(values = c("Rep 1" = "black", "Rep 2" = "grey55")) +
+  theme_pubr(base_size = 16) +
+  theme(legend.position = "top", strip.background = element_blank()) +
+  labs(x = "Percentil de actividad media", y = "Efecto de la característica sobre el
+rango de varianza (con - sin)", col = "", fill = "")
+ggsave(file.path(expl_dir, "ruido_feature_x_actividad_curvas.jpg"), panel_pred, width = 16, height = 3 + 2.6 * ceiling(length(orden) / 4), units = "in")
+
 message("Figuras guardadas en ", out_dir)
