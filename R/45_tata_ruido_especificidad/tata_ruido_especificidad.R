@@ -32,7 +32,8 @@
 #   D panel_d_ruido_gini: AUC de ruido de las TATA fuertes vs. sin motivo del
 #     mismo tercil de Gini (terciles sobre todos los promotores con Gini de
 #     cada replica) y del mismo estrato de actividad. Los no detectados en
-#     FANTOM5 quedan afuera.
+#     FANTOM5 quedan afuera. En B y D, las celdas con menos de 20 casos
+#     muestran solo el n (la AUC queda en el .tsv).
 # Replicas siempre en facetas (columnas). B y D comparten el eje de AUC.
 # Figura completa: tata_ruido_especificidad.jpg/.pdf.
 #
@@ -58,6 +59,7 @@ out_dir <- fig_dir("tata_ruido_especificidad")
 
 CANON <- TATA_CANON
 MIN_N_AUC <- 10
+MIN_N_GRAFICO <- 20 # celdas con menos casos: solo la etiqueta de n en B y D (el .tsv trae la AUC)
 col_alta <- "#216869"
 col_baja <- "#14AFB2"
 th <- theme_pubr(base_size = 16) +
@@ -182,13 +184,14 @@ panel_d_df <- data %>%
 save_tsv(panel_d_df, "panel_d_ruido_gini.tsv")
 
 # Eje de AUC comun a B y D, con todos los IC completos
-lims_auc <- range(c(0.5, panel_b_df$conf.low, panel_b_df$conf.high, panel_d_df$conf.low, panel_d_df$conf.high), na.rm = TRUE)
+ic_graficados <- bind_rows(panel_b_df, panel_d_df) %>% filter(n >= MIN_N_GRAFICO)
+lims_auc <- range(c(0.5, ic_graficados$conf.low, ic_graficados$conf.high), na.rm = TRUE)
 lims_auc <- lims_auc + c(-0.02, 0.06) # lugar para las etiquetas de n
 
 forest_auc <- function(df, x, color, valores, titulo_color, xlab) {
   dodge <- position_dodge(width = 0.75)
   df %>%
-    mutate(y_lab = coalesce(conf.high, 0.5)) %>%
+    mutate(across(c(AUC, conf.low, conf.high), ~ if_else(n < MIN_N_GRAFICO, NA_real_, .x)), y_lab = coalesce(conf.high, 0.5)) %>%
     ggplot(aes(.data[[x]], AUC, color = .data[[color]], group = .data[[color]])) +
     geom_hline(yintercept = 0.5, linetype = "dotted", color = "grey40") +
     geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0, position = dodge, linewidth = 1, na.rm = TRUE) +
@@ -247,7 +250,7 @@ panel_c <- ggplot(panel_c_data, aes(actividad, sample_specificity_gini, fill = g
   scale_y_continuous(labels = num, limits = c(0.1, 1.08), breaks = seq(0.2, 1, 0.2)) +
   facet_wrap(~rep) +
   th +
-  labs(x = "Actividad", y = "Índice de Gini (FANTOM5)", fill = NULL)
+  labs(x = "Actividad", y = "Especificidad tisular (índice de Gini)", fill = NULL)
 save_jpg_pdf(panel_c, "panel_c_gini", 10, 6.5)
 
 # --- Figura completa --------------------------------------------------------------
