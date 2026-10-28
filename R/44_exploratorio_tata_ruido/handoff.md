@@ -8,11 +8,11 @@ TATA de los promotores poco activos son más débiles o están mal posicionadas
 
 - **Script:** `R/44_exploratorio_tata_ruido/tata_ruido.R` (corre entero en
   unos minutos desde la raíz del repo; recalcula la búsqueda del motivo, que
-  tarda segundos). Puntos p0–p10, cada uno con prefijo en los archivos.
+  tarda segundos). Puntos p0–p11, cada uno con prefijo en los archivos.
 - **Salidas:** `figures/exploratorio_tata_ruido/` (sin `fig_dir()`, sin número).
 - **No es figura de la tesis:** no hay fila en `docs/mapping_figuras.csv` y no
   hay que agregarla.
-- Commits: `d7b4d1d` (p0–p5), `26b0c09` (p6), `ad2a3df` (p7), `c70c5bb` (p8), `17440d3` (p9), p10 en el commit que agrega esa sección.
+- Commits: `d7b4d1d` (p0–p5), `26b0c09` (p6), `ad2a3df` (p7), `c70c5bb` (p8), `17440d3` (p9), `147e5d8` (p10), p11 en el commit que agrega esa sección.
 
 Números siempre como Rep 1 / Rep 2.
 
@@ -182,6 +182,31 @@ Por réplica, sobre todos los promotores. Efecto de la canónica vs. sin motivo
 - Lectura: A/T explica el pequeño efecto de baja actividad y una fracción
   menor del de alta; el efecto específico de la TATA canónica existe solo en
   alta actividad.
+
+### p11 — ¿es razonable el corte en el percentil 75?
+TATA canónica vs. sin motivo, efecto sobre el ruido en función de la
+actividad (percentil dentro de cada réplica).
+
+- **Por decil:** AUC ~0.49–0.54 en los deciles 1–6, 0.56 / 0.55 en el 7
+  (n.s.), 0.60–0.63 en los deciles 8–10 (significativos). n 36–198 por decil.
+- **Spline (`ns(act_pct, 4) * canonica`):** efecto ~0–3 rangos hasta P55;
+  sube entre ~P60 y ~P80 (+7.3 / +6.2 en P65, ya con IC > 0; +12.0 / +10.2 en
+  P75) y queda en meseta ~10–12 por encima de P80. Transición gradual, no
+  escalón.
+- **Barrido del corte (P50–P90):** el AUC por encima casi no cambia
+  (0.59–0.61 con cualquier corte); el de abajo sube de 0.50–0.51 (cortes
+  ≤ P65) a 0.54 (P90). Con P75 el grupo bajo queda en 0.525 / 0.526 (p 0.10 /
+  0.06) porque incluye el decil 7.
+- **Bisagra (efecto plano hasta c y lineal después):** perfil plano; un
+  efecto lineal en toda la actividad ajusta igual que cualquier c ≤ ~60
+  (Rep 1) / ~68 (Rep 2), y los quiebres más altos ajustan peor. Los datos no
+  identifican un umbral; el modelo bisagra está mal especificado para una
+  curva con meseta, así que la descripción buena es el spline.
+- Lectura: P75 es coherente (no cambia ninguna conclusión y es un corte
+  elegido a priori, sin sobreajuste), pero no es "el" umbral: el efecto
+  aparece de forma gradual entre ~P60 y ~P80. Un corte en P65–P70 separa un
+  poco más limpio (abajo ~0.51–0.52). Recomendado para la tesis: mantener P75
+  y mostrar la curva continua (deciles o spline) como respaldo.
 
 ---
 

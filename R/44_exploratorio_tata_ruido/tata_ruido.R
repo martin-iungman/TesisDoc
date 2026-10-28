@@ -58,6 +58,8 @@
 #       de cada estrato de actividad (percentil 75 por replica).
 #   p10 var_rank_sw ~ clase * actividad_alta (+ A/T): si el ajuste por A/T
 #       reduce el efecto de la canonica por igual en ambos estratos.
+#   p11 efecto de la canonica sobre el ruido como funcion continua de la
+#       actividad (deciles, barrido del corte, spline, bisagra).
 #
 # Union de Polycomb: data/processed/remap_tf_hits.tsv.
 #
@@ -1019,5 +1021,117 @@ panel_p10 <- bind_rows(
   guides(color = guide_legend(nrow = 1)) +
   labs(x = "Diferencia de rango de varianza vs. sin motivo (modelo clase × actividad)", y = NULL, color = NULL)
 save_jpg(panel_p10, "p10_modelo_clase_x_actividad_AT", 14, 8)
+
+# --- p11: el efecto de la TATA sobre el ruido como funcion continua de la actividad ---
+
+# Para evaluar si el corte en el percentil 75 es razonable. TATA canonica vs.
+# sin motivo, por replica:
+#   (a) AUC por decil de actividad (referencia: sin motivo del mismo decil);
+#   (b) barrido del corte (percentil 50 a 90 cada 5): AUC por encima y por
+#       debajo;
+#   (c) modelo continuo var_rank_sw ~ ns(act_pct, 4) * canonica: diferencia
+#       canonica - sin motivo a lo largo de la actividad, IC 95%;
+#   (d) modelo bisagra var_rank_sw ~ ns(act_pct, 4) + canonica +
+#       canonica:pmax(act_pct - c, 0), con c en una grilla de 0 a 95: c con
+#       menor suma de cuadrados e intervalo por perfil (delta RSS / sigma2 <
+#       3.84), comparado con un efecto lineal en la actividad (c = 0).
+
+d11 <- data %>%
+  filter(clase %in% c("Canónica", "Sin motivo")) %>%
+  mutate(canon = clase == "Canónica")
+
+p11_decil <- d11 %>%
+  group_by(rep) %>%
+  mutate(decil = pmin(floor(act_pct / 10) + 1, 10)) %>%
+  group_by(rep, decil) %>%
+  group_modify(~ auc_vs(.x$var_rank_sw[.x$canon], .x$var_rank_sw[!.x$canon]) %>% mutate(act_media = mean(.x$act_pct))) %>%
+  ungroup()
+save_tsv(p11_decil, "p11_auc_por_decil_actividad.tsv")
+show(p11_decil %>% select(rep, decil, n, n_ref, AUC, conf.low, conf.high, p), "p11 AUC canonica vs. sin motivo por decil de actividad")
+
+p11_barrido <- expand_grid(rep = sort(unique(d11$rep)), corte = seq(50, 90, 5)) %>%
+  mutate(res = map2(rep, corte, function(r, ct) {
+    d <- filter(d11, rep == r)
+    bind_rows(
+      auc_vs(d$var_rank_sw[d$canon & d$act_pct >= ct], d$var_rank_sw[!d$canon & d$act_pct >= ct]) %>% mutate(lado = "Por encima"),
+      auc_vs(d$var_rank_sw[d$canon & d$act_pct < ct], d$var_rank_sw[!d$canon & d$act_pct < ct]) %>% mutate(lado = "Por debajo")
+    )
+  })) %>%
+  unnest(res)
+save_tsv(p11_barrido, "p11_barrido_corte_actividad.tsv")
+show(p11_barrido %>% select(rep, corte, lado, n, AUC, conf.low, conf.high, p), "p11 barrido del corte de actividad")
+
+grid_act <- tibble(act_pct = seq(2, 98, 1))
+p11_curva <- d11 %>%
+  group_by(rep) %>%
+  group_modify(function(d, k) {
+    m <- lm(var_rank_sw ~ splines::ns(act_pct, 4) * canon, data = d)
+    X1 <- model.matrix(delete.response(terms(m)), mutate(grid_act, canon = TRUE))
+    X0 <- model.matrix(delete.response(terms(m)), mutate(grid_act, canon = FALSE))
+    D <- X1 - X0
+    est <- drop(D %*% coef(m))
+    se <- sqrt(rowSums((D %*% vcov(m)) * D))
+    grid_act %>% mutate(efecto = est, low = est - 1.96 * se, high = est + 1.96 * se)
+  }) %>%
+  ungroup()
+save_tsv(p11_curva, "p11_efecto_canonica_vs_actividad_spline.tsv")
+show(p11_curva %>% filter(act_pct %% 10 == 5), "p11 efecto de la canonica (rangos) a lo largo de la actividad, spline")
+
+p11_bisagra <- d11 %>%
+  group_by(rep) %>%
+  group_modify(function(d, k) {
+    base <- lm(var_rank_sw ~ splines::ns(act_pct, 4) + canon, data = d)
+    # bisagra armada a mano: con canon:pmax(...) sin efecto principal, lm()
+    # crea una columna por nivel de canon y el coeficiente no es la pendiente
+    # de la diferencia
+    fit_c <- function(cc) {
+      dd <- mutate(d, bisagra = canon * pmax(act_pct - cc, 0))
+      m <- lm(var_rank_sw ~ splines::ns(act_pct, 4) + canon + bisagra, data = dd)
+      tibble(c = cc, rss = sum(resid(m)^2), pendiente = coef(m)[["bisagra"]], intercepto_canon = coef(m)[["canonTRUE"]])
+    }
+    g <- map_dfr(seq(0, 95, 1), fit_c)
+    sigma2 <- min(g$rss) / (nrow(d) - 7)
+    g %>% mutate(delta = (rss - min(rss)) / sigma2, rss_sin_interaccion = sum(resid(base)^2))
+  }) %>%
+  ungroup()
+save_tsv(p11_bisagra, "p11_bisagra_perfil.tsv")
+p11_bisagra_res <- p11_bisagra %>%
+  group_by(rep) %>%
+  summarise(
+    c_optimo = c[which.min(rss)], c_low = min(c[delta < 3.84]), c_high = max(c[delta < 3.84]),
+    pendiente_optima = pendiente[which.min(rss)], intercepto_canon_optimo = intercepto_canon[which.min(rss)],
+    delta_lineal_c0 = delta[c == 0], .groups = "drop"
+  )
+save_tsv(p11_bisagra_res, "p11_bisagra_resumen.tsv")
+show(p11_bisagra_res, "p11 modelo bisagra: punto de quiebre del efecto de la canonica")
+
+panel_decil <- ggplot(p11_decil, aes(act_media, AUC, color = rep)) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "grey50") +
+  geom_vline(xintercept = 75, linetype = "dotted", color = "grey40") +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0, position = position_dodge(width = 2)) +
+  geom_line(position = position_dodge(width = 2)) +
+  geom_point(size = 2.8, position = position_dodge(width = 2)) +
+  scale_color_manual(values = clr_rep) +
+  th +
+  labs(x = "Percentil de actividad (media del decil)", y = "AUC del ruido, TATA canónica\nvs. sin motivo del decil (IC 95%)", color = NULL)
+panel_curva <- ggplot(p11_curva, aes(act_pct, efecto, color = rep, fill = rep)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_vline(xintercept = 75, linetype = "dotted", color = "grey40") +
+  geom_ribbon(aes(ymin = low, ymax = high), alpha = 0.15, color = NA) +
+  geom_line(linewidth = 1.1) +
+  scale_color_manual(values = clr_rep) +
+  scale_fill_manual(values = clr_rep) +
+  th +
+  labs(x = "Percentil de actividad", y = "Diferencia de rango de varianza,\ncanónica - sin motivo (IC 95%)", color = NULL, fill = NULL)
+panel_barrido <- ggplot(p11_barrido, aes(corte, AUC, color = lado)) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "grey50") +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0, position = position_dodge(width = 1.5)) +
+  geom_line(position = position_dodge(width = 1.5)) +
+  geom_point(size = 2.5, position = position_dodge(width = 1.5)) +
+  scale_color_manual(values = c("Por encima" = col_misma, "Por debajo" = "grey55")) +
+  facet_wrap(~rep) +
+  th +
+  labs(x = "Corte de actividad (percentil)", y = "AUC del ruido, TATA canónica\nvs. sin motivo (IC 95%)", color = NULL)
+save_jpg((panel_decil | panel_curva) / panel_barrido, "p11_efecto_vs_actividad_continua", 15, 11)
 
 message("Salidas en ", out_dir)
