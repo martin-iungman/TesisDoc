@@ -52,6 +52,8 @@
 #   p7  especificidad tisular continua (Gini de FANTOM5 y numero de muestras
 #       con actividad): TATA fuertes vs. resto por actividad, y percentil de
 #       actividad por quintil de Gini.
+#   p8  AUC del ruido de las TATA fuertes vs. sin motivo por tercil de Gini
+#       y estrato de actividad; ruido vs. Gini continuo.
 #
 # Union de Polycomb: data/processed/remap_tf_hits.tsv.
 #
@@ -749,5 +751,78 @@ panel_violin <- spec %>%
   th +
   labs(x = "Actividad (percentil 75 por réplica)", y = "Gini de la expresión\nen FANTOM5", fill = NULL)
 save_jpg(panel_violin / panel_quintil, "p7_especificidad_continua", 12, 11)
+
+# --- p8: ruido de las TATA fuertes segun la especificidad tisular ---------------
+
+# AUC del ruido de las TATA fuertes vs. sin motivo (como p4) dentro de cada
+# tercil de Gini (terciles sobre todos los promotores con Gini de cada
+# replica, los mismos de "Alta/Baja especificidad tisular") y de cada
+# estrato de actividad; la referencia es "sin motivo" del mismo tercil y
+# estrato. Los no detectados en FANTOM5 van como categoria aparte. Ademas,
+# relacion continua dentro de las TATA fuertes: Spearman del rango de
+# varianza con el Gini por estrato de actividad, y var_rank_sw ~ gini *
+# tata_fuerte (TATA fuertes + sin motivo) por estrato.
+
+ESPEC_LAB <- c("1" = "Baja", "2" = "Media", "3" = "Alta", "ND" = "No detectado")
+ruido_spec <- data %>%
+  select(seq_id, rep, var_rank_sw, actividad, clase, score_canon, gini = sample_specificity_gini) %>%
+  mutate(tata_fuerte = clase == "Canónica" & score_canon >= CORTE_MEDIANA - TATA_TOL) %>%
+  group_by(rep) %>%
+  mutate(espec = if_else(is.na(gini), "ND", as.character(ntile(gini, 3)))) %>%
+  ungroup() %>%
+  mutate(espec = factor(ESPEC_LAB[espec], levels = ESPEC_LAB), actividad = factor(actividad, levels = c("Baja", "Alta")))
+
+p8_auc <- bind_rows(
+  ruido_spec %>% mutate(actividad = "Todas"),
+  ruido_spec %>% mutate(actividad = as.character(actividad))
+) %>%
+  mutate(actividad = factor(actividad, levels = c("Todas", "Baja", "Alta"))) %>%
+  group_by(rep, actividad, espec) %>%
+  group_modify(~ auc_vs(.x$var_rank_sw[.x$tata_fuerte], .x$var_rank_sw[.x$clase == "Sin motivo"])) %>%
+  ungroup()
+save_tsv(p8_auc, "p8_auc_tata_fuertes_por_especificidad.tsv")
+show(p8_auc %>% select(rep, actividad, espec, n, n_ref, AUC, conf.low, conf.high, p), "p8 AUC del ruido de las TATA fuertes vs. sin motivo, por tercil de Gini")
+
+# Diferencia de AUC entre terciles extremos (z de DeLong, muestras independientes)
+p8_dif <- p8_auc %>%
+  filter(espec %in% c("Baja", "Alta")) %>%
+  select(rep, actividad, espec, AUC, se) %>%
+  pivot_wider(names_from = espec, values_from = c(AUC, se)) %>%
+  mutate(dif_alta_menos_baja = AUC_Alta - AUC_Baja, p = auc_diff_p(AUC_Alta, se_Alta, AUC_Baja, se_Baja))
+save_tsv(p8_dif, "p8_dif_auc_especificidad_alta_vs_baja.tsv")
+show(p8_dif, "p8 AUC especificidad alta - baja")
+
+p8_cont <- bind_rows(
+  ruido_spec %>% mutate(actividad = "Todas"),
+  ruido_spec %>% mutate(actividad = as.character(actividad))
+) %>%
+  filter(!is.na(gini), tata_fuerte | clase == "Sin motivo") %>%
+  group_by(rep, actividad) %>%
+  group_modify(function(d, k) {
+    s <- d[d$tata_fuerte, ]
+    m <- coef(summary(lm(var_rank_sw ~ gini * tata_fuerte, data = d)))
+    ct <- cor.test(s$gini, s$var_rank_sw, method = "spearman", exact = FALSE)
+    tibble(
+      n_fuertes = nrow(s), rho_fuertes = unname(ct$estimate), p_rho = ct$p.value,
+      pendiente_sin_motivo = m["gini", 1], pendiente_fuertes = m["gini", 1] + m["gini:tata_fuerteTRUE", 1],
+      p_interaccion = m["gini:tata_fuerteTRUE", 4]
+    )
+  }) %>%
+  ungroup()
+save_tsv(p8_cont, "p8_ruido_vs_gini_continuo.tsv")
+show(p8_cont, "p8 ruido vs. Gini (continuo)")
+
+panel_p8 <- p8_auc %>%
+  filter(actividad != "Todas") %>%
+  ggplot(aes(espec, AUC, color = actividad)) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "grey50") +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0, position = position_dodge(width = 0.5), linewidth = 1) +
+  geom_point(size = 3, position = position_dodge(width = 0.5)) +
+  geom_text(aes(y = conf.high, label = paste0("n=", n)), vjust = -0.6, size = 4, position = position_dodge(width = 0.5), show.legend = FALSE) +
+  scale_color_manual(values = c(Baja = col_opuesta, Alta = col_misma)) +
+  facet_wrap(~rep) +
+  th +
+  labs(x = "Especificidad tisular (tercil de Gini en FANTOM5)", y = "AUC del ruido de las TATA fuertes\nvs. sin motivo (IC 95%)", color = "Actividad")
+save_jpg(panel_p8, "p8_ruido_tata_fuertes_por_especificidad", 12, 6.5)
 
 message("Salidas en ", out_dir)
