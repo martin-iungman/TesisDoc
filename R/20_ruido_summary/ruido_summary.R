@@ -3,8 +3,10 @@
 # Resumen del efecto de cada feature booleana del promotor sobre el
 # ruido transcripcional: AUC de la feature prediciendo var_rank_sw alto
 # (rango de varianza dentro de cada bin de actividad media - ver
-# R/19_ruido_cgi_tata), un solo panel combinado (sin separar seq/endo,
-# a diferencia de R7).
+# R/19_ruido_cgi_tata), separado en features de secuencia (seq) y de
+# contexto endogeno (endo) igual que summary_features_secuencia /
+# summary_features_endogeno, pero los dos paneles forman una sola figura
+# (A = secuencia, B = contexto endogeno).
 #
 # Significancia: p-valor de Wald usando la varianza de DeLong del AUC
 # (z = (AUC-0.5)/SE_delong), corregido por multiples tests con BH -
@@ -37,6 +39,7 @@ library(tidyverse)
 library(ggpubr)
 library(fastDummies)
 library(pROC)
+library(patchwork)
 source("R/functions/plot_helpers.R")
 source("R/functions/fig_paths.R")
 
@@ -75,14 +78,38 @@ write_tsv(auc_df, file.path(out_dir, "ruido_summary_auc.tsv"))
 
 # --- Grafico resumen --------------------------------------------------
 # Features con pval_corr<0.05 Y mismo sentido (ruido alto/bajo) en ambas
-# replicas (mismo criterio de consistencia que R7). plot_noise_auc_
-# summary() en plot_helpers.R (compartida con R3.3, la version de esto
+# replicas (mismo criterio de consistencia que summary_features_secuencia). plot_noise_auc_
+# summary() en plot_helpers.R (compartida con remap_tf_noise_gsea, la version de esto
 # para TFs de ReMap, que todavia usa el criterio de IC ya que no calcula
 # pval_corr).
 
-panel <- plot_noise_auc_summary(auc_df)
-for (ext in c("jpg", "pdf")) {
-  ggsave(file.path(out_dir, paste0("summary_noise.", ext)), panel, width = 13.5, height = 6.75, units = "in")
+# Mismo eje x en los dos paneles para que las barras sean comparables.
+auc_signif <- auc_df %>% filter(pval_corr < 0.05)
+x_lim <- range(c(auc_signif$ci2.5, auc_signif$ci97.5, 0.5)) - 0.5
+
+panel_noise <- function(grupo, y_label) {
+  plot_noise_auc_summary(auc_df %>% filter(feature %in% feature_groups$feature[feature_groups$group == grupo])) +
+    coord_cartesian(xlim = x_lim) +
+    labs(y = y_label)
 }
+panel_seq <- panel_noise("seq", "Elementos del promotor")
+panel_endo <- panel_noise("endo", "Características del promotor")
+
+save_jpg_pdf <- function(plot, name, width, height) {
+  for (ext in c("jpg", "pdf")) {
+    ggsave(file.path(out_dir, paste0(name, ".", ext)), plot, width = width, height = height, units = "in")
+  }
+}
+save_jpg_pdf(panel_seq, "summary_noise_seq", 13.5, 6.75)
+save_jpg_pdf(panel_endo, "summary_noise_endo", 13.5, 6.75)
+
+# Figura completa: alto de cada panel proporcional a su numero de features
+# (+3 por los ejes, si no el titulo del eje y de endo no entra).
+n_feat <- map_int(list(panel_seq, panel_endo), ~ n_distinct(.x$data$feature))
+figura <- (panel_seq / panel_endo) +
+  plot_layout(heights = n_feat + 3, guides = "collect") +
+  plot_annotation(tag_levels = "A") &
+  theme(legend.position = "top", plot.tag = element_text(size = 28, face = "bold"))
+save_jpg_pdf(figura, "summary_noise", 13.5, 2 + 0.45 * sum(n_feat + 3))
 
 message("Figuras guardadas en ", out_dir)
