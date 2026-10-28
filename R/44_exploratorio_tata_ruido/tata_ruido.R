@@ -49,6 +49,9 @@
 #       ellas y, como control, interaccion actividad x TATA fuerte sobre
 #       todos los promotores (variables del panorama de caracteristicas,
 #       Polycomb en ReMap, elementos de secuencia y composicion; H1-H4).
+#   p7  especificidad tisular continua (Gini de FANTOM5 y numero de muestras
+#       con actividad): TATA fuertes vs. resto por actividad, y percentil de
+#       actividad por quintil de Gini.
 #
 # Union de Polycomb: data/processed/remap_tf_hits.tsv.
 #
@@ -639,5 +642,112 @@ forest_p6 <- function(df) {
 }
 save_jpg(forest_p6(filter(p6, conjunto == "Todos")), "p6_forest_alta_vs_baja", 13, 14)
 save_jpg(forest_p6(filter(p6, conjunto != "Todos")), "p6_forest_alta_vs_baja_concordantes", 13, 14)
+
+# --- p7: especificidad tisular como variable continua ----------------------------
+
+# Gini de la expresion en las muestras de FANTOM5 (sample_specificity_gini,
+# la variable de la que salen los terciles de "Alta especificidad tisular";
+# NA en los no detectados) y numero de muestras de FANTOM5 con el promotor
+# activo (active_fantom5_samples, 0 en los no detectados). (a) TATA fuertes
+# y resto, actividad alta vs. baja: medianas, HL y Wilcoxon; interaccion
+# actividad x TATA fuerte con lm sobre el percentil de la variable (dentro
+# de cada replica). (b) Relacion continua: Spearman del percentil de
+# actividad con la especificidad en TATA fuertes vs. resto (diferencia por
+# z de Fisher) y lm(act_pct ~ gini * tata_fuerte); percentil de actividad
+# medio por quintil de Gini (quintiles sobre todos los promotores de cada
+# replica).
+
+spec_vars <- c(gini = "Gini (FANTOM5)", n_muestras = "Muestras de FANTOM5 con actividad")
+spec <- feat %>%
+  select(seq_id, rep, act_alta, tata_fuerte) %>%
+  left_join(data %>% select(seq_id, rep, act_pct, gini = sample_specificity_gini, n_muestras = active_fantom5_samples), by = c("seq_id", "rep")) %>%
+  mutate(grupo = factor(if_else(tata_fuerte, "TATA fuertes", "Resto"), levels = c("TATA fuertes", "Resto")))
+
+p7_comp <- spec %>%
+  pivot_longer(c(gini, n_muestras), names_to = "variable", values_to = "valor") %>%
+  filter(!is.na(valor)) %>%
+  group_by(rep, variable) %>%
+  mutate(valor_pct = 100 * percent_rank(valor)) %>%
+  group_modify(function(d, k) {
+    p_int <- coef(summary(lm(valor_pct ~ act_alta * tata_fuerte, data = d)))["act_altaTRUE:tata_fuerteTRUE", 4]
+    d %>%
+      group_by(grupo) %>%
+      group_modify(function(g, kk) {
+        w <- wilcox.test(g$valor[g$act_alta], g$valor[!g$act_alta], conf.int = TRUE, exact = FALSE)
+        tibble(
+          n_alta = sum(g$act_alta), n_baja = sum(!g$act_alta),
+          mediana_alta = median(g$valor[g$act_alta]), mediana_baja = median(g$valor[!g$act_alta]),
+          HL_alta_menos_baja = unname(w$estimate), HL_low = w$conf.int[1], HL_high = w$conf.int[2], p = w$p.value,
+          dif_pct_medio = mean(g$valor_pct[g$act_alta]) - mean(g$valor_pct[!g$act_alta])
+        )
+      }) %>%
+      ungroup() %>%
+      mutate(p_interaccion = p_int)
+  }) %>%
+  ungroup() %>%
+  mutate(variable = spec_vars[variable])
+save_tsv(p7_comp, "p7_especificidad_continua_alta_vs_baja.tsv")
+show(p7_comp, "p7 especificidad continua: actividad alta vs. baja, TATA fuertes y resto")
+
+n_na_gini <- spec %>% group_by(rep, grupo, act_alta) %>% summarise(n = n(), n_sin_gini = sum(is.na(gini)), .groups = "drop")
+show(n_na_gini, "p7 promotores sin Gini (no detectados en FANTOM5)")
+
+fisher_z <- function(r1, n1, r2, n2) 2 * pnorm(-abs((atanh(r1) - atanh(r2)) / sqrt(1 / (n1 - 3) + 1 / (n2 - 3))))
+p7_cor <- spec %>%
+  pivot_longer(c(gini, n_muestras), names_to = "variable", values_to = "valor") %>%
+  filter(!is.na(valor)) %>%
+  group_by(rep, variable) %>%
+  group_modify(function(d, k) {
+    s <- d[d$tata_fuerte, ]
+    r <- d[!d$tata_fuerte, ]
+    rho_s <- cor(s$valor, s$act_pct, method = "spearman")
+    rho_r <- cor(r$valor, r$act_pct, method = "spearman")
+    m <- coef(summary(lm(act_pct ~ valor * tata_fuerte, data = d)))
+    tibble(
+      n_fuertes = nrow(s), rho_fuertes = rho_s, p_fuertes = cor.test(s$valor, s$act_pct, method = "spearman", exact = FALSE)$p.value,
+      n_resto = nrow(r), rho_resto = rho_r, p_dif_rho = fisher_z(rho_s, nrow(s), rho_r, nrow(r)),
+      pendiente_resto = m["valor", 1], pendiente_fuertes = m["valor", 1] + m["valor:tata_fuerteTRUE", 1], p_interaccion_lm = m["valor:tata_fuerteTRUE", 4]
+    )
+  }) %>%
+  ungroup() %>%
+  mutate(variable = spec_vars[variable])
+save_tsv(p7_cor, "p7_especificidad_continua_correlacion.tsv")
+show(p7_cor, "p7 actividad vs. especificidad continua (Spearman, pendiente de lm)")
+
+# Percentil de actividad medio por quintil de Gini
+p7_quintil <- spec %>%
+  filter(!is.na(gini)) %>%
+  group_by(rep) %>%
+  mutate(quintil = ntile(gini, 5)) %>%
+  group_by(rep, quintil) %>%
+  mutate(gini_mediana = median(gini)) %>%
+  group_by(rep, grupo, quintil, gini_mediana) %>%
+  summarise(n = n(), act_media = mean(act_pct), h = qt(0.975, n() - 1) * sd(act_pct) / sqrt(n()), prop_alta = mean(act_alta), .groups = "drop") %>%
+  mutate(conf.low = act_media - h, conf.high = act_media + h)
+save_tsv(p7_quintil, "p7_actividad_por_quintil_gini.tsv")
+show(p7_quintil %>% select(rep, grupo, quintil, gini_mediana, n, act_media, conf.low, conf.high, prop_alta), "p7 percentil de actividad por quintil de Gini")
+
+col_grupo <- scale_color_manual(values = c("TATA fuertes" = col_misma, "Resto" = "grey55"))
+panel_quintil <- ggplot(p7_quintil, aes(gini_mediana, act_media, color = grupo)) +
+  geom_hline(yintercept = 50, linetype = "dotted", color = "grey60") +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0, position = position_dodge(width = 0.02)) +
+  geom_line(position = position_dodge(width = 0.02)) +
+  geom_point(size = 3, position = position_dodge(width = 0.02)) +
+  geom_text(data = filter(p7_quintil, grupo == "TATA fuertes"), aes(y = conf.low, label = paste0("n=", n)), vjust = 1.6, size = 4, show.legend = FALSE) +
+  col_grupo +
+  facet_wrap(~rep) +
+  th +
+  labs(x = "Gini de la expresión en FANTOM5 (mediana del quintil)", y = "Percentil de actividad\n(media, IC 95%)", color = NULL)
+panel_violin <- spec %>%
+  filter(!is.na(gini)) %>%
+  mutate(actividad = factor(if_else(act_alta, "Alta", "Baja"), levels = c("Baja", "Alta"))) %>%
+  ggplot(aes(actividad, gini, fill = grupo)) +
+  geom_violin(position = position_dodge(width = 0.8), alpha = 0.5, color = NA) +
+  geom_boxplot(position = position_dodge(width = 0.8), width = 0.15, outlier.shape = NA, show.legend = FALSE) +
+  scale_fill_manual(values = c("TATA fuertes" = col_misma, "Resto" = "grey60")) +
+  facet_wrap(~rep) +
+  th +
+  labs(x = "Actividad (percentil 75 por réplica)", y = "Gini de la expresión\nen FANTOM5", fill = NULL)
+save_jpg(panel_violin / panel_quintil, "p7_especificidad_continua", 12, 11)
 
 message("Salidas en ", out_dir)
