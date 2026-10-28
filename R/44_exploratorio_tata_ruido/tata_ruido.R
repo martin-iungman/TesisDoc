@@ -54,6 +54,8 @@
 #       actividad por quintil de Gini.
 #   p8  AUC del ruido de las TATA fuertes vs. sin motivo por tercil de Gini
 #       y estrato de actividad; ruido vs. Gini continuo.
+#   p9  p1 y p2 (perfil por ventana, clases, permutadas, modelo A/T) dentro
+#       de cada estrato de actividad (percentil 75 por replica).
 #
 # Union de Polycomb: data/processed/remap_tf_hits.tsv.
 #
@@ -824,5 +826,123 @@ panel_p8 <- p8_auc %>%
   th +
   labs(x = "Especificidad tisular (tercil de Gini en FANTOM5)", y = "AUC del ruido de las TATA fuertes\nvs. sin motivo (IC 95%)", color = "Actividad")
 save_jpg(panel_p8, "p8_ruido_tata_fuertes_por_especificidad", 12, 6.5)
+
+# --- p9: perfil posicional y controles de composicion por estrato de actividad ---
+
+# p1 y p2 repetidos dentro de cada estrato de actividad (percentil 75 de mean
+# por replica): todas las comparaciones (casos y referencia "sin motivo") se
+# hacen dentro del estrato. Los graficos muestran el estrato alto; el bajo
+# queda en las tablas como contraste.
+
+por_estrato <- function(f) {
+  map_dfr(c("Alta", "Baja"), ~ f(filter(data, actividad == .x)) %>% mutate(actividad = .x))
+}
+
+perfil_act <- por_estrato(function(d) profile_auc(d, hits))
+save_tsv(perfil_act, "p9_auc_por_ventana_por_actividad.tsv")
+show(perfil_act %>% filter(between(win, -63, 6)) %>% select(actividad, rep, hebra, win, n, AUC, conf.low, conf.high, p_adj), "p9 AUC por ventana (-63 a +6), por estrato de actividad")
+show(perfil_act %>% group_by(actividad, rep, hebra) %>% summarise(n_ventanas = n(), n_BH = sum(sig), mediana_AUC_fuera_canonica = median(AUC[win != TATA_WIN_ORIGIN]), .groups = "drop"), "p9 resumen del perfil por estrato")
+
+clases_act <- por_estrato(function(dd) {
+  dd %>%
+    group_by(rep) %>%
+    group_modify(function(d, k) {
+      ref <- sin_motivo(d)
+      bind_rows(
+        map_dfr(setdiff(TATA_CLASES, "Sin motivo"), ~ auc_vs(d$var_rank_sw[d$clase == .x], ref) %>% mutate(clase = .x)),
+        auc_vs(d$var_rank_sw[d$seq_id %in% op_canon_solo], ref) %>% mutate(clase = "Hebra opuesta en −31 a −26, sin canónica")
+      ) %>% mutate(p_adj = p.adjust(p, "BH"))
+    }) %>%
+    ungroup()
+}) %>%
+  mutate(clase = fct_rev(fct_inorder(clase)))
+save_tsv(clases_act, "p9_auc_por_clase_por_actividad.tsv")
+show(clases_act %>% select(actividad, rep, clase, n, n_ref, AUC, conf.low, conf.high, p_adj), "p9 AUC por clase vs. sin motivo del estrato")
+
+perfil_perm_act <- imap_dfr(perms, function(p, nm) {
+  s <- tata_scores(code, TATA_W[, p])
+  h <- tata_hits(s$misma, s$opuesta, CORTE)
+  por_estrato(function(d) profile_auc(d, filter(h, hebra == "Misma hebra"), ref_hits = h)) %>%
+    mutate(perm = nm)
+})
+perfil_real_act <- filter(perfil_act, hebra == "Misma hebra")
+perm_canon_act <- bind_rows(perfil_real_act %>% mutate(perm = "Matriz real"), perfil_perm_act) %>%
+  filter(win == TATA_WIN_ORIGIN) %>%
+  select(actividad, rep, perm, n, AUC, conf.low, conf.high, p_adj)
+save_tsv(bind_rows(perfil_real_act %>% mutate(perm = "Matriz real"), perfil_perm_act), "p9_auc_por_ventana_permutadas_por_actividad.tsv")
+save_tsv(perm_canon_act, "p9_permutadas_ventana_canonica_por_actividad.tsv")
+show(perm_canon_act, "p9 ventana -33 a -24 (misma hebra), matriz real vs. permutadas, por estrato")
+
+modelos_act <- data %>%
+  mutate(at_prox = at_prox[seq_id], at_frag = 1 - g_c, clase = relevel(clase, ref = "Sin motivo")) %>%
+  group_by(actividad, rep) %>%
+  group_modify(function(d, k) {
+    bind_rows(
+      broom::tidy(lm(var_rank_sw ~ clase, data = d), conf.int = TRUE) %>% mutate(modelo = modelos_lab[1]),
+      broom::tidy(lm(var_rank_sw ~ clase + at_prox, data = d), conf.int = TRUE) %>% mutate(modelo = modelos_lab[2]),
+      broom::tidy(lm(var_rank_sw ~ clase + at_prox + at_frag, data = d), conf.int = TRUE) %>% mutate(modelo = modelos_lab[3])
+    )
+  }) %>%
+  ungroup() %>%
+  filter(str_detect(term, "^clase|^at_")) %>%
+  mutate(modelo = factor(modelo, levels = modelos_lab))
+save_tsv(modelos_act, "p9_modelo_clase_AT_por_actividad.tsv")
+show(modelos_act %>% select(actividad, rep, modelo, term, estimate, conf.low, conf.high, p.value), "p9 modelo lineal var_rank_sw ~ clase + A/T, por estrato")
+
+# Graficos (estrato alto), mismos formatos que p1 y p2
+perfil_alta <- filter(perfil_act, actividad == "Alta")
+panel_perfil_alta <- ggplot(perfil_alta, aes(win_center, AUC, color = hebra)) +
+  franja +
+  geom_hline(yintercept = 0.5, color = "grey50") +
+  geom_linerange(aes(ymin = conf.low, ymax = conf.high), position = dodge, alpha = 0.7) +
+  geom_line(aes(group = seg), position = dodge, alpha = 0.6) +
+  geom_point(aes(shape = sig), position = dodge, size = 2.2, fill = "white") +
+  scale_shape_manual(values = c(`TRUE` = 16, `FALSE` = 21), labels = c(`TRUE` = "BH < 0.05", `FALSE` = "n.s."), name = NULL) +
+  col_hebra +
+  facet_grid(rep ~ .) +
+  scale_x_continuous(breaks = seq(-240, 0, 20), labels = minus) +
+  th +
+  labs(x = NULL, y = "AUC del ruido vs. sin motivo\n(actividad alta, IC 95%)", color = NULL)
+panel_prop_alta <- ggplot(perfil_alta, aes(win_center, 100 * prop, color = hebra)) +
+  franja +
+  geom_line(aes(group = seg)) +
+  geom_point(size = 1.3) +
+  col_hebra +
+  facet_grid(. ~ rep) +
+  scale_x_continuous(breaks = seq(-200, 0, 50), labels = minus) +
+  th +
+  theme(legend.position = "none") +
+  labs(x = "Posición de la coincidencia respecto del TSS (ventanas de 10 pb)", y = "% de promotores\ncon coincidencia")
+save_jpg(panel_perfil_alta / panel_prop_alta + plot_layout(heights = c(2.2, 1)), "p9_perfil_posicion_auc_actividad_alta", 14, 10)
+save_jpg(forest(filter(clases_act, actividad == "Alta"), "clase", xlab = "AUC del ruido vs. sin motivo, actividad alta (IC 95%)"), "p9_clases_auc_actividad_alta", 10, 5)
+
+panel_perm_alta <- ggplot(filter(perfil_perm_act, actividad == "Alta"), aes(win_center, AUC)) +
+  franja +
+  geom_hline(yintercept = 0.5, color = "grey50") +
+  geom_line(aes(group = paste(perm, seg)), color = "grey65", alpha = 0.7) +
+  geom_line(data = filter(perfil_real_act, actividad == "Alta"), aes(group = seg), color = col_misma, linewidth = 1.1) +
+  geom_point(data = filter(perfil_real_act, actividad == "Alta"), color = col_misma, size = 2) +
+  facet_wrap(~rep, ncol = 1) +
+  scale_x_continuous(breaks = seq(-200, 0, 50), labels = minus) +
+  th +
+  labs(x = "Posición respecto del TSS (ventanas de 10 pb)", y = "AUC del ruido vs. sin motivo\n(actividad alta)")
+save_jpg(panel_perm_alta, "p9_permutadas_auc_actividad_alta", 10, 8)
+
+panel_modelo_act <- modelos_act %>%
+  filter(str_detect(term, "^clase")) %>%
+  mutate(
+    clase = factor(str_remove(term, "^clase"), levels = rev(setdiff(TATA_CLASES, "Sin motivo"))),
+    actividad = factor(paste("Actividad", tolower(actividad)), levels = c("Actividad alta", "Actividad baja"))
+  ) %>%
+  ggplot(aes(estimate, clase, color = modelo)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+  geom_linerange(aes(xmin = conf.low, xmax = conf.high), position = position_dodge(width = 0.6), linewidth = 1) +
+  geom_point(position = position_dodge(width = 0.6), size = 2.8) +
+  scale_color_manual(values = setNames(c("grey55", col_opuesta, col_misma), modelos_lab)) +
+  facet_grid(rep ~ actividad) +
+  th +
+  guides(color = guide_legend(nrow = 1)) +
+  labs(x = "Diferencia de rango de varianza vs. sin motivo del estrato", y = NULL, color = NULL)
+save_jpg(panel_modelo_act, "p9_modelo_AT_por_actividad", 14, 8)
 
 message("Salidas en ", out_dir)

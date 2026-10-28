@@ -8,11 +8,11 @@ TATA de los promotores poco activos son más débiles o están mal posicionadas
 
 - **Script:** `R/44_exploratorio_tata_ruido/tata_ruido.R` (corre entero en
   unos minutos desde la raíz del repo; recalcula la búsqueda del motivo, que
-  tarda segundos). Puntos p0–p8, cada uno con prefijo en los archivos.
+  tarda segundos). Puntos p0–p9, cada uno con prefijo en los archivos.
 - **Salidas:** `figures/exploratorio_tata_ruido/` (sin `fig_dir()`, sin número).
 - **No es figura de la tesis:** no hay fila en `docs/mapping_figuras.csv` y no
   hay que agregarla.
-- Commits: `d7b4d1d` (p0–p5), `26b0c09` (p6), `ad2a3df` (p7), `c70c5bb` (p8).
+- Commits: `d7b4d1d` (p0–p5), `26b0c09` (p6), `ad2a3df` (p7), `c70c5bb` (p8), p9 en el commit que agrega esta sección.
 
 Números siempre como Rep 1 / Rep 2.
 
@@ -140,6 +140,28 @@ concordantes da lo mismo.
 - Lectura: el efecto sobre el ruido sigue a la actividad, no a la clase de
   promotor → refuerza A.
 - Límite: "TATA fuerte × expresión amplia × baja actividad" tiene n 6 / 12.
+
+### p9 — perfil posicional y controles de composición dentro de cada estrato de actividad
+Mismo análisis que p1–p2, con casos y referencia "sin motivo" del mismo
+estrato (percentil 75 por réplica).
+
+- **Actividad alta:** la ventana canónica sube a 0.596 / 0.603 (n 289 / 322)
+  y el resto del perfil queda en ~0.5 (mediana fuera de la canónica 0.56 /
+  0.51 misma hebra; las otras ventanas BH < 0.05 son de una sola réplica, n
+  24–47 y en direcciones opuestas). Muchas ventanas no canónicas tienen n < 20
+  y no se grafican.
+- Clases, actividad alta: canónica 0.601 / 0.607; solo no canónica 0.529 /
+  0.494; solo hebra opuesta 0.513 / 0.524; hebra opuesta en −31 a −26 sin
+  canónica 0.515 / 0.488 (n 31 / 45). Todas las no canónicas n.s.
+- Permutadas, actividad alta: ninguna reproduce el AUC en la ventana canónica
+  (todas BH n.s.; n 20–56).
+- Modelo A/T, actividad alta: canónica +10.2 / +10.8 rangos → +8.25 / +8.47
+  con A/T proximal y del fragmento (se mantiene ~80%).
+- **Actividad baja:** canónica 0.525 / 0.526 n.s. y +2.6 → ~0 con A/T; las
+  clases no canónicas y las permutadas 4 y 6 sí dan AUC > 0.5 (0.58–0.63).
+- Lectura: el componente de composición A/T sobre el ruido vive en los
+  promotores de baja actividad; en los de alta actividad el efecto es
+  específico del motivo y de la posición canónica, como para la actividad.
 
 ---
 
