@@ -1,0 +1,87 @@
+grupo	TF	n_Rep 1	n_Rep 2	incluido	motivo
+pausa	CDK9	7067	8456	TRUE	incluido
+pausa	CCNT1	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+pausa	CCNT2	4276	5102	TRUE	incluido
+pausa	NELFA	6557	7741	TRUE	incluido
+pausa	NELFB	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+pausa	NELFCD	6114	7264	TRUE	incluido
+pausa	NELFE	7431	8922	TRUE	incluido
+pausa	SUPT4H1	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+pausa	SUPT5H	7549	9061	TRUE	incluido
+pausa	AFF4	6716	7995	TRUE	incluido
+pausa	BRD4	7481	9034	TRUE	incluido
+pausa	CDK12	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+pausa	CDK13	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+pausa	MLLT3	3382	3972	TRUE	incluido
+pausa	AFF1	4266	5110	TRUE	incluido
+pausa	ELL	49	58	FALSE	100 promotores unidos o menos en alguna réplica (umbral de remap_tf_noise_gsea)
+pausa	ELL2	5754	6779	TRUE	incluido
+pausa	ELL3	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+pausa	EAF1	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+pausa	EAF2	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+pausa	MLLT1	5922	7101	TRUE	incluido
+pausa	HEXIM1	5839	7004	TRUE	incluido
+pausa	HEXIM2	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+pausa	LARP7	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+pausa	MEPCE	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	TBP	7432	8914	TRUE	incluido
+preiniciacion	TAF1	7790	9434	TRUE	incluido
+preiniciacion	TAF2	580	635	TRUE	incluido
+preiniciacion	TAF3	5080	6082	TRUE	incluido
+preiniciacion	TAF4	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	TAF5	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	TAF6	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	TAF7	4062	4722	TRUE	incluido
+preiniciacion	TAF8	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	TAF9	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	TAF9B	2051	2315	TRUE	incluido
+preiniciacion	TAF10	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	TAF11	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	TAF12	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	TAF13	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	GTF2A1	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	GTF2A2	415	476	TRUE	incluido
+preiniciacion	GTF2B	6009	7097	TRUE	incluido
+preiniciacion	GTF2E1	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	GTF2E2	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	GTF2F1	6916	8225	TRUE	incluido
+preiniciacion	GTF2F2	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	GTF2H1	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	GTF2H2	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	GTF2H3	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	GTF2H4	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	ERCC2	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	ERCC3	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	CDK7	5696	6722	TRUE	incluido
+preiniciacion	CCNH	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	MNAT1	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+preiniciacion	POLR2A	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED	4569	5406	TRUE	incluido
+mediador	MED1	7606	9188	TRUE	incluido
+mediador	MED4	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED6	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED7	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED8	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED9	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED10	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED11	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED12	5325	6220	TRUE	incluido
+mediador	MED13	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED14	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED15	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED16	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED17	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED18	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED19	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED20	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED21	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED22	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED23	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED24	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED25	826	948	TRUE	incluido
+mediador	MED26	6909	8298	TRUE	incluido
+mediador	MED27	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED28	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED29	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED30	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library
+mediador	MED31	NA	NA	FALSE	sin picos de ReMap sobre promotores de la library

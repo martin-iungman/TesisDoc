@@ -1,0 +1,7 @@
+modelo	rep	n_factores_evaluables	n_promotores	frac_cgi_library	n
+ajustado_mas_cgi	Rep 1	982	9300	0.7105376344086022	9300
+ajustado_mas_cgi	Rep 2	982	11400	0.6929824561403509	11400
+estrato_con_isla	Rep 1	982	6608	0.7105376344086022	9300
+estrato_con_isla	Rep 2	982	7900	0.6929824561403509	11400
+estrato_sin_isla	Rep 1	853	2692	0.7105376344086022	9300
+estrato_sin_isla	Rep 2	853	3500	0.6929824561403509	11400

@@ -1,0 +1,3 @@
+rep	n_promotores	n_genetype_snrna_library	n_snrna_hg38_org	n_promotores_a_2kb_de_snrna	n_unidos_SNAPC1	n_unidos_a_2kb_de_snrna	snrna_cercanos_unidos	frac_tata_unidos	frac_cgi_unidos	frac_cgi_library	estimate_sin_cercanos	pval_sin_cercanos	n_unidos_sin_cercanos
+Rep 1	9300	0	64	4	1550	3	RNU12, RNU6-1, RNU7-1	0.09548387096774194	0.9109677419354839	0.7105376344086022	2.5764946326727407	0.002651283685082874	1547
+Rep 2	11400	0	64	4	1742	3	RNU12, RNU6-1, RNU7-1	0.09701492537313433	0.8966704936854191	0.6929824561403509	2.969739060077143	2.4703866467268325e-4	1739

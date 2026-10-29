@@ -1,0 +1,9 @@
+modelo	signo	n
+ajustado	mayor ruido	4
+ajustado	menor ruido	276
+crudo	mayor ruido	0
+crudo	menor ruido	502
+solo_actividad	mayor ruido	1
+solo_actividad	menor ruido	443
+AUC_original	mayor ruido	0
+AUC_original	menor ruido	514

@@ -1,0 +1,26 @@
+grupo	TF	n_Rep 1	n_Rep 2	en_remap_library	incluido	motivo
+metilacion	DNMT1	102	119	TRUE	TRUE	incluido
+metilacion	DNMT3A	NA	NA	FALSE	FALSE	sin picos de ReMap sobre promotores de la library
+metilacion	DNMT3B	4204	4877	TRUE	TRUE	incluido
+metilacion	ZBTB33	5231	6135	TRUE	TRUE	incluido
+metilacion	MBD1	4019	4676	TRUE	TRUE	incluido
+metilacion	MBD2	5656	6594	TRUE	TRUE	incluido
+metilacion	MBD3	1258	1570	TRUE	TRUE	incluido
+metilacion	MBD4	18	25	TRUE	FALSE	100 promotores unidos o menos en alguna réplica (umbral de remap_tf_noise_gsea)
+metilacion	MECP2	17	24	TRUE	FALSE	100 promotores unidos o menos en alguna réplica (umbral de remap_tf_noise_gsea)
+metilacion	UHRF1	NA	NA	FALSE	FALSE	sin picos de ReMap sobre promotores de la library
+metilacion	TET1	NA	NA	FALSE	FALSE	sin picos de ReMap sobre promotores de la library
+metilacion	TET2	3281	3741	TRUE	TRUE	incluido
+metilacion	TET3	NA	NA	FALSE	FALSE	sin picos de ReMap sobre promotores de la library
+cpg_no_metilado	MAZ	7665	9235	TRUE	TRUE	incluido
+cpg_no_metilado	SP1	7582	9094	TRUE	TRUE	incluido
+cpg_no_metilado	SP2	6978	8313	TRUE	TRUE	incluido
+cpg_no_metilado	SP3	6048	7149	TRUE	TRUE	incluido
+cpg_no_metilado	ZBTB14	4218	5098	TRUE	TRUE	incluido
+cpg_no_metilado	E2F1	7529	9074	TRUE	TRUE	incluido
+cpg_no_metilado	E2F4	6643	7867	TRUE	TRUE	incluido
+cpg_no_metilado	NRF1	6853	8172	TRUE	TRUE	incluido
+cpg_no_metilado	GABPA	6850	8202	TRUE	TRUE	incluido
+cpg_no_metilado	KLF16	5205	6152	TRUE	TRUE	incluido
+cpg_no_metilado	CXXC1	NA	NA	FALSE	FALSE	sin picos de ReMap sobre promotores de la library
+cpg_no_metilado	KDM2B	NA	NA	FALSE	FALSE	sin picos de ReMap sobre promotores de la library
