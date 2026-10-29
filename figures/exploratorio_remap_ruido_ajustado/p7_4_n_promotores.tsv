@@ -1,7 +1,0 @@
-rep	modelo	n_promotores	n_full_min	decil	cuartil
-Rep 1	ajustado_ocupacion	9300	0	46	204
-Rep 1	ajustado_sin_decil	8358	47	46	204
-Rep 1	ajustado_sin_cuartil	6973	205	46	204
-Rep 2	ajustado_ocupacion	11400	0	41	185
-Rep 2	ajustado_sin_decil	10251	42	41	185
-Rep 2	ajustado_sin_cuartil	8544	186	41	185
