@@ -1,0 +1,19 @@
+item	rep	valor
+1. Marcas de histona evaluadas (>100 promotores con la marca en ambas réplicas)	ambas	49
+1b. Marcas con efecto consistente (BH < 0.05, mismo sentido)	ambas	Ruido bajo: 23; n.s.: 26
+2. Prevalencia de H3K4me3 en la library	Rep 1	90.7% (8438 de 9300)
+2. Prevalencia de H3K4me3 en la library	Rep 2	90.3% (10299 de 11400)
+3. AUC de H3K4me3, Sin isla CpG (rango recalculado en el estrato)	Rep 1	0.422 [0.398, 0.446], p 2.2e-10; con H3K4me3 1808, sin 792 (69.5% con)
+3. AUC de H3K4me3, Sin isla CpG (rango recalculado en el estrato)	Rep 2	0.468 [0.447, 0.489], p 0.0027; con H3K4me3 2455, sin 1045 (70.1% con)
+4. AUC de H3K4me3, Con isla CpG (rango recalculado en el estrato)	Rep 1	0.418 [0.327, 0.509], p 0.076; con H3K4me3 6557, sin 43 (99.3% con)
+4. AUC de H3K4me3, Con isla CpG (rango recalculado en el estrato)	Rep 2	0.526 [0.450, 0.602], p 0.51; con H3K4me3 7844, sin 56 (99.3% con)
+5a. Factores de ReMap evaluados	ambas	982
+5a. Factores con efecto consistente	ambas	Ruido bajo: 514; n.s.: 468
+5b. MLL1/2 complex (GO:0044665): NES, p ajustado	Rep 1	NES -2.47, p ajustado 0.005
+5b. MLL1/2 complex (GO:0044665): NES, p ajustado	Rep 2	NES -2.01, p ajustado 0.081
+5c. Cinco marcas de menor AUC	Rep 1	H3K4me3 (0.369); H3K27ac (0.372); H2BK15ac (0.383); H3K9ac (0.394); H3K4me2 (0.399)
+5c. Cinco marcas de menor AUC	Rep 2	H3K4me3 (0.435); H3K4me1 (0.443); H3K9ac (0.445); H3K27ac (0.448); H3K4me2 (0.451)
+5d. Rango de varianza medio en promotores sin ningún pico de ReMap	Rep 1	63.1 [58.0, 68.2], n 115; media del conjunto 50.5
+5d. Rango de varianza medio en promotores sin ningún pico de ReMap	Rep 2	59.6 [55.3, 63.9], n 144; media del conjunto 50.5
+5e. Meseta: quiebre de la recta quebrada y medias por tramo	Rep 1	quiebre 400 factores; tramos: 0 63.1, 1-100 59.4, 101-200 56.2, 201-300 51.5, 301-400 48.7, 401-500 47.1, 501-600 47.4, >600 46.6
+5e. Meseta: quiebre de la recta quebrada y medias por tramo	Rep 2	quiebre 375 factores; tramos: 0 59.6, 1-100 54.2, 101-200 51.9, 201-300 49.8, 301-400 48.3, 401-500 49.5, 501-600 49.2, >600 51.1
