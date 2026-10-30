@@ -68,11 +68,11 @@ How much of a gene's regulatory behaviour is written in its own sequence is a ce
 
 [Citometría de flujo y sorting	24](#citometría-de-flujo-y-sorting)
 
-[Controles de spike-in basados en células	25](#controles-de-spike-in-basados-en-células)
+[Controles de spike-in basados en células	26](#controles-de-spike-in-basados-en-células)
 
-[Co-extracción de ADN/ARN  y RT-qPCR de EGFP	25](#co-extracción-de-adn/arn-y-rt-qpcr-de-egfp)
+[Co-extracción de ADN/ARN y RT-qPCR de EGFP	26](#co-extracción-de-adn/arn-y-rt-qpcr-de-egfp)
 
-[Secuenciación de amplicones (Amp-seq)	26](#secuenciación-de-amplicones-\(amp-seq\))
+[Secuenciación de amplicones (Amp-seq)	27](#secuenciación-de-amplicones-\(amp-seq\))
 
 [Secuencias de interés y primers utilizados	28](#secuencias-de-interés-y-primers-utilizados)
 
@@ -124,29 +124,45 @@ How much of a gene's regulatory behaviour is written in its own sequence is a ce
 
 [1\. Estimación masiva de las propiedades transcripcionales de promotores basales humanos	49](#1.-estimación-masiva-de-las-propiedades-transcripcionales-de-promotores-basales-humanos)
 
-[2\. Efectos del promotor sobre la fuerza transcripcional	55](#2.-efectos-del-promotor-sobre-la-fuerza-transcripcional)
+[Controles del procedimiento	49](#controles-del-procedimiento)
 
-[Islas CpG	55](#islas-cpg)
+[Representatividad y cuantificación	51](#representatividad-y-cuantificación)
 
-[TATA-box	57](#tata-box)
+[Sesgos de representatividad	53](#sesgos-de-representatividad)
 
-[CCAAT y GC-box	59](#ccaat-y-gc-box)
+[Validación con promotores individuales	55](#validación-con-promotores-individuales)
 
-[Efecto de la secuencia a lo largo del promotor	60](#efecto-de-la-secuencia-a-lo-largo-del-promotor)
+[2\. Efectos del promotor sobre la fuerza transcripcional	56](#2.-efectos-del-promotor-sobre-la-fuerza-transcripcional)
+
+[Islas CpG	56](#islas-cpg)
+
+[TATA-box	58](#tata-box)
+
+[CCAAT y GC-box	60](#ccaat-y-gc-box)
+
+[Efecto de la secuencia a lo largo del promotor	61](#efecto-de-la-secuencia-a-lo-largo-del-promotor)
 
 [Búsqueda de motivos de novo	62](#búsqueda-de-motivos-de-novo)
 
-[Panorama de las características de secuencia	63](#panorama-de-las-características-de-secuencia)
+[Panorama de las características de secuencia	64](#panorama-de-las-características-de-secuencia)
 
-[Características del contexto endógeno	64](#características-del-contexto-endógeno)
+[Características del contexto endógeno	66](#características-del-contexto-endógeno)
 
-[Unión de TF en el contexto endógeno	66](#unión-de-tf-en-el-contexto-endógeno)
+[Unión de TF en el contexto endógeno	67](#unión-de-tf-en-el-contexto-endógeno)
 
-[NF-YA y CCAAT-box	67](#nf-ya-y-ccaat-box)
+[NF-YA y CCAAT-box	69](#nf-ya-y-ccaat-box)
 
-[3\. Efectos del promotor sobre el ruido transcripcional	69](#3.-efectos-del-promotor-sobre-el-ruido-transcripcional)
+[3\. Efectos del promotor sobre el ruido transcripcional	72](#3.-efectos-del-promotor-sobre-el-ruido-transcripcional)
 
-[**Referencias	71**](#referencias)
+[Islas CpG	73](#islas-cpg-1)
+
+[TATA-box	75](#tata-box-1)
+
+[Panorama general de las características asociadas al ruido	77](#panorama-general-de-las-características-asociadas-al-ruido)
+
+[Unión de factores y marcas de histona en el contexto endógeno	79](#unión-de-factores-y-marcas-de-histona-en-el-contexto-endógeno)
+
+[**Referencias	82**](#referencias)
 
 # 
 
@@ -645,7 +661,7 @@ El punto de partida es una *library* de 23908 secuencias de 252 pb (para detalle
 
 Para medir la expresión de cada promotor, separamos las células por FACS en siete fracciones según la intensidad de fluorescencia de EGFP. Los umbrales se definieron con un perfil de citometría previo: el rango de expresión se dividió en intervalos de igual tamaño en escala logarítmica (Fig. M5), abarcando desde una señal igual de baja a las de células sin reportero hasta el 1% de células más brillantes. De cada fracción recolectamos la misma cantidad de células (250000), extrajimos el ADN genómico y amplificamos por PCR la región del promotor para luego secuenciar estos productos (Amplicon-seq). Las secuencias resultantes permiten cuantificar las proporciones de los distintos promotores presentes en cada fracción. El procedimiento se realizó con tres poblaciones independientes de células, constituyendo tres réplicas biológicas.
 
-### Controles del procedimiento
+### Controles del procedimiento {#controles-del-procedimiento}
 
 Para verificar que la separación por fluorescencia reflejaba los niveles de transcripción del reportero, cuantificamos por RT-qPCR el ARNm de EGFP en cada fracción. Los niveles de ARNm acompañaron el aumento de la fluorescencia en las sucesivas fracciones (Fig. R1.1), excepto en la de menor fluorescencia, donde resultaron indistinguibles de los de la fracción control. Por esta razón, esta fracción fue excluida del análisis en todas las réplicas. Además, una de las tres réplicas independientes mostró un patrón de expresión de EGFP poco consistente, además de un rendimiento deficiente en la extracción de ADN genómico (no mostrado), de modo que fue  descartada. En consecuencia, los análisis se basan en dos réplicas independientes con seis fracciones cada una.
 
@@ -655,7 +671,7 @@ Un segundo supuesto del ensayo es que todas las fracciones se procesaron con la 
 
 **Figura R1.2. La proporción entre los *spike-in* se mantiene entre fracciones.** Abundancia relativa de cada línea de *spike-in* en cada fracción del *sorting* (1 a 6, de menor a mayor fluorescencia), para las dos réplicas biológicas. Los conteos se normalizaron por el tamaño de cada librería de secuenciación y se expresan como cociente respecto del Spike-In 2, en escala logarítmica. El Spike-In 1, el 2 y el 3 se agregaron en cantidades crecientes de células (30,300 y 3000 respectivamente), a modo de estándares internos. Cada punto es una fracción y la línea corresponde a un ajuste lineal. Si todas las fracciones se procesaran con la misma eficiencia, la abundancia relativa de cada *spike-in* sería constante entre ellas. 
 
-### Representatividad y cuantificación
+### Representatividad y cuantificación {#representatividad-y-cuantificación}
 
 Una vez obtenidos los datos de secuenciación de ambas réplicas, alineamos las lecturas contra las secuencias de la *library* de forma de poder obtener una cuantificación del número de veces que cada promotor aparecía en cada fracción (*pipeline* completo en Fig. M7). Una preocupación a lo largo del proceso experimental fue evitar un cuello de botella que lleve a que las lecturas observadas correspondieran sólo a un subgrupo pequeño de las secuencias totales. Esto no ocurrió: obtuvimos lecturas del 80.9% de las secuencias en al menos una réplica y del 67.3% en ambas (Fig. R1.3). Comparando con *libraries* similares en cultivos que no fueron sometidos a FACS, observamos una representación similar, que incluye una pérdida preferencial de secuencias con valores de G+C extremos, y también de aquellas que presentan cuadruplexes de G en la hebra codificante (ver ….). Esto sugiere posibles defectos en la amplificación o secuenciación de algunos promotores, lo que limita la diversidad de secuencias a analizar. Sin embargo, como todos los análisis posteriores comparan entre sí a los promotores medidos, estos sesgos no deberían afectar sus conclusiones. 
 
@@ -678,7 +694,7 @@ Las distribuciones de la Fig. R1.5 muestran además que ambas réplicas difieren
 
 **Figura R1.5. Los filtros de consistencia aumentan la concordancia entre réplicas.** **(A)** Actividad media de cada secuencia en la réplica 1 frente a la réplica 2, antes de aplicar los filtros de consistencia, para todas las secuencias que superan el umbral mínimo de cuentas normalizadas en ambas réplicas (r de Pearson \= 0.72; p \< 2×10⁻¹⁶). En verde azulado se indican las secuencias que quedan en el conjunto de alta confianza y en azul oscuro las que se excluyen. **(B)** La misma comparación, restringida a los promotores de alta confianza (r \= 0.865; p \< 2×10⁻¹⁶). **(C)** Diagrama de Venn de los 11193 promotores de alta confianza según la réplica en la que se detectan, sobre el total de promotores de la *library*; 8889 se detectan en ambas. **(D)** Varianza de la distribución de cada promotor de alta confianza en la réplica 1 frente a la réplica 2 (r \= 0.312; p \< 2×10⁻¹⁶). En A, B y D, las curvas de los márgenes muestran la densidad de cada variable. Los criterios de alta confianza y la definición de ambas métricas se detallan en Métodos. 
 
-### Sesgos de representatividad
+### Sesgos de representatividad {#sesgos-de-representatividad}
 
 Los análisis posteriores comparan entre sí a los promotores de alta confianza. Aun así, nos preguntamos si, más allá de un cuello de botella aleatorio, existía un sesgo en la representatividad de las secuencias. Responder esto permite dimensionar hasta dónde pueden extrapolarse los resultados al conjunto de los promotores humanos anotados, y además identificar puntos a mejorar en la metodología. Para evaluarlo, recurrimos a un experimento previo del laboratorio de la Dra. Fiszbein, en el que se utilizó la misma *library* con los adaptadores ya ligados para generar células HEK293T-A2 con una variante del reportero dirigida al estudio del *splicing*. En ese ensayo los promotores insertados se secuenciaron antes de cualquier filtro por expresión. Encontramos una fuerte asociación entre los promotores detectados en ambos ensayos (OR \= 13.7; p \< 2.2×10⁻¹⁶; test exacto de Fisher; Fig. R1.6A). Es decir que la incorporación de una secuencia a las células en el ensayo previo aumenta marcadamente la probabilidad de detectarla en el ensayo actual, lo que sugiere un sesgo compartido y, por lo tanto, originado en alguno de los pasos experimentales comunes.
 
@@ -692,7 +708,7 @@ Además del contenido de G+C, evaluamos la representatividad de los promotores c
 
 Tanto este sesgo como el del contenido de G+C determinan qué promotores llegan a medirse, pero no dependen de la actividad de los promotores. Como todos los análisis posteriores comparan entre sí a los promotores medidos, estos sesgos no deberían afectar sus conclusiones. Sí limitan, en cambio, la representación de algunos tipos de promotores, en particular los de contenido de G+C extremo y los que tienen G4 en la hebra codificante.
 
-### Validación con promotores individuales
+### Validación con promotores individuales {#validación-con-promotores-individuales}
 
 Para evaluar la concordancia entre las distribuciones discretas reconstruidas y las distribuciones subyacentes, seleccionamos un conjunto de secuencias de la *library* y repetimos el procedimiento experimental con promotores individuales aislados. Generamos líneas celulares estables con el reportero integrado bajo el control de cada una de esas secuencias y medimos la fluorescencia de EGFP célula a célula por citometría de flujo, en tres réplicas técnicas.
 
@@ -860,7 +876,7 @@ Tal como mencionamos anteriormente, la medición del ruido es menos precisa y ro
 
 **Fig. R3.1. Medición del ruido transcripcional desacoplado de la actividad.** **(A)** Construcción de la métrica de ruido en la réplica 1\. A la izquierda, varianza en función de la actividad media de cada promotor; las bandas alternadas delimitan los intervalos de 100 promotores de actividad similar, y en rojo se resalta uno de ellos (intervalo 96). En el centro, los 100 promotores de ese intervalo ordenados por su varianza, con el rango de 1 a 100 asignado a cada uno. A la derecha, distribución de las lecturas normalizadas entre las fracciones de *sorting* para dos promotores de ese intervalo con la misma actividad media (línea punteada): PEX16\_1 (rango 13, en ámbar) y PRPF19\_1 (rango 90, en violeta). **(B)** Rango de varianza dentro de cada intervalo en función del intervalo de actividad media para todos los promotores de la réplica 1, con el intervalo y los promotores de A resaltados. La línea indica la tendencia (LOESS), que por construcción es constante en 50 (línea punteada). A diferencia de la varianza (ρ de Spearman con la actividad media \= 0.21 y 0.42 para las réplicas 1 y 2), el rango de varianza no se correlaciona con la actividad (ρ \< 0.001 en ambas réplicas). **(C)** Reproducibilidad del rango de varianza entre réplicas. Para los 10381 promotores medidos en ambas réplicas, se muestra el rango medio en la réplica 2 (IC 95%) para cada decil del rango en la réplica 1, para el conjunto de los promotores (negro) y por separado según el tercil de actividad (promedio del percentil de actividad en ambas réplicas; tonos de azul). La línea punteada indica el valor esperado en ausencia de reproducibilidad. Las bandas sombreadas indican los deciles en los que se ubican los promotores de ejemplo, con su rango en cada réplica. 
 
-### Islas CpG
+### Islas CpG {#islas-cpg-1}
 
 Para ilustrar la metodología seguida en esta sección, describiremos en detalle el análisis de ruido transcripcional asociado a promotores con y sin islas CpG. En la Figura R3.2A se muestra una matriz de puntos, donde cada punto es un promotor ubicado según su intervalo de actividad y su rango de varianza dentro de este intervalo (ver Fig. R3.1). El color de cada punto indica la presencia o ausencia de la característica analizada (en este caso, islas CpG), y las líneas indican la tendencia de los grupos de promotores así definidos. Una característica sin efecto sobre el ruido daría dos líneas superpuestas en torno a 50\. En cambio, la línea de los promotores con isla CpG se ubicó por debajo de la de los promotores sin isla en la mayor parte del rango de actividad: a igual actividad, los promotores con isla CpG fueron menos ruidosos.
 
@@ -879,7 +895,7 @@ Actividad y ruido dependen, entonces, de aspectos distintos de la composición d
 
 **Fig. R3.3. El ruido se asocia con la composición del fragmento de manera distinta que la actividad. (A)** Rango de varianza medio de los promotores en cada decil de la razón CpG observado/esperado del fragmento, para las réplicas 1 y 2\. Cada punto se ubica en la mediana del decil, y las barras verticales indican el IC 95%. La línea punteada vertical indica el valor de 0.6 que define a las islas CpG. Se indica el ρ de Spearman entre la razón CpG o/e y el rango de varianza de cada réplica. **(B)** Igual que en A, para el contenido de G+C del fragmento; la línea punteada vertical indica el 50%, el valor de contenido de G+C de la definición de isla. 
 
-### TATA-box
+### TATA-box {#tata-box-1}
 
 La TATA-box es el elemento del promotor basal más típicamente asociado a una transcripción en ráfagas y, por esa vía, a un mayor ruido de expresión, tanto en levaduras como en reporteros de mamíferos \[CITA\]. Nuestro ensayo permite evaluar esa asociación sobre la secuencia del promotor humano aislada de su contexto.
 
@@ -897,7 +913,7 @@ Queda entonces la posibilidad de que lo que module el efecto de la TATA-box sobr
 
 **Figura R3.5. El efecto de la TATA-box sobre el ruido es específico del motivo canónico, se restringe a los promotores activos y no sigue al patrón de expresión endógena del promotor.** Todos los análisis se realizan por separado en los promotores de alta actividad (percentil 75 o mayor de la actividad media dentro de cada réplica) y en el resto, y se reportan para cada réplica. **(A)** Efecto de cada clase de coincidencia con la matriz de la TATA-box sobre el rango de varianza, estimado por regresión lineal respecto de los promotores sin ninguna coincidencia, sin covariables y ajustando por el contenido de A/T de la región proximal y del fragmento completo. Las clases son la canónica (coincidencia en la ventana −31 a −26 de la misma hebra), las coincidencias no canónicas fuera de esa ventana y las de la hebra opuesta (ver Métodos). Se muestran los coeficientes con su intervalo de confianza del 95%. **(B)** Área bajo la curva ROC del rango de varianza de los promotores con TATA-box canónica frente a los promotores sin motivo del mismo estrato de actividad, para todas las coincidencias canónicas y por separado para las de puntaje alto y bajo, tomando como corte la mediana del puntaje de las canónicas (-5.67). **(C)** Distribución del índice de Gini de la actividad endógena a lo largo de los grupos de ontología de FANTOM5, que resume la especificidad tisular de cada promotor, en los promotores con TATA-box de puntaje alto y en el resto, dentro de cada estrato de actividad. La línea horizontal de cada violín indica la mediana y la vertical el rango intercuartil. **(D)** Área bajo la curva ROC de los promotores con TATA-box de puntaje alto frente a los promotores sin motivo del mismo estrato, calculada por tercil de especificidad tisular. En B y D, la línea punteada en 0.5 indica la ausencia de asociación y los valores mayores corresponden a un ruido mayor que el esperable para la actividad del promotor; se indica el número de promotores de cada grupo. 
 
-### Panorama general de las características asociadas al ruido
+### Panorama general de las características asociadas al ruido {#panorama-general-de-las-características-asociadas-al-ruido}
 
 Para poner estos resultados en perspectiva, evaluamos con el mismo procedimiento todas las características anotadas en la *library* (ver Métodos; Fig. R3.6). De las 34 evaluadas, 15 mostraron asociaciones significativas y del mismo sentido en ambas réplicas, bastante menos que para la actividad y con efectos de menor magnitud, lo que concuerda con la mayor incerteza de la métrica de ruido.
 
@@ -908,6 +924,28 @@ Al analizar las características relacionadas con el contexto endógeno (Fig. R3
 El resultado de la sección anterior, que el efecto de la TATA-box sobre el ruido depende del nivel de actividad del promotor, plantea si esa dependencia es particular de ese motivo. Para evaluarlo ajustamos, para cada característica, un modelo que incluye su interacción con el percentil de actividad. Cinco características mostraron una interacción significativa y del mismo signo en ambas réplicas, y todas en la misma dirección. La TATA-box es la de mayor magnitud: su efecto sobre el ruido aumenta en unos 14 puntos de rango a lo largo del rango de actividad. Las otras cuatro son la alta actividad endógena en HEK293, la alta accesibilidad de la cromatina, la baja especificidad tisular y la CCAAT-box, todas asociadas a menor ruido, cuyo efecto protector se atenúa a medida que aumenta la actividad. La dependencia del nivel de actividad no es entonces exclusiva de la TATA-box, pero sí lo es su dirección: es el único elemento evaluado cuyo efecto sobre el ruido aparece en los promotores activos en lugar de desvanecerse en ellos. Las islas CpG, en cambio, no mostraron una interacción consistente. 
 
 **Figura R3.6. Panorama de las características asociadas al ruido transcripcional.** Efecto de cada característica anotada en la *library* sobre el rango de varianza, resumido como el área bajo la curva ROC de los promotores que la presentan frente a los que no, en la réplica 1 (color intenso) y la réplica 2 (color claro), con su intervalo de confianza del 95%. Un AUC de 0.5 indica ausencia de asociación, los valores mayores corresponden a un ruido mayor que el esperable para la actividad del promotor y los menores, a un ruido menor. Las características se ordenan según la magnitud del efecto y se colorean según su sentido, en naranja las asociadas a mayor ruido y en verde las asociadas a menor. Solo se incluyen las que mostraron efectos significativos y del mismo sentido en ambas réplicas (ver Métodos). **(A)** Características de la secuencia del fragmento ensayado. **(B)** Características del contexto genómico endógeno de cada promotor, que no se miden en el reportero. 
+
+### Unión de factores y marcas de histona en el contexto endógeno {#unión-de-factores-y-marcas-de-histona-en-el-contexto-endógeno}
+
+Las características analizadas hasta aquí describen la secuencia del fragmento o el patrón de expresión del promotor. Evaluamos ahora dos clases de información medidas sobre la cromatina del promotor en su contexto natural: la ocupación por factores de transcripción, a partir de los picos de ChIP-seq integrados en ReMap, y las modificaciones de histonas anotadas en ChIP-Atlas. Ninguna de las dos se mide en el reportero, de modo que cualquier asociación con el ruido indica que la secuencia ensayada lleva consigo parte de esa información.
+
+De manera análoga a lo realizado para la actividad transcripcional (Fig. R2.13), evaluamos el efecto de la unión de cada factor sobre el ruido. La ocupación se asoció de manera casi unánime a menor ruido: de los 982 factores evaluados, 514 mostraron un efecto significativo y consistente en ambas réplicas, todos en el mismo sentido, y ninguno se asoció a mayor ruido (Fig. R3.7A). El patrón general es, entonces, que la ocupación del promotor en su contexto endógeno, por cualquier factor, acompaña a un menor ruido en el reportero.
+
+Para identificar grupos de proteínas con efectos específicos sobre el ruido, ordenamos los factores según su efecto y realizamos un análisis de enriquecimiento de conjuntos. Más allá de términos inespecíficos que agrupan a buena parte de los factores evaluados, el enriquecimiento más destacado en el extremo de menor ruido correspondió al complejo MLL1/2 (NES \= −2.47 y −2.01; p ajustado \= 0.005 y 0.081, con el umbral de 0.1 del análisis de enriquecimiento; Fig. R3.7B). Los complejos MLL1/2 son una de las principales vías de trimetilación de la lisina 4 de la histona H3 en promotores \[CITA\], de modo que el resultado apunta hacia esa marca.
+
+Para explorar esa asociación evaluamos cómo se relaciona con el ruido la presencia de distintas modificaciones de histonas en el contexto endógeno de los promotores de la *library*. De forma consistente con el enriquecimiento de MLL1/2, la trimetilación de H3K4 fue la marca con la asociación más fuerte con un menor ruido (AUC 0.38 y 0.44), seguida por H3K27ac y H3K9ac (Fig. R3.7C). La marca está presente en el 90.7% y el 90.3% de los promotores, por lo que la comparación la domina el grupo minoritario que carece de ella: lo que el resultado identifica es un conjunto de promotores sin marca y particularmente ruidosos, más que un efecto protector de la marca sobre el resto. Esa carencia no es simplemente la ausencia de isla CpG, ya que prácticamente todos los promotores con isla llevan la marca y la asociación se observa dentro de los promotores sin isla, que son los únicos en los que la marca varía de manera apreciable (AUC 0.42 y 0.47; Fig. R3.7D). 
+
+Las dos observaciones se apoyan mutuamente, pero ninguna de las dos es concluyente por separado. El enriquecimiento de MLL1/2 supera el umbral de significancia en la réplica 1 y no en la réplica 2, y la magnitud del efecto estimado para cada factor depende de cuántos promotores une, porque de eso depende el grupo con el que se lo compara, de modo que el enriquecimiento de un complejo cuyos miembros unen muchos más promotores que el factor típico no puede atribuirse por completo a una propiedad del complejo. Por su parte, la asociación de H3K4me3 no implica que la marca sea la causa del menor ruido, ya que acompaña a la actividad del promotor en su contexto. Tomadas juntas, señalan de manera consistente, desde dos tipos de dato independientes, a los promotores sin señal de cromatina activa como los más ruidosos del ensayo.
+
+Ese mismo conjunto aparece al medir la ocupación como variable continua. Al contar, para cada promotor, cuántos factores distintos lo ocupan en su contexto endógeno, el ruido disminuyó de forma gradual con la ocupación y dejó de reducirse a partir de unos 400 factores (Fig. R3.7E). Los promotores sin ningún pico de ReMap, 115 y 144 en cada réplica, fueron los más ruidosos de la *library*, con un rango de varianza medio de 63.1 y 59.6 frente a 50.5 en el conjunto. El gradiente se concentra en los promotores sin isla CpG; entre los que tienen isla es débil en la réplica 1 y no se observa en la réplica 2\.
+
+Estos resultados describen, entonces, una clase de promotores que carecen a la vez de isla CpG, de ocupación por factores, de marcas de cromatina activa y de actividad detectable en su contexto endógeno, y que resultan los más ruidosos del ensayo. Dado que el reportero mide la secuencia aislada de ese contexto, la ausencia de señal endógena no puede ser la causa del ruido que medimos: que aun así lo prediga indica que esa misma carencia está inscripta en la secuencia del promotor.
+
+**Figura R3.7. Los promotores sin señal de ocupación ni de cromatina activa en su contexto endógeno son los más ruidosos del ensayo. (A)** Efecto de la unión de cada uno de los 982 factores de transcripción de ReMap2022 sobre el rango de varianza, resumido como el área bajo la curva ROC de los promotores unidos frente a los no unidos, en la réplica 1 (color intenso) y la réplica 2 (color claro), ordenados por la magnitud del efecto. Valores menores a 0.5 indican un ruido menor que el esperable para la actividad del promotor. **(B)** Curva de enriquecimiento del término MLL1/2 complex en el análisis de enriquecimiento de conjuntos sobre los factores ordenados según su efecto sobre el ruido. Las líneas verticales indican la posición de cada miembro del complejo en el ordenamiento y la curva, el puntaje de enriquecimiento acumulado. **(C)** Efecto de cada una de las 49 modificaciones de histonas anotadas en ChIP-Atlas, estimado del mismo modo, con la prevalencia de cada marca en la *library* indicada junto a su nombre. Se incluyen las 23 que mostraron efectos significativos y del mismo sentido en ambas réplicas. **(D)** Rango de varianza de cada promotor en función de su intervalo de actividad, según la presencia de H3K4me3, restringido a los promotores sin isla CpG, que son aquellos en los que la marca presenta variación apreciable. Las líneas indican la tendencia de cada grupo. **(E)** Rango de varianza medio según el número de factores distintos de ReMap que ocupan cada promotor, con los promotores sin ningún pico en un grupo propio y el resto agrupado en deciles, por separado para los promotores con y sin isla CpG. Las barras verticales indican el intervalo de confianza del 95% y debajo de cada punto se indica el número de promotores. En todos los paneles, la línea punteada marca la ausencia de asociación. 
+
+Tomados en conjunto, estos resultados muestran que el ruido transcripcional de un promotor está codificado en su secuencia, igual que su actividad, pero que no se trata de la misma propiedad leída dos veces. Algunos elementos actúan sobre ambas en el mismo sentido: las islas CpG se asocian a mayor actividad y a menor ruido. Otros lo hacen en sentidos opuestos: la TATA-box aumenta la actividad y también el ruido, y lo hace solo en los promotores que ya son activos. Y en algunos casos las dos propiedades dependen de aspectos distintos de la misma característica, como ocurre dentro de las islas CpG, donde la actividad acompaña a la densidad de dinucleótidos CpG mientras que el menor ruido se asocia al régimen de isla y al contenido de G+C. La secuencia del promotor basal determina, entonces, no solo cuánto se transcribe sino con qué regularidad, y lo hace en buena medida por vías separadas.
+
+Las asociaciones con el ruido fueron, de todos modos, menos numerosas y de menor magnitud que las observadas para la actividad, lo que es esperable dada la mayor incertidumbre con que se estima esta propiedad. Esa diferencia no impide, sin embargo, identificar un patrón consistente: los promotores más ruidosos son los que carecen de isla CpG y, además, no muestran señal alguna de uso en su contexto endógeno. La relación entre el comportamiento del fragmento en el reportero y el uso del promotor en su genoma se analiza en detalle en la sección siguiente.
 
 # Referencias {#referencias}
 
