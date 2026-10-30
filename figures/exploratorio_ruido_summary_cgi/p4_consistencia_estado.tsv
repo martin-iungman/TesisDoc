@@ -1,0 +1,35 @@
+feature	Global	Con isla CpG	Sin isla CpG	group	cambia
+Alta accesibilidad de cromatina (DNase-seq)	no consistente	no consistente	no consistente	endo	FALSE
+Alta actividad en HEK293	no consistente	no consistente	no consistente	endo	FALSE
+Alta conservación (-150 a -235)	no consistente	no consistente	no consistente	endo	FALSE
+Alta conservación (-50 a -150)	no consistente	no consistente	no consistente	endo	FALSE
+Alta conservación (16 a -50pb)	no consistente	no consistente	no consistente	endo	FALSE
+Alta especificidad tisular	Ruido alto	no consistente	no consistente	endo	TRUE
+Baja especificidad tisular	Ruido bajo	no consistente	no consistente	endo	TRUE
+Enhancers a 50kb	no consistente	no consistente	no consistente	endo	FALSE
+Insertado en humanos	no consistente	no consistente	no consistente	endo	FALSE
+No detectado (FANTOM5)	Ruido alto	no consistente	no consistente	endo	TRUE
+Promotor unidireccional	no consistente	no consistente	no consistente	endo	FALSE
+Promotores anchos	no consistente	no consistente	no consistente	endo	FALSE
+Promotores angostos	Ruido alto	no consistente	no consistente	endo	TRUE
+Sin actividad en ratón	no consistente	no consistente	no consistente	endo	FALSE
+Sin módulo cis-regulatorio	Ruido alto	sin evaluar	Ruido alto	endo	TRUE
+Alto contenido G+C	Ruido bajo	Ruido bajo	no consistente	seq	TRUE
+CA en TSS	no consistente	no consistente	no consistente	seq	FALSE
+CCAAT	no consistente	no consistente	no consistente	seq	FALSE
+CG en TSS	Ruido bajo	no consistente	no consistente	seq	TRUE
+CRE (CREB/ATF)	Ruido alto	no consistente	no consistente	seq	TRUE
+E-box CAGGTR	no consistente	no consistente	no consistente	seq	FALSE
+Elementos transponibles	Ruido alto	no consistente	no consistente	seq	TRUE
+GC-box	Ruido bajo	Ruido bajo	no consistente	seq	TRUE
+Islas CpG	Ruido bajo	sin evaluar	sin evaluar	seq	TRUE
+LINE	no consistente	no consistente	no consistente	seq	FALSE
+SINE	Ruido alto	no consistente	no consistente	seq	TRUE
+TA en TSS	no consistente	no consistente	no consistente	seq	FALSE
+TATA-box	Ruido alto	Ruido alto	no consistente	seq	TRUE
+TCT	no consistente	no consistente	no consistente	seq	FALSE
+TG en TSS	no consistente	no consistente	no consistente	seq	FALSE
+TSS fuerte	no consistente	no consistente	no consistente	seq	FALSE
+TSS no canónico	Ruido alto	no consistente	no consistente	seq	TRUE
+Tracto poli(dA:dT) proximal	no consistente	sin evaluar	sin evaluar	seq	TRUE
+YY1	Ruido alto	no consistente	no consistente	seq	TRUE
