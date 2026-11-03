@@ -1,11 +1,11 @@
-# reporter_endo_fantom (ver docs/mapping_figuras.csv para el numero de
-# figura vigente)
-# Actividad del reportero vs. actividad endogena promedio/maxima a
-# traves de TODAS las muestras de FANTOM5 (tejidos + celulas primarias,
-# no un solo tipo celular como R4.1): reporter_endo_mean_fantom.jpg
-# (mediana de la media por bin de actividad), reporter_endo_mean_fantom_
-# boxplot.jpg y reporter_endo_max_fantom_boxplot.jpg (boxplots por 20
-# bins de rango de actividad).
+# Exploratorio (no va a la tesis): actividad del reportero vs. actividad
+# endogena promedio a traves de TODAS las muestras de FANTOM5 (tejidos +
+# celulas primarias): reporter_endo_mean_fantom.jpg (mediana de la media
+# por bin de actividad) y reporter_endo_mean_fantom_boxplot.jpg (boxplot
+# por 20 bins de rango de actividad). Salida en
+# figures/exploratorio_reporter_endo_fantom. Era la figura
+# reporter_endo_fantom; su boxplot de la actividad endogena maxima paso a
+# actividad_endogena_multi_tejido (panel D, R/23_actividad_endogena).
 #
 # Requiere: data/processed/activity_stats_highconf.tsv, data/processed/
 # prom_df.tsv y data/processed/fantom_endo_activity_summary.tsv (ver
@@ -18,10 +18,9 @@
 
 library(tidyverse)
 source("R/functions/plot_helpers.R")
-source("R/functions/fig_paths.R")
 
-slug <- "reporter_endo_fantom"
-out_dir <- fig_dir(slug)
+out_dir <- "figures/exploratorio_reporter_endo_fantom"
+dir.create(out_dir, showWarnings = FALSE)
 
 stats_highconf <- read_tsv("data/processed/activity_stats_highconf.tsv", show_col_types = FALSE)
 prom_df <- read_tsv("data/processed/prom_df.tsv", show_col_types = FALSE) %>% filter(type == "promoter")
@@ -62,8 +61,5 @@ tpm_rank_boxplot <- function(data, tpm_col, ylab) {
 
 p2 <- tpm_rank_boxplot(data, "mean_tpm", "Actividad endógena media entre tejidos (TPM)")
 ggsave(file.path(out_dir, "reporter_endo_mean_fantom_boxplot.jpg"), p2, width = 9, height = 6.75, units = "in")
-
-p3 <- tpm_rank_boxplot(data, "max_tpm", "TPM (valor máximo entre muestras CAGE FANTOM5)")
-ggsave(file.path(out_dir, "reporter_endo_max_fantom_boxplot.jpg"), p3, width = 9, height = 6.75, units = "in")
 
 message("Figuras guardadas en ", out_dir)
