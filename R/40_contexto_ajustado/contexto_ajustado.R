@@ -425,6 +425,18 @@ niveles_b <- c("Crudo", "Ajustado por secuencia")
 colores_b <- colores_seq[niveles_b]
 desplaz_b <- c("Crudo" = 0.18, "Ajustado por secuencia" = -0.18)
 
+# Orden de B = el del panel A (summary_endo); las caracteristicas que solo
+# estan en B se intercalan justo antes de la que les sigue en el orden por
+# efecto crudo de B (orden_seq).
+panel_a <- readRDS("data/processed/panel_summary_endo.rds")
+orden_a <- unique(as.character(panel_a$data$feature))
+orden_b <- intersect(orden_a, orden_seq)
+for (f in rev(setdiff(orden_seq, orden_a))) {
+  siguiente <- orden_seq[match(f, orden_seq) + 1]
+  pos <- if (is.na(siguiente)) length(orden_b) else match(siguiente, orden_b) - 1
+  orden_b <- append(orden_b, f, after = pos)
+}
+
 panel_b <- efectos_seq %>%
   pivot_longer(
     c(matches("^(estimate|IC2.5|IC97.5|sobrevive)_(crudo|secuencia)$")),
@@ -432,7 +444,7 @@ panel_b <- efectos_seq %>%
   ) %>%
   mutate(
     tipo = factor(recode(tipo, crudo = "Crudo", secuencia = "Ajustado por secuencia"), levels = niveles_b),
-    y = match(caracteristica, orden_seq) + desplaz_b[as.character(tipo)],
+    y = match(caracteristica, orden_b) + desplaz_b[as.character(tipo)],
     relleno = ifelse(sobrevive, as.character(tipo), "no")
   ) %>%
   ggplot(aes(x = estimate, y = y, colour = tipo)) +
@@ -440,7 +452,7 @@ panel_b <- efectos_seq %>%
   geom_segment(aes(x = IC2.5, xend = IC97.5, yend = y), linewidth = 0.8) +
   geom_point(aes(fill = relleno), shape = 21, size = 3, stroke = 1.1) +
   facet_wrap(~rep, nrow = 1) +
-  scale_y_continuous(breaks = seq_along(orden_seq), labels = orden_seq, expand = expansion(add = 0.5)) +
+  scale_y_continuous(breaks = seq_along(orden_b), labels = orden_b, expand = expansion(add = 0.5)) +
   scale_colour_manual(values = colores_b, breaks = niveles_b) +
   scale_fill_manual(values = c(colores_b, "no" = "white"), guide = "none") +
   theme_pubr(base_size = 20) +
@@ -455,7 +467,6 @@ for (ext in c("jpg", "pdf")) {
 # Figura completa de summary_features_endogeno: A = summary_endo (lo genera
 # R/15_summary_features/summary_features.R y lo deja en
 # data/processed/panel_summary_endo.rds; correr ese script antes), B = panel_b.
-panel_a <- readRDS("data/processed/panel_summary_endo.rds")
 figura_endo <- wrap_elements(full = panel_a) / wrap_elements(full = panel_b) +
   plot_layout(heights = c(6.75, 8)) +
   plot_annotation(tag_levels = "A") &
