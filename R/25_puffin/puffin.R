@@ -142,7 +142,7 @@ data_selectivity_pattern <- data %>%
   mutate(specificity_tercile = cut_number(sample_specificity_gini, n = 3) %>% as.numeric()) %>%
   ungroup() %>%
   filter(specificity_tercile != 2) %>%
-  mutate(patron = ifelse(specificity_tercile == 1, "Housekeeping", "Tissue-specific")) %>%
+  mutate(patron = ifelse(specificity_tercile == 1, "Housekeeping", "Tejido-específico")) %>%
   group_by(rep, patron) %>%
   mutate(activity_bin = row_number(mean) %>% cut_number(30) %>% as.numeric()) %>%
   group_by(rep, patron, activity_bin) %>%
@@ -153,8 +153,8 @@ p_selectivity_pattern <- data_selectivity_pattern %>%
   geom_point(alpha = 0.7) +
   geom_smooth(method = "lm") +
   facet_wrap(~rep) +
-  scale_color_manual(values = c("Housekeeping" = "#1B8C8E", "Tissue-specific" = "#0D2C54")) +
-  scale_fill_manual(values = c("Housekeeping" = "#1B8C8E", "Tissue-specific" = "#0D2C54")) +
+  scale_color_manual(values = c("Housekeeping" = "#1B8C8E", "Tejido-específico" = "#0D2C54")) +
+  scale_fill_manual(values = c("Housekeeping" = "#1B8C8E", "Tejido-específico" = "#0D2C54")) +
   labs(
     x = "Bins de actividad media del promotor reportero",
     y = "Índice de selectividad PUFFIN",
