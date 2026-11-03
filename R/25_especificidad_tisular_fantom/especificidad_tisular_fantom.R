@@ -3,13 +3,17 @@
 # Actividad endogena maxima (FANTOM5, todas las muestras) vs. actividad
 # del reportero, separando promotores housekeeping (baja especificidad
 # tisular) vs. tissue-specific (alta), segun tercil de sample_
-# specificity_gini: tissue_specificty_boxplot.jpg (boxplots por 15 bins
+# specificity_gini: tissue_specificity_boxplot.jpg (boxplots por 15 bins
 # de actividad DENTRO de cada tercil) y tissue_specificity_residuals.jpg
 # (residuos de un modelo lineal log10(tpm)~rank(actividad) por tercil,
 # como medida de que tan bien la actividad del reportero predice la
 # actividad endogena en cada grupo). Cada figura se repite restringida a
 # promotores activos en HEK293 (hek_tpm > 0, sufijo _hek_active): los
-# terciles de especificidad se recalculan dentro de ese subconjunto.
+# terciles de especificidad se recalculan dentro de ese subconjunto. La
+# figura completa (especificidad_tisular_fantom.jpg/.pdf, 2x2) junta las
+# cuatro: todos los promotores a la izquierda, HEK293 a la derecha, solo
+# con la replica 1 (los paneles sueltos muestran ambas replicas, para el
+# suplementario). Los boxplots tienen bigotes en los percentiles 10-90.
 #
 # Requiere: data/processed/activity_stats_highconf.tsv, data/processed/
 # prom_df.tsv y data/processed/fantom_endo_activity_summary.tsv (ver
@@ -22,6 +26,7 @@
 
 library(tidyverse)
 library(ggpubr)
+library(patchwork)
 source("R/functions/plot_helpers.R")
 source("R/functions/fig_paths.R")
 
@@ -37,6 +42,9 @@ data_all <- inner_join(stats_highconf, prom_df, by = c("seq_id", "name")) %>%
   mutate(max_tpm = replace_na(max_tpm, 0)) %>%
   filter(!is.na(sample_specificity_gini))
 
+patron_colors <- c("Housekeeping" = "#1B8C8E", "Tejido-específico" = "#0D2C54")
+label_patron <- function(tercile) ifelse(tercile == 1, "Housekeeping", "Tejido-específico")
+
 add_terciles <- function(df) {
   df %>%
     group_by(rep) %>%
@@ -44,30 +52,48 @@ add_terciles <- function(df) {
     ungroup()
 }
 
-save_both <- function(plot, name) {
+save_both <- function(plot, name, width = 9, height = 6.75) {
   for (ext in c("jpg", "pdf")) {
-    ggsave(file.path(out_dir, paste0(name, ".", ext)), plot, width = 9, height = 6.75, units = "in")
+    ggsave(file.path(out_dir, paste0(name, ".", ext)), plot, width = width, height = height, units = "in")
   }
 }
 
+# Una faceta por replica solo si hay mas de una (la figura completa usa una).
+facet_reps <- function(data, ...) {
+  if (n_distinct(data$rep) > 1) facet_wrap(~rep, ...) else NULL
+}
+
 # --- Boxplot: actividad endogena maxima por bin de actividad, dentro de cada tercil ---
+# Bigotes en p10-p90 (los de 1.5*IQR abarcaban 4 ordenes de magnitud y
+# aplastaban las cajas).
 
 plot_box <- function(data) {
-  data %>%
+  box_stats <- data %>%
     filter(specificity_tercile != 2) %>%
     group_by(rep, specificity_tercile) %>%
     mutate(mean_bin = row_number(mean) %>% cut_number(15) %>% as.numeric()) %>%
-    ungroup() %>%
-    mutate(patron = ifelse(specificity_tercile == 1, "Housekeeping", "Tissue-specific")) %>%
-    ggplot(aes(factor(mean_bin), max_tpm, fill = patron)) +
-    geom_boxplot(outliers = FALSE, alpha = 0.6) +
-    facet_wrap(~rep, scales = "free_x") +
+    group_by(rep, specificity_tercile, mean_bin) %>%
+    summarise(
+      ymin = quantile(max_tpm, 0.1), lower = quantile(max_tpm, 0.25), middle = median(max_tpm),
+      upper = quantile(max_tpm, 0.75), ymax = quantile(max_tpm, 0.9),
+      .groups = "drop"
+    ) %>%
+    mutate(patron = label_patron(specificity_tercile))
+
+  box_stats %>%
+    ggplot(aes(factor(mean_bin), fill = patron)) +
+    geom_boxplot(
+      aes(ymin = ymin, lower = lower, middle = middle, upper = upper, ymax = ymax),
+      stat = "identity", alpha = 0.6, width = 0.75, position = position_dodge(0.8),
+      key_glyph = draw_key_rect
+    ) +
+    facet_reps(data, scales = "free_x") +
     scale_y_log10() +
     labs(
       x = "Grupos ordenados de actividad media del reportero (15 bins por tercil)",
       y = "TPM (valor máximo a través de FANTOM5)", fill = "Patrón de expresión"
     ) +
-    scale_fill_manual(values = c("Housekeeping" = "#1B8C8E", "Tissue-specific" = "#0D2C54")) +
+    scale_fill_manual(values = patron_colors) +
     theme_bw(base_size = 15) +
     theme(legend.position = "top")
 }
@@ -86,27 +112,41 @@ plot_residuals <- function(data) {
   residuals_df <- lm_l %>%
     imap(~ tibble(residuals = residuals(.x), grp = .y) %>% separate(grp, into = c("rep", "specificity_tercile"), sep = "_")) %>%
     list_rbind() %>%
-    mutate(patron = ifelse(specificity_tercile == "1", "Housekeeping", "Tissue-specific"))
+    mutate(patron = label_patron(specificity_tercile))
 
   residuals_df %>%
     ggplot(aes(residuals, fill = patron)) +
-    geom_density(alpha = 0.5) +
-    facet_wrap(~rep) +
-    scale_fill_manual(values = c("Housekeeping" = "#1B8C8E", "Tissue-specific" = "#0D2C54")) +
+    geom_density(alpha = 0.6, key_glyph = draw_key_rect) +
+    facet_reps(data) +
+    scale_fill_manual(values = patron_colors) +
     labs(x = "Residuos (log10 TPM ~ rango de actividad)", y = "Densidad", fill = "Patrón de expresión") +
-    ggpubr::theme_pubclean()
+    theme_bw(base_size = 15) +
+    theme(legend.position = "top", panel.grid.minor = element_blank())
 }
 
 subsets <- list(
-  todos = list(data = data_all, suffix = ""),
-  hek_active = list(data = data_all %>% filter(!is.na(hek_tpm), hek_tpm > 0), suffix = "_hek_active")
+  todos = list(data = data_all, suffix = "", title = "Todos los promotores"),
+  hek_active = list(data = data_all %>% filter(!is.na(hek_tpm), hek_tpm > 0), suffix = "_hek_active", title = "Promotores activos en HEK293")
 )
 
-walk(subsets, function(s) {
+panels <- map(subsets, function(s) {
   df <- add_terciles(s$data)
-  suffix <- s$suffix
-  save_both(plot_box(df), paste0("tissue_specificty_boxplot", suffix))
-  save_both(plot_residuals(df), paste0("tissue_specificity_residuals", suffix))
+  save_both(plot_box(df), paste0("tissue_specificity_boxplot", s$suffix))
+  save_both(plot_residuals(df), paste0("tissue_specificity_residuals", s$suffix))
+  df_rep1 <- df %>% filter(rep == "Rep 1")
+  # Mismos limites en ambas columnas para poder comparar todos vs. HEK293
+  list(
+    box = plot_box(df_rep1) + ggtitle(s$title) + coord_cartesian(ylim = c(1, 2000)),
+    res = plot_residuals(df_rep1) + coord_cartesian(xlim = c(-2, 3), ylim = c(0, 1.05))
+  )
 })
+
+# Figura completa (replica 1): columna izquierda todos los promotores,
+# derecha activos en HEK293; boxplot arriba y sus residuos abajo.
+figura <- panels$todos$box + panels$todos$res + panels$hek_active$box + panels$hek_active$res +
+  plot_layout(ncol = 2, byrow = FALSE, guides = "collect") +
+  plot_annotation(tag_levels = "A") &
+  theme(legend.position = "top", plot.tag = element_text(size = 24, face = "bold"))
+save_both(figura, slug, 16, 12)
 
 message("Figuras guardadas en ", out_dir)
