@@ -24,7 +24,7 @@
 source("R/00_prom_features/heavy_data_paths.R")
 
 # No header row - read with read_tsv(col_names = c("seq_id", "feature",
-# "n_samples")) downstream (R/22_chipatlas_histonas/chipatlas_histonas.R).
+# "n_samples")) downstream (R/56_ruido_contexto_endogeno/ruido_contexto_endogeno.R).
 awk_script <- '{
   seqid = $1
   sub(/^[ \t]*[0-9]+ /, "", seqid)
