@@ -8,7 +8,7 @@
 #   - teoTSS_score: score de PUFFIN en la posicion del TSS (pos=16 de
 #     252pb) al correr el modelo sobre nuestras propias secuencias de
 #     la library (EXCEPCION, ver mas abajo).
-# scatter (bins de 100) + boxplot (20 bins de rango) para cada score, y
+# scatter (bins de 100) + boxplot (deciles de rango) para cada score, y
 # selectividad por patron de expresion (housekeeping vs. tejido-especifico).
 # Figura completa puffin_selectivity_predscore.jpg/.pdf (2x2, ver abajo).
 #
@@ -142,21 +142,20 @@ p_pred_scatter <- puffin_scatter(data_sw, "teoTSS_score", paste(lab_pred, "(medi
 save_jpg_pdf(p_sel_scatter, "PUFFIN_selectivity_scatter")
 save_jpg_pdf(p_pred_scatter, "PUFFIN_predscore_scatter")
 
-# --- Boxplot (20 bins de rango, sin outliers) ------------------------------
+# --- Boxplot (deciles de rango, sin outliers) ----------------------------
 
 puffin_boxplot <- function(data, score_col, ylab, titulo) {
   rho <- rho_labels(data, score_col)
   data %>%
     filter(!is.na(.data[[score_col]])) %>%
     group_by(rep) %>%
-    mutate(bin = row_number(mean) %>% cut_number(20) %>% as.numeric() %>% as_factor()) %>%
+    mutate(bin = row_number(mean) %>% cut_number(10) %>% as.numeric() %>% factor(levels = 1:10)) %>%
     ggplot(aes(bin, .data[[score_col]])) +
     geom_boxplot(alpha = 0.6, fill = "#216869", outliers = FALSE) +
     geom_text(data = rho, aes(x = -Inf, y = Inf, label = label), hjust = -0.05, vjust = 1.5, size = 4, parse = TRUE, inherit.aes = FALSE) +
     scale_y_continuous(expand = expansion(mult = c(0.05, 0.12))) +
     facet_wrap(~rep) +
-    scale_x_discrete(breaks = c("1", "5", "10", "15", "20")) +
-    labs(x = paste(lab_x_bins, "(por rango)"), y = ylab, title = titulo) +
+    labs(x = "Deciles de actividad del promotor reportero", y = ylab, title = titulo) +
     theme_bw(base_size = 15) +
     theme(panel.spacing = unit(1.5, "lines"))
 }

@@ -3,7 +3,7 @@
 # Actividad endogena maxima (FANTOM5, todas las muestras) vs. actividad
 # del reportero, separando promotores housekeeping (baja especificidad
 # tisular) vs. tissue-specific (alta), segun tercil de sample_
-# specificity_gini: tissue_specificity_boxplot.jpg (boxplots por 15 bins
+# specificity_gini: tissue_specificity_boxplot.jpg (boxplots por deciles
 # de actividad DENTRO de cada tercil) y tissue_specificity_residuals.jpg
 # (residuos de un modelo lineal log10(tpm)~rank(actividad) por tercil,
 # como medida de que tan bien la actividad del reportero predice la
@@ -11,8 +11,7 @@
 # promotores activos en HEK293 (hek_tpm > 0, sufijo _hek_active), con los
 # MISMOS cortes de tercil que el conjunto completo (recalcularlos dentro
 # del subconjunto bajaba el corte de tejido-especifico de gini 0.56 a 0.37
-# y cambiaba la definicion del grupo); como en HEK quedan ~5 housekeeping
-# por cada tejido-especifico, ese subconjunto usa 8 bins en vez de 15. En
+# y cambiaba la definicion del grupo). En
 # cada boxplot se anota rho de Spearman por grupo con su IC 95% (bootstrap
 # con la N propia de cada grupo) y la N. La
 # figura completa (especificidad_tisular_fantom.jpg/.pdf, 2x2) junta las
@@ -84,11 +83,11 @@ facet_reps <- function(data, ...) {
 # Bigotes en p10-p90 (los de 1.5*IQR abarcaban 4 ordenes de magnitud y
 # aplastaban las cajas).
 
-plot_box <- function(data, n_bins) {
+plot_box <- function(data) {
   box_stats <- data %>%
     filter(specificity_tercile != 2) %>%
     group_by(rep, specificity_tercile) %>%
-    mutate(mean_bin = row_number(mean) %>% cut_number(n_bins) %>% as.numeric()) %>%
+    mutate(mean_bin = row_number(mean) %>% cut_number(10) %>% as.numeric()) %>%
     group_by(rep, specificity_tercile, mean_bin) %>%
     summarise(
       ymin = quantile(max_tpm, 0.1), lower = quantile(max_tpm, 0.25), middle = median(max_tpm),
@@ -130,7 +129,7 @@ plot_box <- function(data, n_bins) {
     facet_reps(data, scales = "free_x") +
     scale_y_log10() +
     labs(
-      x = paste0("Grupos ordenados de actividad media del reportero (", n_bins, " bins por tercil)"),
+      x = "Deciles de actividad del promotor reportero (dentro de cada grupo)",
       y = "TPM (valor máximo a través de FANTOM5)", fill = "Patrón de expresión"
     ) +
     scale_fill_manual(values = patron_colors) +
@@ -165,20 +164,20 @@ plot_residuals <- function(data) {
 }
 
 subsets <- list(
-  todos = list(data = data_all, suffix = "", title = "Todos los promotores", n_bins = 15),
+  todos = list(data = data_all, suffix = "", title = "Todos los promotores"),
   hek_active = list(
     data = data_all %>% filter(!is.na(hek_tpm), hek_tpm > 0), suffix = "_hek_active",
-    title = "Promotores activos en HEK293", n_bins = 8
+    title = "Promotores activos en HEK293"
   )
 )
 
 panels <- map(subsets, function(s) {
   df <- s$data
-  save_both(plot_box(df, s$n_bins), paste0("tissue_specificity_boxplot", s$suffix))
+  save_both(plot_box(df), paste0("tissue_specificity_boxplot", s$suffix))
   save_both(plot_residuals(df), paste0("tissue_specificity_residuals", s$suffix))
   # Mismos limites en ambas columnas para poder comparar todos vs. HEK293
   list(
-    box = plot_box(df, s$n_bins) + ggtitle(s$title) + coord_cartesian(ylim = c(1, 5000)),
+    box = plot_box(df) + ggtitle(s$title) + coord_cartesian(ylim = c(1, 5000)),
     res = plot_residuals(df) + coord_cartesian(xlim = c(-2, 3), ylim = c(0, 1.05))
   )
 })

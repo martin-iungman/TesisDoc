@@ -3,8 +3,8 @@
 # Actividad del promotor endogeno (CAGE TPM, FANTOM5) vs. actividad del
 # promotor reportero, por bin de actividad (mean_sw) y replica: HEK293 (A),
 # HeLa (B) y musculo esqueletico (C); y actividad endogena maxima entre
-# todas las muestras de FANTOM5 (tejidos + celulas primarias) por 20 bins
-# de rango de actividad del reportero (D, boxplot). Figura completa
+# todas las muestras de FANTOM5 (tejidos + celulas primarias) por deciles
+# de actividad del reportero (D, boxplot). Figura completa
 # actividad_endogena_multi_tejido.jpg/.pdf (2x2).
 #
 # Requiere: data/processed/activity_stats_highconf.tsv, data/processed/
@@ -54,19 +54,17 @@ save_jpg_pdf(p_hek, "HEK293_mean", 9, 6.75)
 save_jpg_pdf(p_hela, "Hela_mean", 9, 6.75)
 save_jpg_pdf(p_muscle, "skeletal_muscle_mean", 9, 6.75)
 
-# Boxplot de la actividad endogena maxima por 20 bins de rango de actividad
-# del reportero (sin outliers); en el eje x solo algunos bins para que las
-# etiquetas no se pisen.
+# Boxplot de la actividad endogena maxima por deciles de actividad del
+# reportero (sin outliers).
 p_max <- data %>%
   group_by(rep) %>%
-  mutate(bin = row_number(mean) %>% cut_number(20) %>% as.numeric() %>% as_factor()) %>%
+  mutate(bin = row_number(mean) %>% cut_number(10) %>% as.numeric() %>% factor(levels = 1:10)) %>%
   ggplot(aes(bin, max_tpm)) +
   geom_boxplot(fill = "#AD343E", alpha = 0.5, outliers = FALSE) +
   facet_wrap(~rep) +
   scale_y_log10() +
-  scale_x_discrete(breaks = c("1", "5", "10", "15", "20")) +
   labs(
-    x = "Bins de actividad del promotor reportero (por rango)",
+    x = "Deciles de actividad del promotor reportero",
     y = "TPM (valor máximo entre\nmuestras CAGE FANTOM5)",
     title = "Máximo entre muestras FANTOM5"
   ) +
