@@ -554,12 +554,14 @@ Adicionalmente, se incorporó la métrica de selectividad al contexto genómico 
 
 ## Evaluación del efecto de las características del promotor sobre los patrones transcripcionales medidos {#evaluación-del-efecto-de-las-características-del-promotor-sobre-los-patrones-transcripcionales-medidos}
 
+Cuando se realizaron múltiples comparaciones, los *p-values* se ajustaron por el método de Benjamini-Hochberg [(Benjamini and Hochberg 1995\)](https://www.zotero.org/google-docs/?kngF1X). Salvo donde se indique lo contrario, se consideraron asociadas al fenotipo evaluado únicamente las características con un efecto del mismo signo en ambas réplicas y un *p-value* ajustado menor a 0.05 
+
 ### Asociación de las características del promotor con la actividad transcripcional {#asociación-de-las-características-del-promotor-con-la-actividad-transcripcional}
 
 Para visualizar la asociación entre cada característica de los promotores y su actividad, ordenamos los promotores según su actividad media en el reportero y los agrupamos en grupos de 100 promotores por réplica. Luego determinamos la proporción de promotores que presentan la característica en cada intervalo.   
-A su vez, con el objetivo de evaluar la asociación entre cada característica y la actividad de los promotores evaluados, se realizó un test de Wilcoxon utilizando el paquete de R Coin v1.4.3 [(Hothorn et al. 2008\)](https://www.zotero.org/google-docs/?UH1y2E). Para establecer la significancia, la réplica se consideró como una variable de efectos aleatorios. En todos los casos donde se realizaron múltiples comparaciones, se aplicó la corrección de Benjamini-Hochberg sobre los *p-values* [(Benjamini and Hochberg 1995\)](https://www.zotero.org/google-docs/?C3W1cP). Sin embargo, para obtener el tamaño del efecto, realizamos el test en cada réplica por separado e informamos ambos valores del estimador Hodges-Lehmann. A su vez, para hacer foco en la replicabilidad, se consideraron asociadas a la actividad solo las características con un *p-value* ajustado menor a 0,05 cuyo estimador de Hodges-Lehmann y su intervalo de confianza del 95% tuvieran el mismo signo en ambas réplicas. 
+A su vez, con el objetivo de evaluar la asociación entre cada característica y la actividad de los promotores evaluados, se realizó un test de Wilcoxon utilizando el paquete de R Coin v1.4.3 [(Hothorn et al. 2008\)](https://www.zotero.org/google-docs/?UH1y2E). Para establecer la significancia, la réplica se consideró como una variable de efectos aleatorios. A su vez, realizamos el test en cada réplica por separado e informamos ambos valores del estimador Hodges-Lehmann como medida del tamaño del efecto. Para hacer foco en la replicabilidad, se consideraron asociadas a la actividad solo las características con un *p-value* ajustado menor a 0,05 cuyo estimador de Hodges-Lehmann y su intervalo de confianza del 95% tuvieran el mismo signo en ambas réplicas. 
 
-Para el análisis de variables continuas y para los modelos lineales, la actividad media de cada promotor se expresó como rango percentil dentro de cada réplica. La relación con variables continuas, como la razón CpG observado/esperado, se evaluó agrupando los promotores en deciles de la variable, calculando el percentil de actividad medio de cada decil con su IC 95% y cuantificando la asociación con la correlación de Spearman.
+En el análisis de variables continuas y para los modelos lineales, la actividad media de cada promotor se expresó como rango percentil dentro de cada réplica. La relación con variables continuas, como la razón CpG observado/esperado, se evaluó agrupando los promotores en deciles de la variable, calculando el percentil de actividad medio de cada decil con su IC 95% y cuantificando la asociación con la correlación de Spearman.
 
 Para evaluar si la asociación de un elemento con la actividad dependía de su co-ocurrencia con las islas CpG, el test se repitió por separado en los promotores con y sin isla CpG. La asociación entre la presencia de cada motivo y la de una isla CpG se evaluó con el test exacto de Fisher.
 
@@ -635,12 +637,33 @@ El procedimiento fue el siguiente:
 
 Para estimar la incertidumbre del AUC y determinar qué asociaciones son estadísticamente significativas, se utilizó el método de DeLong (DeLong & Clarke-Pearson 1988), que explota el hecho de que el AUC es matemáticamente equivalente al estadístico U de Mann-Whitney (la probabilidad de que un promotor elegido al azar del grupo con la característica tenga un rank de varianza mayor que uno elegido al azar del grupo sin ella). A partir de esta equivalencia, DeLong deriva una fórmula cerrada y asintótica para la varianza del AUC, sin necesidad de remuestreo. Con esa varianza se calcularon intervalos de confianza del 95% y un *p-value* (test de Wald contra el valor nulo de 0.5), que se corrigió por comparaciones múltiples con el método de Benjamini-Hochberg (FDR). Las características cuyo *p-value* corregido superó 0.05 en alguna de las dos réplicas, o que mostraron sentido de efecto opuesto entre réplicas, fueron descartadas por no presentar un efecto consistente y significativo sobre el ruido transcripcional.
 
+### Análisis de discordancia entre reportero y endógeno
+
+Para identificar qué características se asocian a que un promotor se aparte de la correspondencia entre su actividad en el reportero y su uso endógeno, analizamos la diferencia entre ambas mediciones siguiendo la lógica de un análisis de Bland-Altman [(Bland and Altman 1986\)](https://www.zotero.org/google-docs/?KTWxFE). El análisis se restringió a los promotores de alta confianza con actividad endógena detectable en HEK293 (TPM \> 0), lo que dejó 6525 promotores, 5149 en ambas réplicas.
+
+Dentro de ese subconjunto, la actividad en el reportero y la actividad endógena máxima entre las muestras de FANTOM5 se expresaron como rangos normalizados (*rr* y *re*). La discordancia se definió como *d \= rr − re*, de modo que un valor positivo indica que el reportero sobreestima la actividad respecto del uso endógeno y uno negativo, que la subestima. El nivel general de actividad se definió como *a* \= (*rr* \+ *re*) / 2 y se utilizó como covariable por ser prácticamente ortogonal a *d*, mientras que controlar solo por *rr* dejaría pasar al coeficiente el efecto de cada característica sobre la actividad cruda.
+
+El efecto de cada característica binaria *x* se estimó con el modelo lineal
+
+d \= β₀ \+ β₁a \+ β₂réplica \+ β₃x \+ ε
+
+donde β₃ representa la diferencia de discordancia entre los promotores con y sin la característica, a igual nivel de actividad. Las características y sus terciles se definieron sobre el conjunto completo de promotores de alta confianza, con los mismos cortes utilizados en el resto del trabajo.
+
+Dado que las dos réplicas de un mismo promotor no son observaciones independientes, los errores estándar se calcularon con un estimador robusto agrupado por promotor [(Liang and Zeger 1986\)](https://www.zotero.org/google-docs/?KLjoFA), de tipo HC1, mediante el paquete de R sandwich v3.1.1 [(Zeileis et al. 2020\)](https://www.zotero.org/google-docs/?5cvIgm). Los intervalos de confianza del 95% y los *p-values* se obtuvieron de una distribución t con G − 1 grados de libertad, siendo G el número de promotores.
+
+Se excluyeron de la visualización y de la corrección por comparaciones múltiples las características presentes en menos de 100 promotores del subconjunto, así como “Alta actividad en HEK293”. Esta última funciona como un indicador de *re*, por lo que, a igual *a*, se asocia por construcción con una menor *d*. Para evaluarlo se permutó la actividad en HEK293 entre promotores del mismo percentil de actividad endógena máxima, lo que conserva su acople con *re* y rompe su relación con otras propiedades del promotor, y se ajustó el modelo en cada una de 200 permutaciones.
+
+Como control de que el efecto sobre la discordancia difiere del efecto sobre la actividad cruda, se calculó la correlación de Pearson entre los coeficientes de este modelo y los efectos de las mismas características sobre la actividad en el reportero.
+
+La asociación con la unión de TFs se evaluó con el mismo modelo, reemplazando x por la presencia de picos de cada factor en ReMap2022. Como criterio de robustez, el análisis se repitió utilizando solo los picos provenientes de células HEK293 para los 263 factores que cumplían el mismo umbral de cobertura, y se identificaron aquellos con un *p-value* ajustado menor a 0.05 y el mismo signo en ambos análisis.
+
+Por último, se comparó la discordancia entre los promotores con y sin unión de tres correpresores (SETDB1, NCOR1 y L3MBTL2), elegidos entre los factores que cumplieron el criterio de robustez. Para esta comparación se utilizó una observación por promotor, promediando sus réplicas, y un test de suma de rangos de Wilcoxon.
+
 ### Análisis de enriquecimiento funcional de la unión de TFs {#análisis-de-enriquecimiento-funcional-de-la-unión-de-tfs}
 
-Las asociaciones entre la ocupación proteica de TFs y tanto el ruido como la actividad transcripcional se evaluaron utilizando el mismo marco de trabajo aplicado a todas las características binarias.   
-Se realizó un análisis de enriquecimiento de conjuntos de genes (*GSEA*) [(Subramanian et al. 2005\)](https://www.zotero.org/google-docs/?TX1IGX) sobre el subconjunto de factores de transcripción identificados utilizando términos de *Gene Ontology* (*GO*), ordenados ya sea por el tamaño del efecto del test de suma de rangos de *Wilcoxon* (*Wilcoxon rank-sum test*) o por el *AUC-ROC*.Estos análisis se implementaron mediante *scripts* propios utilizando los paquetes de *R/Bioconductor* *AnnotationDbi*, *clusterProfiler* [(Yu et al. 2012\)](https://www.zotero.org/google-docs/?T157q5) y *enrichplot*.
+Las asociaciones entre la ocupación proteica de TFs y tanto el ruido como la actividad transcripcional se evaluaron utilizando el mismo marco de trabajo aplicado a todas las características binarias. En dichos casos se realizó un análisis de enriquecimiento de conjuntos de genes (*GSEA*) [(Subramanian et al. 2005\)](https://www.zotero.org/google-docs/?TX1IGX) sobre el subconjunto de factores de transcripción identificados utilizando términos de *Gene Ontology* (*GO*), ordenados ya sea por el tamaño del efecto del test de suma de rangos de *Wilcoxon* (*Wilcoxon rank-sum test*) o por el *AUC-ROC*.Estos análisis se implementaron mediante *scripts* propios utilizando los paquetes de *R/Bioconductor* *AnnotationDbi*, *clusterProfiler* [(Yu et al. 2012\)](https://www.zotero.org/google-docs/?T157q5) y *enrichplot*.
 
-### Análisis de discordancia entre reportero y endógeno
+Para el análisis de discordancia, los términos sobrerrepresentados se identificaron por separado entre los factores asociados a cada dirección (*p-value* ajustado menor a 0.05) mediante un análisis de sobrerrepresentación (ORA) con la función *enrichGO*, utilizando las tres ontologías de *org.Hs.eg.db* v3.20.0, los factores evaluados como universo y términos de entre 10 y 500 genes. 
 
 ## Promotores alternativos {#promotores-alternativos}
 
@@ -1007,6 +1030,12 @@ La selectividad predicha, en cambio, disminuyó al aumentar la actividad medida 
 
 **Figura R4.4. La actividad medida coincide con la predicha a partir de la secuencia y se asocia a una menor dependencia del contexto genómico. (A)** Puntaje de predicción de Puffin en el TSS en función de la actividad en el reportero, con los promotores agrupados en deciles de actividad, para cada réplica. Correlación de Spearman sobre los promotores individuales: 0.40 \[IC 95%: 0.38–0.41\] en la réplica 1 (n \= 9397\) y 0.39 \[0.38–0.41\] en la réplica 2 (n \= 11447). **(B)** Mediana del puntaje de predicción para cada combinación de decil de actividad y decil del índice de Gini de especificidad tisular, con el número de promotores de cada celda y, entre paréntesis, la mediana de Gini de cada decil. Coeficientes de un modelo lineal del puntaje en función de la actividad, la especificidad y su interacción: 0.25, −0.14 y −0.02 en la réplica 1, y 0.25, −0.15 y −0.03 en la réplica 2\. **(C)** y **(D)** Lo mismo que A y B para el índice de selectividad de Puffin-D, tomado de los valores publicados por Dudnyk et al. para los promotores coincidentes con los de nuestra *library*; el menor número de promotores respecto de A y B corresponde a los que disponen de ese valor. En C, ρ \= −0.19 \[−0.21 a −0.16\] (n \= 6055\) y −0.21 \[−0.24 a −0.19\] (n \= 7182). En D, los coeficientes son −0.09, 0.51 y 0.07 en la réplica 1, y −0.12, 0.50 y 0.08 en la réplica 2\.
 
+#### **Características asociadas a la discordancia**
+
+Las subsecciones anteriores muestran que la actividad autónoma predice parte del uso endógeno y dejan sin explicar el resto. Esa diferencia no tiene por qué ser ruido: puede ser sistemática y depender de qué clase de promotor se trate. Para evaluarlo invertimos la pregunta y analizamos, para cada promotor, la diferencia entre su rango de actividad en el reportero y su rango de uso endógeno, controlando por el nivel general de actividad de modo que el resultado no recoja simplemente el efecto de cada característica sobre la actividad (ver Métodos). Un efecto positivo indica que el reportero sobreestima al promotor respecto de su locus, y uno negativo, que lo subestima.
+
+Del lado de la sobreestimación aparecieron los promotores insertados en el linaje humano y los que no conservan actividad en ratón, seguidos por la accesibilidad de la cromatina y la presencia de CCAAT, islas CpG, elementos transponibles, sitios YY1 y CRE, y baja especificidad tisular (Fig. R4.5).
+
 # Referencias {#referencias}
 
 [Agarwal, Vikram, and Jay Shendure. 2020\. “Predicting mRNA Abundance Directly from Genomic Sequence Using Deep Convolutional Neural Networks.” *Cell Reports* 31 (7): 107663\. https\://doi.org/10.1016/j.celrep.2020.107663.](https://www.zotero.org/google-docs/?Sm3FUd) 
@@ -1018,6 +1047,8 @@ La selectividad predicha, en cambio, disminuyó al aumentar la actividad medida 
 [Banerji, J., S. Rusconi, and W. Schaffner. 1981\. “Expression of a Beta-Globin Gene Is Enhanced by Remote SV40 DNA Sequences.” *Cell* 27 (2 Pt 1): 299–308. https\://doi.org/10.1016/0092-8674(81)90413-x.](https://www.zotero.org/google-docs/?Sm3FUd) 
 
 [Benjamini, Yoav, and Yosef Hochberg. 1995\. “Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing.” *Journal of the Royal Statistical Society. Series B (Methodological)* 57 (1): 289–300.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Bland, J. M., and D. G. Altman. 1986\. “Statistical Methods for Assessing Agreement between Two Methods of Clinical Measurement.” *Lancet* (London, England) 1 (8476): 307–10.](https://www.zotero.org/google-docs/?Sm3FUd) 
 
 [Boer, Carl G. de, Eeshit Dhaval Vaishnav, Ronen Sadeh, Esteban Luis Abeyta, Nir Friedman, and Aviv Regev. 2020\. “Deciphering Eukaryotic Gene-Regulatory Logic with 100 Million Random Promoters.” *Nature Biotechnology* 38 (1): 56–65. https\://doi.org/10.1038/s41587-019-0315-8.](https://www.zotero.org/google-docs/?Sm3FUd) 
 
@@ -1093,6 +1124,8 @@ La selectividad predicha, en cambio, disminuyó al aumentar la actividad medida 
 
 [Li, Cai, Boris Lenhard, and Nicholas M. Luscombe. 2018\. “Integrated Analysis Sheds Light on Evolutionary Trajectories of Young Transcription Start Sites in the Human Genome.” *Genome Research* 28 (5): 676–88. https\://doi.org/10.1101/gr.231449.117.](https://www.zotero.org/google-docs/?Sm3FUd) 
 
+[Liang, Kung-Yee, and Scott L. Zeger. 1986\. “Longitudinal Data Analysis Using Generalized Linear Models.” *Biometrika* 73 (1): 13–22. https\://doi.org/10.1093/biomet/73.1.13.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
 [Long, Hannah K., Sara L. Prescott, and Joanna Wysocka. 2016\. “Ever-Changing Landscapes: Transcriptional Enhancers in Development and Evolution.” *Cell* 167 (5): 1170–87. https\://doi.org/10.1016/j.cell.2016.09.018.](https://www.zotero.org/google-docs/?Sm3FUd) 
 
 [Lubliner, Shai, Leeat Keren, and Eran Segal. 2013\. “Sequence Features of Yeast and Human Core Promoters That Are Predictive of Maximal Promoter Activity.” *Nucleic Acids Research* 41 (11): 5569–81. https\://doi.org/10.1093/nar/gkt256.](https://www.zotero.org/google-docs/?Sm3FUd) 
@@ -1156,6 +1189,8 @@ La selectividad predicha, en cambio, disminuyó al aumentar la actividad medida 
 [Yu, Guangchuang, Li-Gen Wang, Yanyan Han, and Qing-Yu He. 2012\. “clusterProfiler: An R Package for Comparing Biological Themes Among Gene Clusters.” *OMICS: A Journal of Integrative Biology* 16 (5): 284–87. https\://doi.org/10.1089/omi.2011.0118.](https://www.zotero.org/google-docs/?Sm3FUd) 
 
 [Zabidi, Muhammad A., Cosmas D. Arnold, Katharina Schernhuber, et al. 2015\. “Enhancer-Core-Promoter Specificity Separates Developmental and Housekeeping Gene Regulation.” *Nature* 518 (7540): 556–59. https\://doi.org/10.1038/nature13994.](https://www.zotero.org/google-docs/?Sm3FUd) 
+
+[Zeileis, Achim, Susanne Köll, and Nathaniel Graham. 2020\. “Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R.” *Journal of Statistical Software* 95 (October): 1–36. https\://doi.org/10.18637/jss.v095.i01.](https://www.zotero.org/google-docs/?Sm3FUd) 
 
 [Zou, Zhaonan, Tazro Ohta, and Shinya Oki. 2024\. “ChIP-Atlas 3.0: A Data-Mining Suite to Explore Chromosome Architecture Together with Large-Scale Regulome Data.” *Nucleic Acids Research* 52 (W1): W45–53. https\://doi.org/10.1093/nar/gkae358.](https://www.zotero.org/google-docs/?Sm3FUd) 
 
