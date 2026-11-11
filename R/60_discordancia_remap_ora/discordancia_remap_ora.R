@@ -29,7 +29,8 @@
 # Paneles:
 # (A) efecto de cada TF; (B) terminos GO por direccion; (C) discordancia segun
 # la union de tres correpresores (SETDB1, MGA, HDAC3), con una observacion
-# por promotor (promedio de sus replicas) y Wilcoxon sobre esas observaciones.
+# por promotor (promedio de sus replicas); la etiqueta es el beta del modelo con
+# su IC 95%.
 # Los tres siguen significativos en ambas replicas despues de corregir por
 # cobertura (ver R/65_exploratorio_cobertura_discordancia). SETDB1 ademas es
 # concordante con la union en HEK293; MGA y HDAC3 no tienen suficientes picos
@@ -243,17 +244,22 @@ una_por_promotor <- por_marcador %>%
   group_by(marcador, seq_id, union) %>%
   summarise(dif_signed = mean(dif_signed), .groups = "drop")
 
-etiquetas_p <- una_por_promotor %>%
-  group_by(marcador) %>%
-  summarise(p = wilcox.test(dif_signed ~ union)$p.value, .groups = "drop") %>%
-  mutate(etiqueta = ifelse(p < 2.2e-16, "p < 2.2e-16", sprintf("p = %.1e", p)))
+# etiqueta: beta del modelo (con avg_rank y rep, SE agrupados por promotor) y
+# su IC 95%, no un test sobre las distribuciones: con miles de promotores
+# cualquier corrimiento minimo da p infimo aunque los violines se superpongan
+etiquetas_p <- resultados %>%
+  filter(TF %in% marcadores) %>%
+  transmute(
+    marcador = factor(TF, levels = marcadores),
+    etiqueta = sprintf("β = %.3f\nIC 95%%: %.3f a %.3f", estimate, conf.low, conf.high)
+  )
 
 p_violin <- una_por_promotor %>%
   ggplot(aes(union, dif_signed, fill = union)) +
   geom_violin(draw_quantiles = 0.5, alpha = 0.7) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
-  geom_text(data = etiquetas_p, aes(x = 1.5, y = 1.2, label = etiqueta), inherit.aes = FALSE, size = 4) +
-  coord_cartesian(ylim = c(-1, 1.3)) +
+  geom_text(data = etiquetas_p, aes(x = 1.5, y = 1.22, label = etiqueta), inherit.aes = FALSE, size = 4, lineheight = 0.9) +
+  coord_cartesian(ylim = c(-1, 1.4)) +
   facet_wrap(~marcador, ncol = 3) +
   scale_fill_manual(values = c("Presente" = "#c0392b", "Ausente" = "grey70")) +
   labs(x = "Unión del factor", y = "Discordancia\n(reportero - endógeno)", fill = NULL) +
