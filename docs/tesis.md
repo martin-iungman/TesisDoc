@@ -98,71 +98,91 @@ How much of a gene's regulatory behaviour is written in its own sequence is a ce
 
 [Análisis de datos masivos de ChIP-seq	39](#análisis-de-datos-masivos-de-chip-seq)
 
+[Metilación del ADN en HEK293	40](#metilación-del-adn-en-hek293)
+
+[Para estimar la metilación endógena de los promotores se utilizaron datos públicos de secuenciación de genoma completo con bisulfito (WGBS) de células HEK293 depositados en GEO. Se incluyeron únicamente muestras control, sin perturbación genética ni farmacológica: dos réplicas tratadas con vehículo de la serie GSE243785 y tres réplicas de células TNRC18 WT de la serie GSE233830 \[(Zhao et al. 2023)\]. En ambos casos se partió de los archivos de metilación por CpG procesados por los autores, alineados sobre el genoma hg19. En GSE243785 las lecturas se alinearon con Bismark v0.22.3; en GSE233830 se utilizó el reporte de citosinas de DRAGEN, que informa los mismos conteos de lecturas metiladas y no metiladas para cada hebra. La profundidad media fue de 3 lecturas por CpG en la primera serie y de entre 10 y 14.5 en la segunda.	40](#heading)
+
+[Como se trata del único conjunto de datos de este trabajo anotado sobre hg19, las coordenadas de los fragmentos de la library se llevaron de hg38 a hg19 con la cadena hg38ToHg19 de UCSC y la función liftOver del paquete rtracklayer. Se descartaron los fragmentos que quedaron partidos en más de un segmento o cuya longitud cambió en más de un 10%, lo que afectó a 195 de las 47612 ventanas convertidas. Esas ventanas comprenden, además del fragmento de 252 pb, una ventana de 1 kb centrada en el mismo punto, utilizada como análisis de sensibilidad.	40](#heading)
+
+[Para cada promotor se sumaron las lecturas metiladas y las totales de todos los CpG contenidos en el fragmento, a lo largo de las cinco muestras, y la metilación se expresó como el porcentaje de lecturas metiladas sobre el total. Se consideró que un promotor tenía medición válida cuando al menos una de las muestras aportaba tres o más CpG con cinco o más lecturas dentro del fragmento, lo que se cumplió en 11580 de los 11955 promotores de alta confianza, y se lo clasificó como metilado cuando ese porcentaje alcanzaba el 50%. Como la cobertura no es uniforme entre grupos de promotores, la proporción de promotores medidos se informa junto con cada comparación.	40](#para-cada-promotor-se-sumaron-las-lecturas-metiladas-y-las-totales-de-todos-los-cpg-contenidos-en-el-fragmento,-a-lo-largo-de-las-cinco-muestras,-y-la-metilación-se-expresó-como-el-porcentaje-de-lecturas-metiladas-sobre-el-total.-se-consideró-que-un-promotor-tenía-medición-válida-cuando-al-menos-una-de-las-muestras-aportaba-tres-o-más-cpg-con-cinco-o-más-lecturas-dentro-del-fragmento,-lo-que-se-cumplió-en-11580-de-los-11955-promotores-de-alta-confianza,-y-se-lo-clasificó-como-metilado-cuando-ese-porcentaje-alcanzaba-el-50%.-como-la-cobertura-no-es-uniforme-entre-grupos-de-promotores,-la-proporción-de-promotores-medidos-se-informa-junto-con-cada-comparación.)
+
 [Algoritmos de predicción de la actividad promotora basados en la secuencia	40](#algoritmos-de-predicción-de-la-actividad-promotora-basados-en-la-secuencia)
 
 [Evaluación del efecto de las características del promotor sobre los patrones transcripcionales medidos	41](#evaluación-del-efecto-de-las-características-del-promotor-sobre-los-patrones-transcripcionales-medidos)
 
-[Asociación de las características del promotor con la actividad transcripcional	41](#asociación-de-las-características-del-promotor-con-la-actividad-transcripcional)
+[Asociación de las características del promotor con la actividad transcripcional	42](#asociación-de-las-características-del-promotor-con-la-actividad-transcripcional)
 
 [Efecto de la secuencia por posición	42](#efecto-de-la-secuencia-por-posición)
 
-[Búsqueda de motivos (6-meros)	43](#búsqueda-de-motivos-\(6-meros\))
+[Búsqueda de motivos (6-meros)	44](#búsqueda-de-motivos-\(6-meros\))
 
 [Análisis de aditividad	44](#análisis-de-aditividad)
 
-[Ajuste de las características del contexto endógeno por la secuencia	44](#ajuste-de-las-características-del-contexto-endógeno-por-la-secuencia)
+[Ajuste de las características del contexto endógeno por la secuencia	45](#ajuste-de-las-características-del-contexto-endógeno-por-la-secuencia)
 
-[Asociación de las características del promotor con el ruido transcripcional	45](#asociación-de-las-características-del-promotor-con-el-ruido-transcripcional)
+[Asociación de las características del promotor con el ruido transcripcional	46](#asociación-de-las-características-del-promotor-con-el-ruido-transcripcional)
 
-[Análisis de enriquecimiento funcional de la unión de TFs	46](#análisis-de-enriquecimiento-funcional-de-la-unión-de-tfs)
+[Análisis de discordancia entre reportero y endógeno	47](#análisis-de-discordancia-entre-reportero-y-endógeno)
 
-[Promotores alternativos	47](#promotores-alternativos)
+[Análisis de enriquecimiento funcional de la unión de TFs	49](#análisis-de-enriquecimiento-funcional-de-la-unión-de-tfs)
 
-[Clasificación de promotores alternativos	47](#clasificación-de-promotores-alternativos)
+[Promotores alternativos	49](#promotores-alternativos)
 
-[**Resultados	49**](#resultados)
+[Clasificación de promotores alternativos	49](#clasificación-de-promotores-alternativos)
 
-[1\. Estimación masiva de las propiedades transcripcionales de promotores basales humanos	49](#1.-estimación-masiva-de-las-propiedades-transcripcionales-de-promotores-basales-humanos)
+[**Resultados	51**](#resultados)
 
-[Controles del procedimiento	49](#controles-del-procedimiento)
+[1\. Estimación masiva de las propiedades transcripcionales de promotores basales humanos	51](#1.-estimación-masiva-de-las-propiedades-transcripcionales-de-promotores-basales-humanos)
 
-[Representatividad y cuantificación	51](#representatividad-y-cuantificación)
+[Controles del procedimiento	51](#controles-del-procedimiento)
 
-[Sesgos de representatividad	53](#sesgos-de-representatividad)
+[Representatividad y cuantificación	53](#representatividad-y-cuantificación)
 
-[Validación con promotores individuales	55](#validación-con-promotores-individuales)
+[Sesgos de representatividad	55](#sesgos-de-representatividad)
 
-[2\. Efectos del promotor sobre la fuerza transcripcional	56](#2.-efectos-del-promotor-sobre-la-fuerza-transcripcional)
+[Validación con promotores individuales	57](#validación-con-promotores-individuales)
 
-[Islas CpG	56](#islas-cpg)
+[2\. Efectos del promotor sobre la fuerza transcripcional	58](#2.-efectos-del-promotor-sobre-la-fuerza-transcripcional)
 
-[TATA-box	58](#tata-box)
+[Islas CpG	58](#islas-cpg)
 
-[CCAAT y GC-box	60](#ccaat-y-gc-box)
+[TATA-box	60](#tata-box)
 
-[Efecto de la secuencia a lo largo del promotor	61](#efecto-de-la-secuencia-a-lo-largo-del-promotor)
+[CCAAT y GC-box	62](#ccaat-y-gc-box)
 
-[Búsqueda de motivos de novo	62](#búsqueda-de-motivos-de-novo)
+[Efecto de la secuencia a lo largo del promotor	63](#efecto-de-la-secuencia-a-lo-largo-del-promotor)
 
-[Panorama de las características de secuencia	64](#panorama-de-las-características-de-secuencia)
+[Búsqueda de motivos de novo	64](#búsqueda-de-motivos-de-novo)
 
-[Características del contexto endógeno	66](#características-del-contexto-endógeno)
+[Panorama de las características de secuencia	66](#panorama-de-las-características-de-secuencia)
 
-[Unión de TF en el contexto endógeno	67](#unión-de-tf-en-el-contexto-endógeno)
+[Características del contexto endógeno	68](#características-del-contexto-endógeno)
 
-[NF-YA y CCAAT-box	69](#nf-ya-y-ccaat-box)
+[Unión de TF en el contexto endógeno	69](#unión-de-tf-en-el-contexto-endógeno)
 
-[3\. Efectos del promotor sobre el ruido transcripcional	72](#3.-efectos-del-promotor-sobre-el-ruido-transcripcional)
+[NF-YA y CCAAT-box	71](#nf-ya-y-ccaat-box)
 
-[Islas CpG	73](#islas-cpg-1)
+[3\. Efectos del promotor sobre el ruido transcripcional	74](#3.-efectos-del-promotor-sobre-el-ruido-transcripcional)
 
-[TATA-box	75](#tata-box-1)
+[Islas CpG	75](#islas-cpg-1)
 
-[Panorama general de las características asociadas al ruido	77](#panorama-general-de-las-características-asociadas-al-ruido)
+[TATA-box	77](#tata-box-1)
 
-[Unión de factores y marcas de histona en el contexto endógeno	79](#unión-de-factores-y-marcas-de-histona-en-el-contexto-endógeno)
+[Panorama general de las características asociadas al ruido	79](#panorama-general-de-las-características-asociadas-al-ruido)
 
-[**Referencias	82**](#referencias)
+[Unión de factores y marcas de histona en el contexto endógeno	81](#unión-de-factores-y-marcas-de-histona-en-el-contexto-endógeno)
+
+[4\. Actividad autónoma del promotor y uso endógeno	84](#4.-actividad-autónoma-del-promotor-y-uso-endógeno)
+
+[Correspondencia con el uso endógeno	84](#correspondencia-con-el-uso-endógeno)
+
+[Promotores housekeeping y tejido-específicos	86](#promotores-housekeeping-y-tejido-específicos)
+
+[Predicción a partir de la secuencia	88](#predicción-a-partir-de-la-secuencia)
+
+[Características asociadas a la discordancia	89](#características-asociadas-a-la-discordancia-entre-actividad-del-reportero-y-endógena)
+
+[**Referencias	90**](#referencias)
 
 # 
 
@@ -542,6 +562,16 @@ Para NF-YA, en ausencia de datos en HEK293, se utilizó la intersección de las 
 
 El análisis de modificaciones de histonas y marcas epigenéticas se realizó con los datos obtenidos de ChIP-Atlas [(Zou et al. 2024\)](https://www.zotero.org/google-docs/?KAeqoK).
 
+### Metilación del ADN en HEK293 {#metilación-del-adn-en-hek293}
+
+### Para estimar la metilación endógena de los promotores se utilizaron datos públicos de secuenciación de genoma completo con bisulfito (WGBS) de células HEK293 depositados en GEO. Se incluyeron únicamente muestras control, sin perturbación genética ni farmacológica: dos réplicas tratadas con vehículo de la serie GSE243785 y tres réplicas de células TNRC18 WT de la serie GSE233830 \[(Zhao et al. 2023)\]. En ambos casos se partió de los archivos de metilación por CpG procesados por los autores, alineados sobre el genoma hg19. En GSE243785 las lecturas se alinearon con Bismark v0.22.3; en GSE233830 se utilizó el reporte de citosinas de DRAGEN, que informa los mismos conteos de lecturas metiladas y no metiladas para cada hebra. La profundidad media fue de 3 lecturas por CpG en la primera serie y de entre 10 y 14.5 en la segunda. {#heading}
+
+### Como se trata del único conjunto de datos de este trabajo anotado sobre hg19, las coordenadas de los fragmentos de la *library* se llevaron de hg38 a hg19 con la cadena hg38ToHg19 de UCSC y la función *liftOver* del paquete rtracklayer. Se descartaron los fragmentos que quedaron partidos en más de un segmento o cuya longitud cambió en más de un 10%, lo que afectó a 195 de las 47612 ventanas convertidas. Esas ventanas comprenden, además del fragmento de 252 pb, una ventana de 1 kb centrada en el mismo punto, utilizada como análisis de sensibilidad. {#heading}
+
+### Para cada promotor se sumaron las lecturas metiladas y las totales de todos los CpG contenidos en el fragmento, a lo largo de las cinco muestras, y la metilación se expresó como el porcentaje de lecturas metiladas sobre el total. Se consideró que un promotor tenía medición válida cuando al menos una de las muestras aportaba tres o más CpG con cinco o más lecturas dentro del fragmento, lo que se cumplió en 11580 de los 11955 promotores de alta confianza, y se lo clasificó como metilado cuando ese porcentaje alcanzaba el 50%. Como la cobertura no es uniforme entre grupos de promotores, la proporción de promotores medidos se informa junto con cada comparación.  {#para-cada-promotor-se-sumaron-las-lecturas-metiladas-y-las-totales-de-todos-los-cpg-contenidos-en-el-fragmento,-a-lo-largo-de-las-cinco-muestras,-y-la-metilación-se-expresó-como-el-porcentaje-de-lecturas-metiladas-sobre-el-total.-se-consideró-que-un-promotor-tenía-medición-válida-cuando-al-menos-una-de-las-muestras-aportaba-tres-o-más-cpg-con-cinco-o-más-lecturas-dentro-del-fragmento,-lo-que-se-cumplió-en-11580-de-los-11955-promotores-de-alta-confianza,-y-se-lo-clasificó-como-metilado-cuando-ese-porcentaje-alcanzaba-el-50%.-como-la-cobertura-no-es-uniforme-entre-grupos-de-promotores,-la-proporción-de-promotores-medidos-se-informa-junto-con-cada-comparación.}
+
+###  {#heading}
+
 ### Algoritmos de predicción de la actividad promotora basados en la secuencia {#algoritmos-de-predicción-de-la-actividad-promotora-basados-en-la-secuencia}
 
 Puffin es un modelo interpretable de aprendizaje automático que predice la señal de inicio transcripcional a resolución de base a partir de la secuencia del promotor, descomponiendo su predicción en la contribución aditiva de tres tipos de elementos de secuencia: motivos, iniciadores y trinucleótidos [(Dudnyk et al. 2024\)](https://www.zotero.org/google-docs/?WdzDtE). A diferencia de otros modelos de *deep learning* de tipo "caja negra", Puffin permite atribuir la señal predicha a posiciones y motivos específicos de la secuencia, facilitando la interpretación mecanística de los determinantes de la actividad promotora. En este trabajo se utilizó un modelo pre-entrenado con datos de CAGE en humano (GRCh38).
@@ -637,7 +667,7 @@ El procedimiento fue el siguiente:
 
 Para estimar la incertidumbre del AUC y determinar qué asociaciones son estadísticamente significativas, se utilizó el método de DeLong (DeLong & Clarke-Pearson 1988), que explota el hecho de que el AUC es matemáticamente equivalente al estadístico U de Mann-Whitney (la probabilidad de que un promotor elegido al azar del grupo con la característica tenga un rank de varianza mayor que uno elegido al azar del grupo sin ella). A partir de esta equivalencia, DeLong deriva una fórmula cerrada y asintótica para la varianza del AUC, sin necesidad de remuestreo. Con esa varianza se calcularon intervalos de confianza del 95% y un *p-value* (test de Wald contra el valor nulo de 0.5), que se corrigió por comparaciones múltiples con el método de Benjamini-Hochberg (FDR). Las características cuyo *p-value* corregido superó 0.05 en alguna de las dos réplicas, o que mostraron sentido de efecto opuesto entre réplicas, fueron descartadas por no presentar un efecto consistente y significativo sobre el ruido transcripcional.
 
-### Análisis de discordancia entre reportero y endógeno
+### Análisis de discordancia entre reportero y endógeno {#análisis-de-discordancia-entre-reportero-y-endógeno}
 
 Para identificar qué características se asocian a que un promotor se aparte de la correspondencia entre su actividad en el reportero y su uso endógeno, analizamos la diferencia entre ambas mediciones siguiendo la lógica de un análisis de Bland-Altman [(Bland and Altman 1986\)](https://www.zotero.org/google-docs/?KTWxFE). El análisis se restringió a los promotores de alta confianza con actividad endógena detectable en HEK293 (TPM \> 0), lo que dejó 6525 promotores, 5149 en ambas réplicas.
 
@@ -972,7 +1002,7 @@ Tomados en conjunto, estos resultados muestran que el ruido transcripcional de u
 
 Las asociaciones con el ruido fueron, de todos modos, menos numerosas y de menor magnitud que las observadas para la actividad, lo que es esperable dada la mayor incertidumbre con que se estima esta propiedad. Esa diferencia no impide, sin embargo, identificar un patrón consistente: los promotores más ruidosos son los que carecen de isla CpG y, además, no muestran señal alguna de uso en su contexto endógeno. La relación entre el comportamiento del fragmento en el reportero y el uso del promotor en su genoma se analiza en detalle en la sección siguiente.
 
-### 4\. Actividad autónoma del promotor y uso endógeno 
+## 4\. Actividad autónoma del promotor y uso endógeno  {#4.-actividad-autónoma-del-promotor-y-uso-endógeno}
 
 Al evaluar las características del contexto endógeno encontramos que las asociaciones más fuertes con la actividad en el reportero no correspondieron a ningún elemento de secuencia, sino a la actividad del propio promotor en su locus y a la accesibilidad de su cromatina (Fig. R2.12A). En la misma línea, al ordenar los factores de transcripción según cuánto marcaba su ocupación la actividad medida, el conjunto más enriquecido en el extremo de mayor efecto fue el de los factores generales de iniciación de la RNA polimerasa II (Fig. R2.13C). El análisis del ruido apuntó después en la misma dirección: los promotores más ruidosos del ensayo fueron los que no muestran señal alguna de uso en su contexto endógeno (Fig. R3.7E).
 
@@ -982,7 +1012,7 @@ Esta sección toma esa correspondencia como objeto de estudio y no como un subpr
 
 Esa medida puede tomarse en un tipo celular determinado, donde informa cuánto se usa el promotor en ese contexto particular, o resumirse sobre el conjunto de las muestras; usamos ambas formas a lo largo de la sección, según la pregunta. En uno y otro caso la comparación se lee de manera asimétrica: que las dos mediciones coincidan indica que la secuencia basal alcanza para explicar el uso del promotor, mientras que su discrepancia admite dos lecturas, la de una secuencia que no contiene esa información y la de un promotor que requiere condiciones que el ensayo no reproduce.
 
-#### Correspondencia con el uso endógeno
+### Correspondencia con el uso endógeno {#correspondencia-con-el-uso-endógeno}
 
 Comenzamos por el caso más directo, el de las células HEK293, que son las mismas en las que se realizó el ensayo y donde, por lo tanto, el trans-ambiente es común a las dos mediciones. Al ordenar los promotores por su actividad en el reportero y agruparlos en intervalos de 100, el uso endógeno medio de cada intervalo aumentó de manera sostenida a lo largo de todo el rango de actividad (Fig. R4.1A). Sobre los promotores individuales, la correlación fue de ρ \= 0.36 en ambas réplicas (p \< 2.2 × 10⁻¹⁶).
 
@@ -994,7 +1024,7 @@ La actividad que un fragmento de 252 pb genera aislado en un locus ectópico pre
 
 **Figura R4.1. La actividad autónoma del promotor se corresponde con su uso endógeno. (A)** Uso endógeno en células HEK293, medido por CAGE (TPM), en función de la actividad media en el reportero, para la réplica 1 (izquierda) y la réplica 2 (derecha). Los promotores se ordenaron por actividad media y se agruparon en intervalos (*bins*) de 100 promotores; cada punto corresponde al valor medio de un intervalo. La línea muestra el ajuste lineal y la banda gris su intervalo de confianza del 95%. **(B)** Lo mismo para células HeLa. **(C)** Lo mismo para músculo esquelético. **(D)** Uso endógeno máximo entre todas las muestras de FANTOM5, en función de la actividad en el reportero. En este caso los promotores se agruparon en diez intervalos de igual número de promotores; cada caja resume la distribución del uso endógeno dentro de un intervalo, con la mediana como línea horizontal y el rango intercuartil como caja. En todos los paneles el eje vertical está en escala logarítmica. Los coeficientes ρ citados en el texto corresponden a la correlación de Spearman entre la actividad y el uso endógeno, calculada sobre los promotores individuales. 
 
-#### Promotores housekeeping y tejido-específicos
+### Promotores housekeeping y tejido-específicos {#promotores-housekeeping-y-tejido-específicos}
 
 La correspondencia descrita hasta acá vale para el conjunto de la *library*, pero no tiene por qué ser igual en todos los promotores. Ya vimos que la baja especificidad tisular se asocia a mayor actividad en el reportero y la alta especificidad a menor (Fig. R2.12A), de modo que cabe esperar que el reportero prediga el uso endógeno de unos mejor que el de otros. Para evaluarlo separamos los promotores según el índice de Gini de su actividad a lo largo de los grupos de ontología de FANTOM5, conservando el primer y el tercer tercil como *housekeeping* y tejido-específicos (ver Métodos).
 
@@ -1018,7 +1048,7 @@ El reportero conserva entonces parte del ordenamiento endógeno en los dos tipos
 
 **Figura R4.3. El reportero conserva parte del ordenamiento endógeno de los promotores.** Distribución de la diferencia absoluta entre el rango de actividad en el reportero y el rango de uso endógeno máximo entre las muestras de FANTOM5, calculados sobre el conjunto de ambos grupos, para los promotores *housekeeping* (celeste) y tejido-específicos (azul). Las líneas punteadas corresponden, para cada grupo, a un control construido permutando los rangos endógenos entre los miembros de ese mismo grupo, lo que preserva su ubicación en ambos ordenamientos. Se indican la mediana observada de cada grupo y el valor p empírico frente a su control. Se muestran las dos réplicas por separado. 
 
-#### **Predicción a partir de la secuencia**
+### Predicción a partir de la secuencia {#predicción-a-partir-de-la-secuencia}
 
 En los últimos años se desarrollaron varios algoritmos que predicen la salida transcripcional a partir del ADN, apoyados en la idea de que los determinantes de la actividad promotora están inscriptos sobre todo en la secuencia del propio promotor \[CITAS\]. Aplicamos uno de ellos, Puffin, que predice el patrón de TSS a partir de la secuencia del promotor basal, junto con la métrica de selectividad derivada de Puffin-D, que estima cuánto depende la actividad de un promotor del contexto genómico que lo rodea (ver Métodos).
 
@@ -1030,11 +1060,59 @@ La selectividad predicha, en cambio, disminuyó al aumentar la actividad medida 
 
 **Figura R4.4. La actividad medida coincide con la predicha a partir de la secuencia y se asocia a una menor dependencia del contexto genómico. (A)** Puntaje de predicción de Puffin en el TSS en función de la actividad en el reportero, con los promotores agrupados en deciles de actividad, para cada réplica. Correlación de Spearman sobre los promotores individuales: 0.40 \[IC 95%: 0.38–0.41\] en la réplica 1 (n \= 9397\) y 0.39 \[0.38–0.41\] en la réplica 2 (n \= 11447). **(B)** Mediana del puntaje de predicción para cada combinación de decil de actividad y decil del índice de Gini de especificidad tisular, con el número de promotores de cada celda y, entre paréntesis, la mediana de Gini de cada decil. Coeficientes de un modelo lineal del puntaje en función de la actividad, la especificidad y su interacción: 0.25, −0.14 y −0.02 en la réplica 1, y 0.25, −0.15 y −0.03 en la réplica 2\. **(C)** y **(D)** Lo mismo que A y B para el índice de selectividad de Puffin-D, tomado de los valores publicados por Dudnyk et al. para los promotores coincidentes con los de nuestra *library*; el menor número de promotores respecto de A y B corresponde a los que disponen de ese valor. En C, ρ \= −0.19 \[−0.21 a −0.16\] (n \= 6055\) y −0.21 \[−0.24 a −0.19\] (n \= 7182). En D, los coeficientes son −0.09, 0.51 y 0.07 en la réplica 1, y −0.12, 0.50 y 0.08 en la réplica 2\.
 
-#### **Características asociadas a la discordancia**
+### Características asociadas a la discordancia entre actividad del reportero y endógena {#características-asociadas-a-la-discordancia-entre-actividad-del-reportero-y-endógena}
 
-Las subsecciones anteriores muestran que la actividad autónoma predice parte del uso endógeno y dejan sin explicar el resto. Esa diferencia no tiene por qué ser ruido: puede ser sistemática y depender de qué clase de promotor se trate. Para evaluarlo invertimos la pregunta y analizamos, para cada promotor, la diferencia entre su rango de actividad en el reportero y su rango de uso endógeno, controlando por el nivel general de actividad de modo que el resultado no recoja simplemente el efecto de cada característica sobre la actividad (ver Métodos). Un efecto positivo indica que el reportero sobreestima al promotor respecto de su locus, y uno negativo, que lo subestima.
+Las subsecciones anteriores muestran que la actividad autónoma predice una parte del uso endógeno y dejan sin explicar el resto. Esa diferencia no tiene por qué ser ruido: puede ser sistemática y depender de la clase de promotor. Para evaluarlo invertimos la pregunta y analizamos, para cada promotor, la diferencia entre su rango de actividad en el reportero y su rango de uso endógeno, controlando por el nivel general de actividad de modo que el resultado no recoja el efecto de cada característica sobre la actividad misma (ver Métodos). Un valor negativo indica que el reportero subestima al promotor respecto de su locus, y uno positivo, que lo sobreestima.
 
-Del lado de la sobreestimación aparecieron los promotores insertados en el linaje humano y los que no conservan actividad en ratón, seguidos por la accesibilidad de la cromatina y la presencia de CCAAT, islas CpG, elementos transponibles, sitios YY1 y CRE, y baja especificidad tisular (Fig. R4.5).
+Los promotores que rindieron más en su locus que en el reportero fueron los de alta especificidad tisular, los que tienen enhancers anotados en las cercanías, los que contienen TATA-box o TCT, los conservados en cualquiera de las tres ventanas evaluadas y los de alto contenido G+C (Fig. R4.5). La lectura de este lado es directa: son promotores cuya posición relativa cae al medirlos fuera de contexto, porque dependen de él para alcanzar su salida.
+
+Del lado opuesto aparecieron los promotores insertados en el linaje humano y los que no conservan actividad en ratón, seguidos por la accesibilidad de la cromatina, la presencia de CCAAT, las islas CpG, los elementos transponibles, los sitios YY1 y CRE, y la baja especificidad tisular.
+
+Conviene precisar cómo se lee esta medida. Como las dos actividades se comparan en forma de rangos, la discordancia es necesariamente relativa: un promotor del lado de la sobreestimación no produce más en el reportero que en su locus, sino que ocupa una posición más alta entre los promotores del ensayo que entre los del genoma. Los dos lados no son, por lo tanto, dos mecanismos independientes, y los sobreestimados pueden ser simplemente los menos perjudicados por la pérdida del contexto.
+
+Dos asociaciones de este panorama no tienen explicación evidente. La accesibilidad de la cromatina acompaña a la sobreestimación, cuando cabría esperar lo contrario de un promotor abierto en su locus. Y las islas CpG caen de ese lado mientras que el alto contenido G+C cae del opuesto, pese a describir aspectos de una misma composición; como el efecto de cada característica se estimó por separado, los dos coeficientes son asociaciones marginales entre variables que se superponen, de modo que el contraste no es tan directo como sugiere su lectura en paralelo.
+
+**Figura R4.5. Características asociadas a la discordancia entre la actividad en el reportero y el uso endógeno.** Efecto de cada característica sobre la diferencia entre el rango de actividad en el reportero y el rango de uso endógeno máximo entre las muestras de FANTOM5, estimado a igual nivel general de actividad (ver Métodos). Cada característica se evaluó en un modelo propio, de modo que los efectos son asociaciones marginales y no están ajustados entre sí. Los valores negativos indican que el reportero subestima al promotor respecto de su locus y los positivos, que lo sobreestima. Las barras corresponden al intervalo de confianza del 95% y el color indica la significancia tras la corrección por comparaciones múltiples.
+
+Entre las características del lado de la subestimación, la cercanía de enhancers merece un análisis propio, porque mide directamente aquello que el capítulo viene afirmando desde la sección 2\. Al reemplazar la variable binaria por el número de enhancers anotados en la ventana, la discordancia disminuyó de forma sostenida a medida que aumentaba ese número (Fig. R4.6). Los promotores sin ningún enhancer cercano se ubicaron por encima de cero, es decir del lado de la sobreestimación, y los que tienen seis o más, claramente por debajo.
+
+La relación se mantuvo al analizar por separado a los promotores *housekeeping* y a los tejido-específicos, en ambas réplicas, de modo que no se trata de un efecto de la especificidad tisular expresado a través de los enhancers. El gradiente fue, eso sí, bastante más pronunciado en los tejido-específicos, en los que la discordancia media recorre todo el rango entre los promotores sin enhancers y los que tienen seis o más, mientras que entre los *housekeeping* el descenso es significativo pero pequeño. Lo que el reportero no reproduce de estos promotores es, entonces, el aporte de los elementos distales que los acompañan en el genoma, y ese aporte pesa más cuanto más restringida es su expresión.
+
+**Figura R4.6. La subestimación del reportero aumenta con el número de enhancers cercanos.** Discordancia media entre el rango de actividad en el reportero y el rango de uso endógeno, según el número de enhancers anotados en una ventana de ±25 kb alrededor del promotor, para los promotores *housekeeping* (celeste) y tejido-específicos (azul), definidos como el primer y el tercer tercil del índice de Gini con los cortes del conjunto de promotores detectados (ver Métodos). Las barras indican el intervalo de confianza del 95% de la media y los números al pie, la cantidad de promotores de cada grupo. Los coeficientes corresponden al ajuste de la discordancia en función del número de enhancers dentro de cada clase, controlando por el nivel general de actividad: en la réplica 1, −0.0139 \[−0.0219, −0.0059\] en *housekeeping* y −0.0311 \[−0.0442, −0.0180\] en tejido-específicos; en la réplica 2, −0.0169 \[−0.0240, −0.0099\] y −0.0249 \[−0.0374, −0.0125\]. Se muestran las dos réplicas por separado.
+
+### Ocupación proteica y discordancia 
+
+Del lado de la subestimación, los factores asociados corresponden sobre todo a los complejos remodeladores de cromatina de la familia BAF, el equivalente humano de SWI/SNF (Fig. R4.7B). Los términos más enriquecidos nombran variantes del complejo, npBAF y nBAF, que comparten la mayor parte de sus subunidades, de modo que el resultado señala a la familia en su conjunto más que a una composición particular. Los acompañan varios términos de progresión del ciclo celular y de segregación cromosómica, que se apoyan en buena medida en los mismos factores y no conviene leer como enriquecimientos independientes.
+
+Estos complejos desplazan nucleosomas de manera dependiente de ATP y son reclutados a loci específicos por factores de unión al ADN. Que marquen a los promotores que el reportero subestima admite una lectura directa: su contribución depende de que el complejo sea reclutado sobre ese locus, y el ensayo, que coloca a todos los fragmentos en el mismo sitio, no reproduce ese reclutamiento. El contraste con lo observado en la sección 2 resulta útil. Allí las islas CpG se asociaron a mayor actividad, en parte porque su composición desfavorece por sí misma la ocupación nucleosomal, un efecto que la secuencia lleva consigo y que el reportero sí reproduce. La remodelación por BAF es la contraparte en trans del mismo problema, y es justamente la que se pierde al sacar al promotor de su contexto.
+
+Del lado de la sobreestimación, en cambio, el análisis de sobrerrepresentación no devolvió ningún término específico, sino dos categorías amplias que agrupan a buena parte de los factores evaluados. Lo que distingue a ese lado no es entonces una función compartida, sino factores concretos.
+
+Los más consistentes fueron tres proteínas asociadas a la represión mediada por cromatina, que operan por vías distintas: SETDB1, que deposita la trimetilación de la lisina 9 de la histona H3 y silencia elementos repetitivos y retrovirus endógenos; MGA, componente del complejo PRC1.6, de la familia Polycomb; y HDAC3, núcleo catalítico de los complejos correpresores NCoR y SMRT, que remueve la acetilación de las histonas. Las tres se asociaron a mayor discordancia en los promotores que unen (Fig. R4.7C). Que tres mecanismos represivos independientes apunten en la misma dirección refuerza la interpretación, porque no se trata de una única vía apareciendo tres veces.
+
+La asociación de estos tres factores resiste dos controles. Se los eligió entre los que se mantuvieron significativos y con el mismo signo al restringir los picos de ChIP-seq a experimentos realizados en HEK293 y HEK293T, de modo que no depende de evidencia proveniente de otros tipos celulares; y ese filtro, lejos de favorecer a los factores que el artefacto de cobertura infla, selecciona factores de cobertura más baja que el promedio. Los tres conservan además su significancia tras la corrección por cobertura: en el caso de SETDB1, que une a algo más de la mitad de los promotores evaluados, la corrección incluso mejora su posición en el ordenamiento.
+
+Esto permite retomar la ambigüedad planteada al analizar las características de secuencia. Allí señalamos que la sobreestimación podía reflejar tanto promotores a los que la pérdida del contexto les cuesta menos como promotores activamente reprimidos en su locus. La presencia de estas tres proteínas sobre los promotores sobreestimados apoya la segunda lectura, al menos para una parte de ese grupo.
+
+**Figura R4.7. Factores de transcripción asociados a la discordancia. (A)** Efecto de la unión de cada uno de los 949 factores de ReMap sobre la discordancia entre el rango de actividad en el reportero y el rango de uso endógeno, corregido por la cobertura del factor (ver Métodos). Los valores positivos indican mayor discordancia, es decir sobreestimación por parte del reportero, en los promotores que el factor une. El color indica la significancia tras la corrección por comparaciones múltiples. **(B)** Términos de *Gene Ontology* sobrerrepresentados entre los factores asociados a cada dirección de la discordancia. La longitud de la barra indica la significancia y el color, el número de factores que sostienen cada término. **(C)** Distribución de la discordancia en los promotores con y sin unión de SETDB1, MGA y HDAC3, elegidos entre los factores asociados a la sobreestimación que se mantuvieron significativos al restringir los picos a experimentos de HEK293 y HEK293T. Se indican el efecto estimado por el modelo y su intervalo de confianza del 95%.
+
+### Promotores sin actividad endógena detectable en HEK293
+
+El análisis de discordancia excluye por construcción a los promotores sin señal endógena, porque sin ella no hay rango endógeno que comparar. Ese grupo, sin embargo, es informativo por sí mismo: un promotor que no se detecta en su locus pero transcribe en el reportero tiene en su secuencia una capacidad que el contexto no realiza. Separamos entonces los promotores según su actividad endógena en HEK293 y su actividad en el reportero (Fig. R4.8A). Conviene aclarar desde el inicio que la ausencia de señal se define por no superar el umbral de 1 TPM de CAGE, de modo que el grupo reúne tanto promotores reprimidos como promotores que transcriben por debajo del límite de detección.
+
+Dentro de los promotores sin señal endógena preguntamos qué características distinguen a los que son activos en el reportero. Casi todas se comportaron igual que en los promotores con actividad endógena: los elementos del promotor basal, la TATA-box y la CCAAT entre ellos, predicen la actividad con la misma fuerza en ambos grupos (Fig. R4.8B). Solo tres se apartaron de esa correspondencia. Las islas CpG y el alto contenido G+C la predicen algo peor entre los promotores sin señal endógena.
+
+La tercera fue la presencia de LTR, las repeticiones terminales largas de retrovirus endógenos integrados en la línea germinal. Corresponden a la porción del provirus que portaba su propio promotor y sus secuencias reguladoras, de modo que, a diferencia de los LINE y los SINE, son promotores por origen y no por accidente. Su comportamiento se invierte entre los dos grupos: entre los promotores con actividad endógena se asocian a menor actividad en el reportero, y entre los que carecen de ella, a una actividad marcadamente mayor.
+
+Esa inversión no forma parte de un reacomodamiento general de los determinantes de la actividad. Al repetir la comparación sobre 790 motivos de JASPAR y sobre la unión de 850 factores de ReMap, ninguno mostró una interacción significativa y las estimaciones de ambos grupos se alinearon sobre la diagonal (Fig. R4.8C). Los LTR son, en ese panorama, la excepción.
+
+El efecto corresponde además a una familia de LTR en particular. Al separar los promotores sin señal endógena según la clase de elemento transponible con la que se solapan, solo los que contienen un LTR de la familia ERVL-MaLR mostraron rangos de actividad superiores al resto, con ERV1 en el límite de la significancia y ERVL sin efecto alguno (Fig. R4.8D). El resto de las clases, incluidos LINE y SINE, no se diferenciaron de los promotores sin elementos transponibles. Se trata de un grupo chico, de 65 promotores.
+
+La ubicación del elemento respecto del sitio de inicio también importa. Entre los promotores sin señal endógena que contienen un LTR, los que tienen el TSS anotado dentro del elemento alcanzaron rangos de actividad claramente mayores que aquellos en los que el TSS queda fuera (Fig. R4.8E). Lo que aporta actividad no es la vecindad del elemento sino el elemento como promotor.
+
+Por último, la metilación del ADN permite distinguir, dentro de este grupo, a los promotores efectivamente reprimidos de los que simplemente no se detectan (Fig. R4.8F). Los promotores sin señal endógena que tienen isla CpG están prácticamente sin metilar, igual que los promotores activos, lo que sugiere que su ausencia de señal refleja un nivel de expresión por debajo del límite de detección más que un estado reprimido. Los que carecen de isla CpG, en cambio, están fuertemente metilados, y los que contienen un LTR son los más metilados de todos. Los promotores que conservan actividad autónoma en este grupo pertenecen, por lo tanto, a la fracción genuinamente reprimida en su contexto.
+
+Estos promotores son los mismos elementos que, en la subsección anterior, aparecían asociados a SETDB1, la enzima que deposita la trimetilación de la lisina 9 de la histona H3 sobre retrovirus endógenos. Las dos observaciones provienen de conjuntos de promotores disjuntos y de análisis independientes, de modo que no constituyen un único resultado, pero convergen sobre el mismo tipo de elemento: secuencias de origen retroviral con capacidad promotora propia, mantenidas en silencio por la maquinaria represiva del genoma.
 
 # Referencias {#referencias}
 
