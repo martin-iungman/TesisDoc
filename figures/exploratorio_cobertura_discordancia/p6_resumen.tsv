@@ -1,0 +1,2 @@
+n_todos	n_pasan	mediana_todos	mediana_pasan	mediana_no_pasan	p_wilcoxon	rho_cobertura_hek_vs_total	rho_estimate_hek_vs_cobertura_hek	frac_sobre_original_que_pasan	frac_sub_original_que_pasan	concordantes_sobre	concordantes_sub	concordantes_sobre_que_sobreviven_ajuste	concordantes_sub_que_sobreviven_ajuste
+949	263	3520	2814	3849	0.001407118117446415	0.7079596265581445	0.12271643251744899	0.2098092643051771	0.23711340206185566	46	14	20	14

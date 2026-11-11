@@ -1,0 +1,10 @@
+rep	lado	n	mediana_n_unidos
+Rep 1	ns	555	2125
+Rep 1	sobreestima	317	3843
+Rep 1	subestima	77	1566
+Rep 2	ns	501	2281
+Rep 2	sobreestima	358	4407
+Rep 2	subestima	90	2024
+Conjunto	ns	485	2279
+Conjunto	sobreestima	367	4546
+Conjunto	subestima	97	2024

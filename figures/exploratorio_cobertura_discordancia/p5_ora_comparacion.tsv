@@ -1,0 +1,67 @@
+direccion	ONTOLOGY	ID	Description	p.adjust_original	Count_original	p.adjust_ajustado	Count_ajustado	estado
+sobreestima	CC	GO:0005667	transcription regulator complex	0.0013067195724519877	118	0.012235303484429128	63	se mantiene
+sobreestima	CC	GO:0032991	protein-containing complex	0.009723052240228508	192	NA	NA	se pierde
+sobreestima	CC	GO:0005737	cytoplasm	0.020256161345555912	185	0.03717419340171088	96	se mantiene
+sobreestima	CC	GO:0140513	nuclear protein-containing complex	0.034487441119189215	132	NA	NA	se pierde
+sobreestima	CC	GO:0090575	RNA polymerase II transcription regulator complex	0.04039504409012423	62	NA	NA	se pierde
+sobreestima	CC	GO:0005829	cytosol	0.04039504409012423	114	NA	NA	se pierde
+sobreestima	CC	GO:0005794	Golgi apparatus	0.042633916435496175	17	NA	NA	se pierde
+subestima	CC	GO:0071564	npBAF complex	3.0598081614547776e-5	8	3.7593222496119376e-6	10	se mantiene
+subestima	BP	GO:0006325	chromatin organization	6.269266003110244e-4	41	0.007545780642334326	58	se mantiene
+subestima	BP	GO:2000819	regulation of nucleotide-excision repair	6.269266003110244e-4	9	6.459911159889327e-4	11	se mantiene
+subestima	BP	GO:0006338	chromatin remodeling	8.265274604637067e-4	36	0.012437259131236614	50	se mantiene
+subestima	CC	GO:0071565	nBAF complex	0.0010130700665673114	7	4.1813846435936e-4	9	se mantiene
+subestima	CC	GO:0016514	SWI/SNF complex	0.0030241611423004397	8	0.0054704694551732935	10	se mantiene
+subestima	BP	GO:0045023	G0 to G1 transition	0.003594243537010211	8	0.004043676056598463	10	se mantiene
+subestima	BP	GO:0070316	regulation of G0 to G1 transition	0.003594243537010211	8	0.004043676056598463	10	se mantiene
+subestima	BP	GO:0006289	nucleotide-excision repair	0.003594243537010211	9	0.006044287812136206	11	se mantiene
+subestima	CC	GO:1902494	catalytic complex	0.004946703258753836	28	NA	NA	se pierde
+subestima	BP	GO:0000819	sister chromatid segregation	0.005268117908103352	11	3.6644894131531987e-4	17	se mantiene
+subestima	BP	GO:0045739	positive regulation of DNA repair	0.005268117908103352	12	0.006044287812136206	16	se mantiene
+subestima	BP	GO:2000781	positive regulation of double-strand break repair	0.005762976395473276	10	0.021811422154885796	12	se mantiene
+subestima	BP	GO:0051983	regulation of chromosome segregation	0.006107284090167652	9	0.004442050843567571	12	se mantiene
+subestima	BP	GO:0045663	positive regulation of myoblast differentiation	0.006107284090167652	8	0.00908121771619652	10	se mantiene
+subestima	BP	GO:0098813	nuclear chromosome segregation	0.007115355585297517	11	3.6644894131531987e-4	18	se mantiene
+subestima	BP	GO:0007091	metaphase/anaphase transition of mitotic cell cycle	0.007277985263552731	8	0.004043676056598463	11	se mantiene
+subestima	BP	GO:0030071	regulation of mitotic metaphase/anaphase transition	0.007277985263552731	8	0.004043676056598463	11	se mantiene
+subestima	BP	GO:0044784	metaphase/anaphase transition of cell cycle	0.007277985263552731	8	0.004043676056598463	11	se mantiene
+subestima	BP	GO:1902099	regulation of metaphase/anaphase transition of cell cycle	0.007277985263552731	8	0.004043676056598463	11	se mantiene
+subestima	BP	GO:0033045	regulation of sister chromatid segregation	0.01131491803603936	8	0.006044287812136206	11	se mantiene
+subestima	MF	GO:0031491	nucleosome binding	0.012837758340696337	10	0.005540699280761398	14	se mantiene
+subestima	BP	GO:0080135	regulation of cellular response to stress	0.01624901177630588	18	0.02387826358917085	26	se mantiene
+subestima	BP	GO:0006282	regulation of DNA repair	0.01624901177630588	14	0.019528824112243416	20	se mantiene
+subestima	BP	GO:0034728	nucleosome organization	0.01684802678787067	9	0.021811422154885796	12	se mantiene
+subestima	BP	GO:0006337	nucleosome disassembly	0.01684802678787067	6	0.0095742373046384735	8	se mantiene
+subestima	BP	GO:0051054	positive regulation of DNA metabolic process	0.017616719561922036	14	NA	NA	se pierde
+subestima	BP	GO:0016043	cellular component organization	0.01763791461157284	53	NA	NA	se pierde
+subestima	BP	GO:0050870	positive regulation of T cell activation	0.01763791461157284	11	NA	NA	se pierde
+subestima	MF	GO:0042393	histone binding	0.018934736243872697	16	0.041401997934272496	22	se mantiene
+subestima	BP	GO:0071824	protein-DNA complex organization	0.019519085739613303	13	NA	NA	se pierde
+subestima	BP	GO:0071840	cellular component organization or biogenesis	0.021753879054951696	53	0.04720274647980485	87	se mantiene
+subestima	BP	GO:0032984	protein-containing complex disassembly	0.021753879054951696	7	0.03705949427406379	9	se mantiene
+subestima	BP	GO:0045582	positive regulation of T cell differentiation	0.022428168708644666	10	NA	NA	se pierde
+subestima	BP	GO:0032986	protein-DNA complex disassembly	0.022428168708644666	6	0.01961233965645364	8	se mantiene
+subestima	MF	GO:0003713	transcription coactivator activity	0.023980861868687055	17	NA	NA	se pierde
+subestima	BP	GO:0033043	regulation of organelle organization	0.025129598800018752	16	0.02387826358917085	24	se mantiene
+subestima	MF	GO:0140030	modification-dependent protein binding	0.025576938052982535	11	NA	NA	se pierde
+subestima	BP	GO:0006281	DNA repair	0.02647088011651557	18	0.019528824112243416	28	se mantiene
+subestima	BP	GO:0007059	chromosome segregation	0.02854234218156026	11	0.004043676056598463	18	se mantiene
+subestima	BP	GO:1903039	positive regulation of leukocyte cell-cell adhesion	0.02854234218156026	11	NA	NA	se pierde
+subestima	BP	GO:0045661	regulation of myoblast differentiation	0.029331534981135853	8	NA	NA	se pierde
+subestima	BP	GO:0045621	positive regulation of lymphocyte differentiation	0.03214497768260762	10	NA	NA	se pierde
+subestima	BP	GO:1902806	regulation of cell cycle G1/S phase transition	0.039028588869902486	10	NA	NA	se pierde
+subestima	BP	GO:2000779	regulation of double-strand break repair	0.039028588869902486	10	NA	NA	se pierde
+subestima	BP	GO:1902107	positive regulation of leukocyte differentiation	0.039028588869902486	11	NA	NA	se pierde
+subestima	BP	GO:1903708	positive regulation of hemopoiesis	0.039028588869902486	11	NA	NA	se pierde
+subestima	BP	GO:0048584	positive regulation of response to stimulus	0.0421841434314665	28	NA	NA	se pierde
+subestima	BP	GO:0040029	epigenetic regulation of gene expression	0.04287460660751157	16	NA	NA	se pierde
+subestima	BP	GO:0022409	positive regulation of cell-cell adhesion	0.04542510938200118	11	NA	NA	se pierde
+subestima	MF	GO:0016746	acyltransferase activity	0.0454789768105312	10	NA	NA	se pierde
+subestima	MF	GO:0030674	protein-macromolecule adaptor activity	0.0454789768105312	26	NA	NA	se pierde
+subestima	CC	GO:0070603	SWI/SNF superfamily-type complex	0.0462659830949191	11	NA	NA	se pierde
+subestima	CC	GO:1904949	ATPase complex	0.0462659830949191	11	NA	NA	se pierde
+subestima	BP	GO:0033044	regulation of chromosome organization	NA	NA	0.021811422154885796	19	aparece
+subestima	BP	GO:0051276	chromosome organization	NA	NA	0.04544976187913924	25	aparece
+subestima	CC	GO:0000775	chromosome, centromeric region	NA	NA	0.004888728867402766	16	aparece
+subestima	MF	GO:0031492	nucleosomal DNA binding	NA	NA	0.020146191196822698	9	aparece
+subestima	MF	GO:0003682	chromatin binding	NA	NA	0.020146191196822698	62	aparece
