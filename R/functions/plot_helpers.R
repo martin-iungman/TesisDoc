@@ -105,9 +105,10 @@ add_noise_rank <- function(df) {
 # (rank_reporter unicamente) al modelar la discordancia. Requiere `mean`
 # (actividad del reportero) y `max_tpm` (actividad endogena maxima,
 # FANTOM5 - ver R/00_prom_features/build_fantom_endo_activity_summary.R)
-# ya presentes en df. Usado por R4.6/R4.7 (rank_dif_lmm y derivados) -
-# ver R/27_rank_dif_lmm/rank_dif_lmm.R para la discusion completa de por
-# que reemplaza al diseño anterior (controlar solo por rank_reporter).
+# ya presentes en df. Usado por discordancia_features y
+# discordancia_remap_ora - ver R/59_discordancia_features/
+# discordancia_features.R para el diseño (reemplaza a controlar solo por
+# rank_reporter).
 add_rank_discordance <- function(df) {
   df %>%
     group_by(rep) %>%
@@ -119,6 +120,28 @@ add_rank_discordance <- function(df) {
       dif_signed = rr - re
     ) %>%
     ungroup()
+}
+
+# Efecto de `presente` (factor con niveles FALSE/TRUE) sobre dif_signed con
+# errores estandar robustos agrupados por promotor. Un promotor medido en las
+# dos replicas aporta dos filas correlacionadas: los coeficientes salen de MCO,
+# pero la varianza se calcula sumando los residuos de cada promotor (seq_id).
+# No se usa (1 | seq_id): re es igual en las dos replicas, asi que dentro de un
+# promotor dif_signed cambia exactamente el doble que avg_rank, y el coeficiente
+# pasaria a medir el rango endogeno en lugar de la discordancia.
+ajustar_discordancia_robusto <- function(datos) {
+  fit <- lm(dif_signed ~ avg_rank + rep + presente, data = datos)
+  vc <- sandwich::vcovCL(fit, cluster = datos$seq_id, type = "HC1")
+  df <- dplyr::n_distinct(datos$seq_id) - 1
+  estimate <- unname(coef(fit)["presenteTRUE"])
+  std.error <- sqrt(vc["presenteTRUE", "presenteTRUE"])
+  statistic <- estimate / std.error
+  tibble::tibble(
+    estimate, std.error, statistic, df,
+    conf.low = estimate - qt(0.975, df) * std.error,
+    conf.high = estimate + qt(0.975, df) * std.error,
+    p_value = 2 * pt(-abs(statistic), df)
+  )
 }
 
 # ROC curve (por umbral de rango) de una feature booleana contra
