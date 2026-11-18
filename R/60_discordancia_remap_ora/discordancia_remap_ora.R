@@ -248,7 +248,7 @@ terminos <- ora %>%
   map(~ slice_head(.x, n = 12)) %>%
   list_rbind() %>%
   mutate(
-    direccion = factor(direcciones[direccion], levels = direcciones),
+    direccion = factor(direcciones[direccion], levels = rev(direcciones)),
     neglog10_p = -log10(p.adjust),
     termino = paste0(str_wrap(Description, width = 45), "  ")
   ) %>%

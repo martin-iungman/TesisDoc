@@ -81,9 +81,8 @@ path_fantom5_tissue_ontology <- file.path(translib, "External_data/FANTOM5/tissu
 path_fantom5_tissue_dir <- file.path(translib, "External_data/FANTOM5/hg38_tissue")
 
 # ElemeNT / CORE_EPDnew (Sloutskin et al.) core promoter element calls
-# (TATA, Inr, DPE, MTE, BRE, etc.), por promotor via EPDnew - exploratorio
-# (R/discordancia_reportero_endogeno/2_dif_signed_bland_altman/
-# element_core_promoter.R), no forma parte de prom_df/build_prom_features.R.
+# (TATA, Inr, DPE, MTE, BRE, etc.), por promotor via EPDnew - sin uso actual
+# en el pipeline; no forma parte de prom_df/build_prom_features.R.
 path_element_epd <- file.path(translib, "External_data/CORE_EPDnew_Aug2023.xlsx")
 
 # PRO-cap bigWig (HEK293, ENCODE), 2 replicas x plus/minus strand (~20MB c/u)
