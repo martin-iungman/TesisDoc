@@ -1,0 +1,40 @@
+n = 8889; r entre percentiles = 0.684; techo Spearman-Brown = 0.812
+aditivo: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\aditivo.tsv
+aditivo_comp: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\aditivo_comp.tsv
+kmeros_vent_1a4: 1020 variables, 17 s
+kmeros_vent_1a5: 4092 variables, 452 s
+hyenadna_vent_c2: 768 variables, 18 s
+nt_vent_c11: 1536 variables, 53 s
+dnabert2_media_c6: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\dnabert2_media_c6.tsv
+dnabert2_vent_c3: 2304 variables, 138 s
+dnabert2_vent_c3c6: 4608 variables, 645 s
+dnabert2_kmeros_aditivo: 3334 variables, 307 s
+tres_modelos_vent: 4608 variables, 697 s
+hgb_dnabert2_aditivo: 2314 variables, 38 s
+                        frac_techo       r2
+replica                   Promedio Promedio
+modelo                                     
+aditivo                      0.166    0.135
+aditivo_comp                 0.196    0.159
+hyenadna_vent_c2             0.240    0.195
+kmeros_vent_1a4              0.240    0.195
+nt_vent_c11                  0.249    0.202
+dnabert2_media_c6            0.255    0.207
+kmeros_vent_1a5              0.257    0.208
+hgb_dnabert2_aditivo         0.274    0.222
+tres_modelos_vent            0.314    0.255
+dnabert2_vent_c3             0.317    0.257
+dnabert2_kmeros_aditivo      0.324    0.263
+dnabert2_vent_c3c6           0.325    0.264
+                 modelo      referencia  replica  dif_r2  ic_inf  ic_sup  dif_frac_techo
+                aditivo kmeros_vent_1a4 Promedio  -0.060  -0.073  -0.048          -0.074
+           aditivo_comp kmeros_vent_1a4 Promedio  -0.036  -0.048  -0.025          -0.044
+dnabert2_kmeros_aditivo kmeros_vent_1a4 Promedio   0.068   0.059   0.077           0.084
+      dnabert2_media_c6 kmeros_vent_1a4 Promedio   0.012   0.000   0.023           0.014
+       dnabert2_vent_c3 kmeros_vent_1a4 Promedio   0.062   0.052   0.072           0.077
+     dnabert2_vent_c3c6 kmeros_vent_1a4 Promedio   0.069   0.058   0.079           0.085
+   hgb_dnabert2_aditivo kmeros_vent_1a4 Promedio   0.027   0.016   0.038           0.033
+       hyenadna_vent_c2 kmeros_vent_1a4 Promedio  -0.000  -0.011   0.009          -0.001
+        kmeros_vent_1a5 kmeros_vent_1a4 Promedio   0.013   0.009   0.017           0.016
+            nt_vent_c11 kmeros_vent_1a4 Promedio   0.007  -0.003   0.017           0.009
+      tres_modelos_vent kmeros_vent_1a4 Promedio   0.060   0.048   0.070           0.073

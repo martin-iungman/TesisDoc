@@ -1,0 +1,160 @@
+{
+ "elegida": {
+  "filtros": 128,
+  "k1": 11,
+  "n_bloques": 4,
+  "drop": 0.3,
+  "denso": 256,
+  "lr": 0.001,
+  "wd": 0.01,
+  "desp": 3,
+  "val_mse": 0.7703120112419128,
+  "epocas": 22
+ },
+ "todas": [
+  {
+   "filtros": 128,
+   "k1": 19,
+   "n_bloques": 4,
+   "drop": 0.3,
+   "denso": 256,
+   "lr": 0.001,
+   "wd": 0.001,
+   "desp": 0,
+   "val_mse": 0.8142701387405396,
+   "epocas": 13
+  },
+  {
+   "filtros": 256,
+   "k1": 11,
+   "n_bloques": 3,
+   "drop": 0.4,
+   "denso": 256,
+   "lr": 0.0005,
+   "wd": 0.01,
+   "desp": 0,
+   "val_mse": 0.8018978238105774,
+   "epocas": 15
+  },
+  {
+   "filtros": 128,
+   "k1": 15,
+   "n_bloques": 4,
+   "drop": 0.4,
+   "denso": 256,
+   "lr": 0.001,
+   "wd": 0.001,
+   "desp": 0,
+   "val_mse": 0.7868964672088623,
+   "epocas": 18
+  },
+  {
+   "filtros": 128,
+   "k1": 15,
+   "n_bloques": 4,
+   "drop": 0.4,
+   "denso": 128,
+   "lr": 0.001,
+   "wd": 0.0001,
+   "desp": 3,
+   "val_mse": 0.7893014550209045,
+   "epocas": 28
+  },
+  {
+   "filtros": 128,
+   "k1": 11,
+   "n_bloques": 3,
+   "drop": 0.2,
+   "denso": 128,
+   "lr": 0.0002,
+   "wd": 0.001,
+   "desp": 3,
+   "val_mse": 0.8432061076164246,
+   "epocas": 22
+  },
+  {
+   "filtros": 128,
+   "k1": 15,
+   "n_bloques": 3,
+   "drop": 0.2,
+   "denso": 128,
+   "lr": 0.0002,
+   "wd": 0.001,
+   "desp": 3,
+   "val_mse": 0.8406644463539124,
+   "epocas": 22
+  },
+  {
+   "filtros": 128,
+   "k1": 11,
+   "n_bloques": 4,
+   "drop": 0.3,
+   "denso": 256,
+   "lr": 0.001,
+   "wd": 0.01,
+   "desp": 3,
+   "val_mse": 0.7703120112419128,
+   "epocas": 22
+  },
+  {
+   "filtros": 256,
+   "k1": 7,
+   "n_bloques": 4,
+   "drop": 0.3,
+   "denso": 128,
+   "lr": 0.0002,
+   "wd": 0.0001,
+   "desp": 3,
+   "val_mse": 0.786673367023468,
+   "epocas": 22
+  },
+  {
+   "filtros": 256,
+   "k1": 15,
+   "n_bloques": 4,
+   "drop": 0.3,
+   "denso": 128,
+   "lr": 0.0002,
+   "wd": 0.001,
+   "desp": 0,
+   "val_mse": 0.824532151222229,
+   "epocas": 18
+  },
+  {
+   "filtros": 256,
+   "k1": 7,
+   "n_bloques": 4,
+   "drop": 0.4,
+   "denso": 128,
+   "lr": 0.001,
+   "wd": 0.0001,
+   "desp": 3,
+   "val_mse": 0.7803938388824463,
+   "epocas": 26
+  },
+  {
+   "filtros": 128,
+   "k1": 19,
+   "n_bloques": 4,
+   "drop": 0.2,
+   "denso": 256,
+   "lr": 0.0002,
+   "wd": 0.0001,
+   "desp": 3,
+   "val_mse": 1.0326545238494873,
+   "epocas": 9
+  },
+  {
+   "filtros": 256,
+   "k1": 19,
+   "n_bloques": 4,
+   "drop": 0.4,
+   "denso": 128,
+   "lr": 0.0002,
+   "wd": 0.0001,
+   "desp": 3,
+   "val_mse": 0.8721132278442383,
+   "epocas": 22
+  }
+ ]
+}

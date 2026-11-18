@@ -1,0 +1,51 @@
+Techo en percentiles (Pearson entre replicas): 0.688
+aditivo: 8 variables, 1 s
+aditivo_comp: 10 variables, 0 s
+kmeros_vent_1a4: 1020 variables, 72 s
+kmeros_vent_1a5: 4092 variables, 1198 s
+hyenadna_vent_c2: 768 variables, 42 s
+nt_vent_c11: 1536 variables, 154 s
+dnabert2_media_c6: 768 variables, 41 s
+dnabert2_vent_c3: 2304 variables, 356 s
+dnabert2_vent_c3c6: 4608 variables, 1411 s
+dnabert2_kmeros_aditivo: 3334 variables, 512 s
+tres_modelos_vent: 4608 variables, 1231 s
+hgb_dnabert2_aditivo: 2314 variables, 62 s
+                        frac_techo            r2       
+replica                      Rep 1  Rep 2  Rep 1  Rep 2
+modelo                                                 
+aditivo                      0.148  0.140  0.102  0.096
+aditivo_comp                 0.175  0.163  0.121  0.112
+hyenadna_vent_c2             0.207  0.197  0.142  0.135
+nt_vent_c11                  0.210  0.207  0.145  0.142
+kmeros_vent_1a4              0.212  0.196  0.146  0.135
+kmeros_vent_1a5              0.225  0.214  0.155  0.147
+dnabert2_media_c6            0.226  0.219  0.155  0.150
+hgb_dnabert2_aditivo         0.239  0.225  0.165  0.155
+tres_modelos_vent            0.278  0.262  0.191  0.180
+dnabert2_vent_c3             0.279  0.258  0.192  0.178
+dnabert2_kmeros_aditivo      0.285  0.265  0.196  0.182
+dnabert2_vent_c3c6           0.291  0.273  0.200  0.188
+                 modelo      referencia replica  dif_r2  ic_inf  ic_sup  dif_frac_techo
+                aditivo kmeros_vent_1a4   Rep 1  -0.044  -0.056  -0.032          -0.064
+           aditivo_comp kmeros_vent_1a4   Rep 1  -0.026  -0.037  -0.015          -0.037
+dnabert2_kmeros_aditivo kmeros_vent_1a4   Rep 1   0.050   0.043   0.056           0.072
+      dnabert2_media_c6 kmeros_vent_1a4   Rep 1   0.009  -0.002   0.020           0.013
+       dnabert2_vent_c3 kmeros_vent_1a4   Rep 1   0.046   0.036   0.055           0.066
+     dnabert2_vent_c3c6 kmeros_vent_1a4   Rep 1   0.054   0.044   0.063           0.078
+   hgb_dnabert2_aditivo kmeros_vent_1a4   Rep 1   0.018   0.008   0.029           0.027
+       hyenadna_vent_c2 kmeros_vent_1a4   Rep 1  -0.004  -0.013   0.006          -0.005
+        kmeros_vent_1a5 kmeros_vent_1a4   Rep 1   0.008   0.005   0.012           0.012
+            nt_vent_c11 kmeros_vent_1a4   Rep 1  -0.001  -0.011   0.007          -0.002
+      tres_modelos_vent kmeros_vent_1a4   Rep 1   0.045   0.037   0.053           0.066
+                aditivo kmeros_vent_1a4   Rep 2  -0.038  -0.050  -0.028          -0.056
+           aditivo_comp kmeros_vent_1a4   Rep 2  -0.023  -0.032  -0.013          -0.033
+dnabert2_kmeros_aditivo kmeros_vent_1a4   Rep 2   0.048   0.042   0.054           0.070
+      dnabert2_media_c6 kmeros_vent_1a4   Rep 2   0.016   0.006   0.027           0.023
+       dnabert2_vent_c3 kmeros_vent_1a4   Rep 2   0.043   0.036   0.051           0.063
+     dnabert2_vent_c3c6 kmeros_vent_1a4   Rep 2   0.053   0.045   0.062           0.078
+   hgb_dnabert2_aditivo kmeros_vent_1a4   Rep 2   0.020   0.011   0.029           0.029
+       hyenadna_vent_c2 kmeros_vent_1a4   Rep 2   0.001  -0.008   0.010           0.001
+        kmeros_vent_1a5 kmeros_vent_1a4   Rep 2   0.013   0.009   0.017           0.019
+            nt_vent_c11 kmeros_vent_1a4   Rep 2   0.008   0.000   0.015           0.011
+      tres_modelos_vent kmeros_vent_1a4   Rep 2   0.046   0.038   0.054           0.067

@@ -1,0 +1,48 @@
+n = 8889; r entre percentiles = 0.684; techo Spearman-Brown = 0.812
+aditivo: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\aditivo.tsv
+aditivo_comp: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\aditivo_comp.tsv
+kmeros_vent_1a4: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\kmeros_vent_1a4.tsv
+kmeros_vent_1a5: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\kmeros_vent_1a5.tsv
+hyenadna_vent_c2: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\hyenadna_vent_c2.tsv
+nt_vent_c11: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\nt_vent_c11.tsv
+dnabert2_media_c6: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\dnabert2_media_c6.tsv
+dnabert2_vent_c3: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\dnabert2_vent_c3.tsv
+dnabert2_vent_c3c6: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\dnabert2_vent_c3c6.tsv
+dnabert2_kmeros_aditivo: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\dnabert2_kmeros_aditivo.tsv
+tres_modelos_vent: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\tres_modelos_vent.tsv
+hgb_dnabert2_aditivo: ya estaba, se usa figures\exploratorio_embeddings_adn\mejoras_promedio\predicciones\hgb_dnabert2_aditivo.tsv
+                        frac_techo       r2
+replica                   Promedio Promedio
+modelo                                     
+aditivo                      0.166    0.135
+aditivo_comp                 0.196    0.159
+kmeros_vent_1a4              0.240    0.195
+hyenadna_vent_c2             0.240    0.195
+nt_vent_c11                  0.249    0.202
+dnabert2_media_c6            0.255    0.207
+kmeros_vent_1a5              0.257    0.208
+hgb_dnabert2_aditivo         0.274    0.222
+cnn_ajustada_s0              0.274    0.223
+cnn_ajustada                 0.295    0.240
+tres_modelos_vent            0.314    0.255
+dnabert2_vent_c3             0.317    0.257
+dnabert2_kmeros_aditivo      0.324    0.263
+dnabert2_vent_c3c6           0.325    0.264
+dnabert2_ft_s0               0.341    0.277
+dnabert2_ft                  0.362    0.294
+                 modelo      referencia  replica  dif_r2  ic_inf  ic_sup  dif_frac_techo
+                aditivo kmeros_vent_1a4 Promedio  -0.060  -0.073  -0.048          -0.074
+           aditivo_comp kmeros_vent_1a4 Promedio  -0.036  -0.048  -0.025          -0.044
+           cnn_ajustada kmeros_vent_1a4 Promedio   0.045   0.032   0.057           0.055
+        cnn_ajustada_s0 kmeros_vent_1a4 Promedio   0.028   0.014   0.041           0.034
+            dnabert2_ft kmeros_vent_1a4 Promedio   0.099   0.084   0.113           0.122
+         dnabert2_ft_s0 kmeros_vent_1a4 Promedio   0.081   0.066   0.097           0.100
+dnabert2_kmeros_aditivo kmeros_vent_1a4 Promedio   0.068   0.059   0.077           0.084
+      dnabert2_media_c6 kmeros_vent_1a4 Promedio   0.012   0.000   0.023           0.014
+       dnabert2_vent_c3 kmeros_vent_1a4 Promedio   0.062   0.052   0.072           0.077
+     dnabert2_vent_c3c6 kmeros_vent_1a4 Promedio   0.069   0.058   0.079           0.085
+   hgb_dnabert2_aditivo kmeros_vent_1a4 Promedio   0.027   0.016   0.038           0.033
+       hyenadna_vent_c2 kmeros_vent_1a4 Promedio  -0.000  -0.011   0.009          -0.001
+        kmeros_vent_1a5 kmeros_vent_1a4 Promedio   0.013   0.009   0.017           0.016
+            nt_vent_c11 kmeros_vent_1a4 Promedio   0.007  -0.003   0.017           0.009
+      tres_modelos_vent kmeros_vent_1a4 Promedio   0.060   0.048   0.070           0.073
