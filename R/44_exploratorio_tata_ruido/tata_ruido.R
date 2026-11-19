@@ -60,6 +60,9 @@
 #       reduce el efecto de la canonica por igual en ambos estratos.
 #   p11 efecto de la canonica sobre el ruido como funcion continua de la
 #       actividad (deciles, barrido del corte, spline, bisagra).
+#   p12 uso endogeno maximo (max_tpm de FANTOM5) por celda TATA fuerte x
+#       actividad; log2(max_tpm + 1) ~ act_alta * tata_fuerte.
+#   p13 p12 con la actividad endogena en HEK293 (hek_tpm, CAGE de HEK293).
 #
 # Union de Polycomb: data/processed/remap_tf_hits.tsv.
 #
@@ -1147,5 +1150,173 @@ for (ext in c("jpg", "pdf")) {
     width = 10, height = 6.5, units = "in", device = if (ext == "pdf") cairo_pdf else NULL)
 }
 write_tsv(p11_decil, file.path(dir_r35, "respaldo_auc_por_decil_actividad.tsv"))
+
+# --- p12: uso endogeno maximo de las TATA fuertes de baja actividad -------------
+
+# Las TATA fuertes de baja actividad son tejido-especificas y estan apagadas
+# en HEK293 (p6, p7); quedan fuera del analisis de discordancia (restringido
+# a promotores con CAGE en HEK293). Aca: alcanzan niveles altos en algun
+# tejido? max_tpm = TPM maximo entre las muestras de tejido + celula primaria
+# de FANTOM5 (data/processed/fantom_endo_activity_summary.tsv, ver
+# R/00_prom_features/build_fantom_endo_activity_summary.R). Por replica, las
+# cuatro celdas TATA fuerte (si / no, definicion de p6) x actividad alta (si
+# / no, percentil 75): n, mediana y cuartiles de max_tpm, sin senal en
+# ninguna muestra (max_tpm = 0) y debajo del umbral de deteccion (max_tpm
+# <= 1 TPM en todas las muestras; mismo umbral que active_fantom5_samples).
+# Modelo lm(log2(max_tpm + 1) ~ act_alta * tata_fuerte) sobre todos los
+# promotores: efecto de la TATA fuerte en baja actividad (termino principal),
+# en alta (combinacion lineal) e interaccion, con IC 95%; sensibilidad con
+# log2(max_tpm) en los detectados (max_tpm > 1). En baja actividad, ademas,
+# Wilcoxon / HL de TATA fuertes vs. resto y vs. sin motivo. Deteccion
+# (max_tpm > 1) con glm(detectado ~ act_alta * tata_fuerte). Todos y solo los
+# promotores con el mismo grupo de actividad en ambas replicas (ids_conc).
+
+fantom_endo <- read_tsv("data/processed/fantom_endo_activity_summary.tsv", show_col_types = FALSE)
+
+# Modelo lineal con efecto de la TATA fuerte en baja (termino principal), en
+# alta (combinacion lineal) e interaccion, con IC 95%
+modelo_endo <- function(d, f) {
+  m <- lm(f, data = d)
+  b <- coef(m)
+  V <- vcov(m)
+  t_int <- "act_altaTRUE:tata_fuerteTRUE"
+  ci <- function(est, se) c(est, est - 1.96 * se, est + 1.96 * se)
+  baja <- ci(b[["tata_fuerteTRUE"]], sqrt(V["tata_fuerteTRUE", "tata_fuerteTRUE"]))
+  l <- setNames(rep(0, length(b)), names(b))
+  l[c("tata_fuerteTRUE", t_int)] <- 1
+  alta <- ci(sum(l * b), sqrt(drop(t(l) %*% V %*% l)))
+  int <- ci(b[[t_int]], sqrt(V[t_int, t_int]))
+  cf <- coef(summary(m))
+  tibble(
+    n = nobs(m),
+    tata_baja = baja[1], tata_baja_low = baja[2], tata_baja_high = baja[3], p_tata_baja = cf["tata_fuerteTRUE", 4],
+    tata_alta = alta[1], tata_alta_low = alta[2], tata_alta_high = alta[3],
+    interaccion = int[1], int_low = int[2], int_high = int[3], p_interaccion = cf[t_int, 4]
+  )
+}
+
+# Celdas, modelos, deteccion, comparacion en baja actividad y figura para
+# una variable endogena (var_endo); no detectado = var_endo <= umbral
+endo_por_celda <- function(var_endo, umbral, prefijo, ylab, archivo_fig) {
+  d <- feat %>%
+    select(seq_id, rep, act_alta, tata_fuerte) %>%
+    left_join(data %>% select(seq_id, rep, clase, hek_tpm), by = c("seq_id", "rep")) %>%
+    left_join(fantom_endo %>% select(seq_id, max_tpm), by = "seq_id") %>%
+    mutate(
+      valor = .data[[var_endo]],
+      celda = factor(paste(if_else(tata_fuerte, "TATA fuerte", "Resto"), "-", if_else(act_alta, "alta", "baja")),
+        levels = c("Resto - baja", "TATA fuerte - baja", "Resto - alta", "TATA fuerte - alta")
+      )
+    )
+  stopifnot(!anyNA(d$valor))
+  sets <- bind_rows(
+    d %>% mutate(conjunto = "Todos"),
+    d %>% filter(seq_id %in% ids_conc) %>% mutate(conjunto = "Actividad concordante entre réplicas")
+  ) %>% mutate(conjunto = factor(conjunto, levels = c("Todos", "Actividad concordante entre réplicas")))
+
+  celdas <- sets %>%
+    group_by(conjunto, rep, celda) %>%
+    summarise(
+      n = n(), mediana = median(valor), q1 = quantile(valor, 0.25), q3 = quantile(valor, 0.75),
+      n_cero = sum(valor == 0), n_no_detectado = sum(valor <= umbral), prop_no_detectado = mean(valor <= umbral),
+      mediana_detectados = median(valor[valor > umbral]),
+      n_mayor_100 = sum(valor > 100), prop_mayor_100 = mean(valor > 100), .groups = "drop"
+    )
+  save_tsv(celdas, paste0(prefijo, "_", var_endo, "_por_celda.tsv"))
+  show(celdas, paste(prefijo, var_endo, "por celda TATA fuerte x actividad"))
+
+  f_log1 <- as.formula(paste0("log2(", var_endo, " + 1) ~ act_alta * tata_fuerte"))
+  f_det <- as.formula(paste0("log2(", var_endo, ") ~ act_alta * tata_fuerte"))
+  modelo <- bind_rows(
+    sets %>% group_by(conjunto, rep) %>%
+      group_modify(~ modelo_endo(.x, f_log1)) %>% mutate(modelo = paste0("log2(", var_endo, " + 1), todos")),
+    sets %>% filter(valor > umbral) %>% group_by(conjunto, rep) %>%
+      group_modify(~ modelo_endo(.x, f_det)) %>% mutate(modelo = paste0("log2(", var_endo, "), detectados (> ", umbral, " TPM)"))
+  ) %>%
+    ungroup() %>%
+    mutate(across(c(tata_baja, tata_baja_low, tata_baja_high, tata_alta, tata_alta_low, tata_alta_high, interaccion, int_low, int_high), ~ 2^.x, .names = "{.col}_veces")) %>%
+    select(modelo, conjunto, rep, everything())
+  save_tsv(modelo, paste0(prefijo, "_modelo_", var_endo, "_interaccion.tsv"))
+  show(modelo %>% select(modelo, conjunto, rep, n, tata_baja, tata_baja_low, tata_baja_high, p_tata_baja, tata_alta, interaccion, int_low, int_high, p_interaccion), paste(prefijo, "lm log2 ~ act_alta * tata_fuerte (log2)"))
+  show(modelo %>% select(modelo, conjunto, rep, ends_with("_veces")), paste(prefijo, "mismos efectos como razon (veces)"))
+
+  # Deteccion: OR de la TATA fuerte en baja y en alta actividad, interaccion
+  deteccion <- sets %>%
+    group_by(conjunto, rep) %>%
+    group_modify(function(dd, k) {
+      m <- glm(I(valor > umbral) ~ act_alta * tata_fuerte, family = binomial, data = dd)
+      b <- coef(m)
+      V <- vcov(m)
+      cf <- coef(summary(m))
+      t_int <- "act_altaTRUE:tata_fuerteTRUE"
+      l <- setNames(rep(0, length(b)), names(b))
+      l[c("tata_fuerteTRUE", t_int)] <- 1
+      est_alta <- sum(l * b)
+      se_alta <- sqrt(drop(t(l) %*% V %*% l))
+      tibble(
+        prop_det_fuerte_baja = mean(dd$valor[dd$tata_fuerte & !dd$act_alta] > umbral),
+        prop_det_resto_baja = mean(dd$valor[!dd$tata_fuerte & !dd$act_alta] > umbral),
+        prop_det_fuerte_alta = mean(dd$valor[dd$tata_fuerte & dd$act_alta] > umbral),
+        prop_det_resto_alta = mean(dd$valor[!dd$tata_fuerte & dd$act_alta] > umbral),
+        OR_tata_baja = exp(b[["tata_fuerteTRUE"]]),
+        OR_tata_baja_low = exp(b[["tata_fuerteTRUE"]] - 1.96 * cf["tata_fuerteTRUE", 2]),
+        OR_tata_baja_high = exp(b[["tata_fuerteTRUE"]] + 1.96 * cf["tata_fuerteTRUE", 2]),
+        p_tata_baja = cf["tata_fuerteTRUE", 4],
+        OR_tata_alta = exp(est_alta), OR_tata_alta_low = exp(est_alta - 1.96 * se_alta), OR_tata_alta_high = exp(est_alta + 1.96 * se_alta),
+        OR_interaccion = exp(b[[t_int]]), p_interaccion = cf[t_int, 4]
+      )
+    }) %>%
+    ungroup()
+  save_tsv(deteccion, paste0(prefijo, "_deteccion_", var_endo, "_interaccion.tsv"))
+  show(deteccion, paste(prefijo, "deteccion (>", umbral, "TPM) ~ act_alta * tata_fuerte (glm)"))
+
+  # Baja actividad: TATA fuertes vs. resto y vs. sin motivo (Wilcoxon, HL en log2(valor + 1))
+  baja <- sets %>%
+    filter(!act_alta) %>%
+    group_by(conjunto, rep) %>%
+    group_modify(function(dd, k) {
+      s <- log2(dd$valor[dd$tata_fuerte] + 1)
+      map_dfr(c("Resto", "Sin motivo"), function(ref) {
+        r <- log2(dd$valor[if (ref == "Resto") !dd$tata_fuerte else dd$clase == "Sin motivo"] + 1)
+        w <- wilcox.test(s, r, conf.int = TRUE, exact = FALSE)
+        tibble(
+          referencia = ref, n_fuertes = length(s), n_ref = length(r),
+          mediana_fuertes = 2^median(s) - 1, mediana_ref = 2^median(r) - 1,
+          HL_log2 = unname(w$estimate), HL_low = w$conf.int[1], HL_high = w$conf.int[2], p = w$p.value
+        )
+      })
+    }) %>%
+    ungroup()
+  save_tsv(baja, paste0(prefijo, "_baja_actividad_tata_fuertes_vs_referencia.tsv"))
+  show(baja, paste(prefijo, "baja actividad:", var_endo, "de TATA fuertes vs. resto / sin motivo"))
+
+  y_lab <- 4 * max(sets$valor + 1)
+  etiq <- celdas %>% mutate(lab = paste0("n=", n, "\n", sub("\\.?0+$", "", format(round(mediana, 1), nsmall = 1, trim = TRUE))))
+  panel <- sets %>%
+    ggplot(aes(celda, valor + 1, fill = tata_fuerte)) +
+    geom_hline(yintercept = umbral + 1, linetype = "dotted", color = "grey50") +
+    geom_violin(alpha = 0.5, color = NA, scale = "width") +
+    geom_boxplot(width = 0.18, outlier.shape = NA, show.legend = FALSE) +
+    geom_text(data = etiq, aes(celda, y_lab, label = lab), inherit.aes = FALSE, size = 3.8, lineheight = 0.9) +
+    scale_y_log10(labels = function(x) format(x, scientific = FALSE, big.mark = "", trim = TRUE, drop0trailing = TRUE)) +
+    scale_fill_manual(values = c("TRUE" = col_misma, "FALSE" = "grey60"), labels = c("TRUE" = "TATA fuerte", "FALSE" = "Resto")) +
+    facet_grid(conjunto ~ rep) +
+    th +
+    theme(axis.text.x = element_text(angle = 25, hjust = 1)) +
+    labs(x = NULL, y = ylab, fill = NULL)
+  save_jpg(panel, archivo_fig, 12, 11)
+  invisible(list(celdas = celdas, modelo = modelo, deteccion = deteccion, baja = baja))
+}
+
+p12_res <- endo_por_celda("max_tpm", 1, "p12", "TPM máximo en FANTOM5 + 1\n(escala log)", "p12_max_tpm_tata_fuertes_x_actividad")
+
+# --- p13: lo mismo con CAGE de HEK293 ---------------------------------------------
+
+# hek_tpm de prom_df (CAGE de HEK293, suma de los tag clusters que solapan el
+# fragmento; 0 = sin tag cluster). Detectado = hek_tpm > 0 (el valor positivo
+# minimo es ~1 TPM). La mitad de los promotores tiene 0, asi que el modelo de
+# deteccion (glm) pesa tanto como el lineal.
+
+p13_res <- endo_por_celda("hek_tpm", 0, "p13", "TPM en CAGE de HEK293 + 1\n(escala log)", "p13_hek_tpm_tata_fuertes_x_actividad")
 
 message("Salidas en ", out_dir)

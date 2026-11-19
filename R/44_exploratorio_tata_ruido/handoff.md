@@ -8,11 +8,11 @@ TATA de los promotores poco activos son más débiles o están mal posicionadas
 
 - **Script:** `R/44_exploratorio_tata_ruido/tata_ruido.R` (corre entero en
   unos minutos desde la raíz del repo; recalcula la búsqueda del motivo, que
-  tarda segundos). Puntos p0–p11, cada uno con prefijo en los archivos.
+  tarda segundos). Puntos p0–p13, cada uno con prefijo en los archivos.
 - **Salidas:** `figures/exploratorio_tata_ruido/` (sin `fig_dir()`, sin número).
 - **No es figura de la tesis:** no hay fila en `docs/mapping_figuras.csv` y no
   hay que agregarla.
-- Commits: `d7b4d1d` (p0–p5), `26b0c09` (p6), `ad2a3df` (p7), `c70c5bb` (p8), `17440d3` (p9), `147e5d8` (p10), p11 en el commit que agrega esa sección.
+- Commits: `d7b4d1d` (p0–p5), `26b0c09` (p6), `ad2a3df` (p7), `c70c5bb` (p8), `17440d3` (p9), `147e5d8` (p10), p11, p12 y p13 en los commits que agregan cada sección.
 
 Números siempre como Rep 1 / Rep 2.
 
@@ -211,6 +211,89 @@ actividad (percentil dentro de cada réplica).
   figura ni va a la tesis) en la carpeta de `tata_ruido_especificidad`:
   `respaldo_auc_por_decil_actividad.jpg/.pdf/.tsv`, vía `fig_dir()`. No está
   en la columna `archivos` del mapping.
+
+### p12 — uso endógeno máximo (FANTOM5) de las TATA fuertes de baja actividad
+Las TATA fuertes de baja actividad quedan fuera de la discordancia (que exige
+CAGE en HEK293), así que se mira directo el lado endógeno: `max_tpm` = TPM
+máximo entre las muestras de tejido + célula primaria de FANTOM5
+(`data/processed/fantom_endo_activity_summary.tsv`). Celdas TATA fuerte (p6)
+× actividad alta (P75), por réplica. Umbral de detección = 1 TPM (el de
+`active_fantom5_samples`). Modelo `log2(max_tpm + 1) ~ act_alta * tata_fuerte`
+sobre todos los promotores; sensibilidad con `log2(max_tpm)` en los
+detectados (> 1 TPM).
+
+| Celda | n | max_tpm mediano (TPM) | ≤ 1 TPM | = 0 |
+|---|---|---|---|---|
+| Resto, baja | 6803 / 8316 | 27.6 / 25.5 | 9.5 / 9.9% | 34 / 45 |
+| **TATA fuerte, baja** | 172 / 234 | **99.3 / 88.4** | 14 / 23 (8.1 / 9.8%) | 2 / 1 |
+| Resto, alta | 2163 / 2673 | 73.7 / 63.9 | 3.5 / 4.2% | 12 / 14 |
+| TATA fuerte, alta | 162 / 177 | 329.6 / 359 | 7.4 / 7.3% | 1 / 2 |
+
+- **TATA fuerte vs. resto en baja actividad:** ×3.2 / ×3.3 (IC 2.5–4.2 /
+  2.7–4.2; p 6e-19 / 4e-26). Contra "sin motivo" de baja actividad (mediana
+  29.6 / 27.8): HL +1.7 / +1.7 log2, p 1e-9 / 3e-12. La mitad de las TATA
+  fuertes de baja actividad (50 / 49%) supera 100 TPM en alguna muestra,
+  contra 20 / 19% del resto de baja actividad (y 41 / 38% del resto de alta).
+- En alta actividad la TATA fuerte suma lo mismo (×3.1 / ×3.8). **Interacción
+  n.s.:** −0.06 log2 (IC −0.60 a 0.48; p 0.83) / +0.19 (−0.31 a 0.68; p
+  0.46). Con los detectados: +0.20 / +0.31, p 0.47 / 0.21.
+- Sin señal endógena: muy pocas (max_tpm = 0 en 2 / 1; ≤ 1 TPM en 8 / 10%,
+  igual que el resto de baja actividad). No cambia la lectura.
+- **Concordantes entre réplicas** (mismo grupo de actividad en ambas; como
+  `max_tpm` es por promotor, Rep 1 y Rep 2 dan idéntico): TATA fuerte baja
+  n 145, mediana 60.2 (resto baja 26.4, n 5931); alta n 133, mediana 417
+  (resto alta 85.1, n 1600). TATA fuerte en baja ×2.9 (2.2–3.8); interacción
+  +0.13 log2 (−0.46 a 0.72; p 0.67). 13 con ≤ 1 TPM, 1 con 0.
+- Lectura: las TATA fuertes de baja actividad en el reportero alcanzan en su
+  tejido un uso endógeno ~3 veces mayor que los promotores de igual baja
+  actividad sin TATA fuerte, y la ventaja de la TATA es la misma que en los de
+  alta actividad. Su baja actividad en el reportero refleja el contexto
+  (tejido-específico, apagados en HEK293) y no una TATA deficiente →
+  consistente con la lectura A. Distribución muy ancha (Q1 ~9 TPM, Q3 ~510): no
+  todas son altas en algún tejido.
+- Detección en FANTOM5 (> 1 TPM, `glm`): en baja actividad igual que el resto
+  (92 / 90% vs. 91 / 90%; OR 1.18 / 1.01, n.s.); en alta las TATA fuertes se
+  detectan algo menos que el resto (93 / 93% vs. 97 / 96%), interacción p
+  0.026 / 0.10. Menor.
+
+### p13 — lo mismo con CAGE de HEK293 (`hek_tpm`)
+Misma función que p12 (`endo_por_celda()`), con `hek_tpm` de `prom_df`
+(suma de los tag clusters de CAGE de HEK293 que solapan el fragmento).
+Detectado = `hek_tpm` > 0 (el mínimo positivo es ~1 TPM); la mitad de los
+promotores tiene 0, así que pesa tanto el modelo de detección como el lineal.
+
+| Celda | n | `hek_tpm` mediano | Sin señal (= 0) | Mediana en detectados |
+|---|---|---|---|---|
+| Resto, baja | 6803 / 8316 | 1.0 / 0 | 49 / 52% | 20.2 / 19.4 |
+| **TATA fuerte, baja** | 172 / 234 | **0 / 0** | **71 / 72%** (122 / 168) | 13.3 / 17.0 |
+| Resto, alta | 2163 / 2673 | 26.7 / 21.9 | 20 / 23% | 41.7 / 38.6 |
+| TATA fuerte, alta | 162 / 177 | 23.7 / 28.9 | 29 / 27% | 100 / 83.0 |
+
+- **Detección:** TATA fuerte vs. resto en baja actividad OR 0.40 / 0.42 (p
+  6e-8 / 4e-9); en alta 0.61 / 0.78; interacción OR 1.5 / 1.9 (p 0.09 /
+  0.007).
+- **`log2(hek_tpm + 1)`:** TATA fuerte en baja ×0.51 / ×0.55 (IC 0.38–0.67 /
+  0.43–0.69); en alta ×1.2 / ×1.6; interacción ×2.4 / ×2.9 (IC 1.6–3.6 /
+  2.0–4.2; p 2e-5 / 1e-8).
+- **Solo detectados (`log2(hek_tpm)`):** en baja no difieren del resto
+  (×0.92 / ×0.99, p 0.68 / 0.94); en alta ×2.1 / ×2.4; interacción ×2.3 /
+  ×2.4 (p 8e-4 / 1e-4).
+- Concordantes (Rep 1 = Rep 2): baja n 145, 75% sin señal (resto 51%); alta
+  n 133, mediana 44.2 (resto 35.5); interacción `log2(+1)` ×3.2 (p 2e-7),
+  detección OR 1.9 (p 0.036).
+- Wilcoxon en baja actividad vs. resto / sin motivo: p < 1e-7 en todos, pero
+  el HL es 0 (empates en cero); la información está en la detección.
+- Lectura: en HEK293 el patrón es el opuesto al de FANTOM5. Las TATA fuertes
+  de baja actividad en el reportero están más a menudo apagadas
+  endógenamente en HEK293 que el resto de baja actividad, y cuando se
+  detectan están en niveles parecidos. Entre las de alta actividad, la TATA
+  fuerte duplica el nivel endógeno en HEK293. Es decir, el reportero
+  reproduce el estado endógeno de HEK293: las TATA fuertes de baja actividad
+  son concordantes (bajas en los dos), no subestimadas. Junto con p12: son
+  promotores de uso alto en su tejido (×3 vs. el resto) que en HEK293
+  están apagados tanto en el genoma como en la biblioteca → lo que limita
+  es el contexto celular de HEK293 (probablemente factores *trans*), no la
+  TATA.
 
 ---
 
