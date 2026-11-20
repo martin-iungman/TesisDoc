@@ -114,6 +114,8 @@ p <- enrichment_df %>%
     axis.title = element_blank(), panel.grid = element_blank(), legend.position = "right"
   ) +
   labs(title = "Enriquecimiento de features por categoría de promotor alternativo", subtitle = "* = FDR < 0.05 (test exacto de Fisher, categoría vs. resto)")
-ggsave(file.path(out_dir, "promalt_enriquecimiento_features.jpg"), p, width = 14, height = 4.5, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("promalt_enriquecimiento_features.", ext)), p, width = 14, height = 4.5, units = "in")
+}
 
 message("Figura guardada en ", out_dir)
