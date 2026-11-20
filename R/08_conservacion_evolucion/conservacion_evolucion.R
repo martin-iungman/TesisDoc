@@ -25,6 +25,11 @@ panel_a <- phylo1pb_prom_df %>%
   ggplot(aes(16 - relpos, med_score)) +
   geom_line(linewidth = 0.4, col = thesis_clr) +
   geom_vline(xintercept = c(-50, -150), linetype = "dashed", linewidth = 0.3) +
+  # regiones del promotor: distal (-235 a -150), central (-150 a -50),
+  # proximal (-50 a +16)
+  annotate("text", x = c(-192.5, -100, -17), y = Inf, vjust = 1.2,
+           label = c("Distal", "Central", "Proximal"), size = 16 / .pt) +
+  scale_y_continuous(expand = expansion(mult = c(0.05, 0.12))) +
   xlab("Posición relativa al TSS") +
   ylab("Mediana del PhyloP score") +
   theme_pubclean(base_size = 16)
@@ -32,7 +37,7 @@ panel_a <- phylo1pb_prom_df %>%
 # --- Panel B: conservacion funcional humano-raton (Young 2015) -----------
 
 turnover_labels <- tibble(
-  cambio = c("Ambigua", "Cambio\nde tejido", "Inserción\nen humanos",
+  cambio = c("Ambigua", "Activo solo\nen humano", "Inserción\nen humanos",
              "Consistente", "Deleción\nen ratón", "Actividad\ndisminuida en ratón"),
   turnover = c("ambiguous", "expression-turnover", "human-inserted",
                "matched", "mouse-deleted", "mouse-diminished")
@@ -53,8 +58,8 @@ panel_b <- turnover_counts %>%
 # --- Save individual panels + combined figure -----------------------------
 
 out_dir <- fig_dir(slug)
-ggsave(file.path(out_dir, "panel_a_phylop.jpg"), panel_a, width = 9, height = 6.75, units = "in")
-ggsave(file.path(out_dir, "panel_b_turnover.jpg"), panel_b, width = 9, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) ggsave(file.path(out_dir, paste0("panel_a_phylop.", ext)), panel_a, width = 9, height = 6.75, units = "in")
+for (ext in c("jpg", "pdf")) ggsave(file.path(out_dir, paste0("panel_b_turnover.", ext)), panel_b, width = 9, height = 6.75, units = "in")
 
 combined <- panel_a / panel_b + plot_annotation(tag_levels = "A")
-ggsave(file.path(out_dir, paste0(slug, ".jpg")), combined, width = 9, height = 12, units = "in")
+for (ext in c("jpg", "pdf")) ggsave(file.path(out_dir, paste0(slug, ".", ext)), combined, width = 9, height = 12, units = "in")

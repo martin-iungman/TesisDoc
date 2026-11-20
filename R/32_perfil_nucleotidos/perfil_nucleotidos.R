@@ -136,12 +136,20 @@ panel_c <- perfil %>%
 # --- Save individual panels + combined figure -----------------------------
 
 out_dir <- fig_dir(slug)
-ggsave(file.path(out_dir, "panel_a_perfil_completo.jpg"), panel_a, width = 14, height = 4.5, units = "in")
-ggsave(file.path(out_dir, "panel_b_perfil_zoom.jpg"), panel_b, width = 14, height = 4.5, units = "in")
-ggsave(file.path(out_dir, "panel_c_cpg.jpg"), panel_c, width = 14, height = 3.5, units = "in")
+save_fig <- function(p, name, width, height) {
+  for (ext in c("jpg", "pdf")) {
+    ggsave(file.path(out_dir, paste0(name, ".", ext)), p, width = width, height = height, units = "in")
+  }
+}
+save_fig(panel_a, "panel_a_perfil_completo", 14, 4.5)
+save_fig(panel_b, "panel_b_perfil_zoom", 14, 4.5)
+save_fig(panel_c, "panel_c_cpg", 14, 3.5)
 write_tsv(perfil, file.path(out_dir, "perfil_nucleotidos.tsv"))
 
-combined <- panel_a / panel_b / panel_c +
+# B comparte la leyenda "Base" con A, pero con otro grosor de linea, asi que
+# guides = "collect" la duplicaria: en la compuesta se le saca la leyenda a B.
+combined <- panel_a / (panel_b + theme(legend.position = "none")) / panel_c +
   plot_layout(heights = c(1, 1, 0.7), guides = "collect") +
-  plot_annotation(tag_levels = "A")
-ggsave(file.path(out_dir, paste0(slug, ".jpg")), combined, width = 14, height = 11, units = "in")
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(size = 22, face = "bold"))
+save_fig(combined, slug, 14, 11)

@@ -474,6 +474,11 @@ wilcox_effect_summary <- function(tidy_data) {
 # por coocurrencia_motivos y promalt_coocurrencia.
 # `cgi_col`: igual que en build_tidy_features() (default "CGI_frag").
 build_cooccurrence_features <- function(prom_df, cgi_col = "CGI_frag") {
+  # Solo promotores EPD (desde 2026-11-20): sin esto entraban enhancers y
+  # promotores de cancer, y el universo de las features sin NA llegaba a
+  # ~23800 en lugar de 20851; tambien los terciles (G+C, DNase, ...) y la
+  # mediana de HEK293 se calculan ahora sobre los promotores.
+  prom_df <- prom_df %>% filter(type == "promoter")
   prom_df %>%
     fastDummies::dummy_cols("TE_superclass", ignore_na = TRUE, omit_colname_prefix = TRUE, remove_selected_columns = FALSE) %>%
     fastDummies::dummy_cols("sample_specificity_class", ignore_na = TRUE, omit_colname_prefix = TRUE, remove_selected_columns = TRUE) %>%

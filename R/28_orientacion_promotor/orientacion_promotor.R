@@ -42,7 +42,10 @@ MIN_SENSE <- 10L
 # Mismos colores que shape_especificidad_tisular (shape_especificidad_tisular.R): azul =
 # thesis_clr ("#358AAA"), rojo = "#AD343E".
 cls_colors <- c(bidireccional = "#AD343E", unidireccional = "#358AAA")
-color_umbral_senal <- "#7FB800" # verde oliva, elegido para combinar con cls_colors
+# Panel A en grises para no confundirse con los colores de clase (B-D):
+# oscuro = pasa el umbral de señal, claro = queda por debajo.
+color_umbral_senal <- "#4D4D4D"
+color_bajo_umbral <- "#C8C8C8"
 
 # --- Datos ya calculados -----------------------------------------------
 
@@ -58,25 +61,35 @@ p_hist <- orientation_df %>%
   geom_vline(xintercept = log10(MIN_SENSE + 1), linetype = "dashed", color = "tomato") +
   annotate("text", x = log10(MIN_SENSE + 1), y = Inf, vjust = 1.5, hjust = -0.1,
            label = paste0("umbral = ", MIN_SENSE), size = 3.5, color = "tomato") +
-  scale_fill_manual(values = c("TRUE" = "#BBBBBB", "FALSE" = color_umbral_senal), guide = "none") +
-  labs(x = "log10(señal en sentido + 1)", y = "Promotores",
-       title = "Umbral de señal mínima") +
+  scale_fill_manual(values = c("TRUE" = color_bajo_umbral, "FALSE" = color_umbral_senal), guide = "none") +
+  labs(x = "log10(señal en sentido + 1)", y = "Promotores") +
   theme_bw(base_size = 13)
 
 # --- Panel 2: histograma de la Orientation Index (umbral OI_THRESH) ----
 
 OI_THRESH <- 0.9
 
+# Bins de 0.05 armados a mano, con el umbral en un borde y cerrados a la
+# izquierda (unidireccional es OI >= OI_THRESH): asi ninguna barra queda
+# partida entre clases. geom_histogram() aplica un "fuzz" a los bordes que
+# metia valores apenas por debajo de 0.9 en el bin de arriba.
+OI_BIN <- 0.05
 p_oi <- orientation_df %>%
   filter(!is.na(orientacion)) %>%
-  ggplot(aes(x = OI, fill = orientacion)) +
-  geom_histogram(binwidth = 0.05, color = "white", linewidth = 0.2) +
+  # OI muy cercanos a 0.9 (p. ej. 0.8999999) caerian del lado equivocado por
+  # punto flotante: se acota el bin segun la clase ya asignada
+  mutate(
+    bin_ini = floor(OI / OI_BIN) * OI_BIN,
+    bin_ini = ifelse(orientacion == "bidireccional", pmin(bin_ini, OI_THRESH - OI_BIN), pmax(bin_ini, OI_THRESH))
+  ) %>%
+  count(bin_ini, orientacion) %>%
+  ggplot(aes(x = bin_ini + OI_BIN / 2, y = n, fill = orientacion)) +
+  geom_col(width = OI_BIN, color = "white", linewidth = 0.2) +
   geom_vline(xintercept = OI_THRESH, linetype = "dashed", color = "tomato") +
   annotate("text", x = OI_THRESH - 0.01, y = Inf, vjust = 1.5, hjust = 1,
            label = paste0("umbral = ", OI_THRESH), size = 3.5, color = "tomato") +
   scale_fill_manual(values = cls_colors) +
-  labs(x = "Orientation Index (OI)", y = "Promotores", fill = NULL,
-       title = "Umbral de la Orientation Index") +
+  labs(x = "Orientation Index (OI)", y = "Promotores", fill = NULL) +
   theme_bw(base_size = 13) +
   theme(legend.position = "top", legend.text = element_text(size = 13))
 
@@ -91,7 +104,7 @@ p_comp <- orientation_df %>%
   geom_text(aes(label = sprintf("%s\n%.1f%%\nn=%d", orientacion, pct, n)),
             position = position_stack(vjust = 0.5), size = 3.2, lineheight = 0.9) +
   scale_fill_manual(values = c(cls_colors, "no clasificado" = "#BBBBBB")) +
-  labs(x = NULL, y = "% de promotores", title = "Composición") +
+  labs(x = NULL, y = "% de promotores") +
   theme_bw(base_size = 13) +
   theme(legend.position = "none")
 
@@ -171,14 +184,17 @@ p_meta <- meta_df %>%
   scale_color_manual(values = c(Bidireccional = cls_colors[["bidireccional"]], Unidireccional = cls_colors[["unidireccional"]]), guide = "none") +
   scale_linetype_manual(values = c(Sentido = "solid", Antisentido = "dashed")) +
   labs(x = "Posición relativa al TSS (pb)", y = "Señal media de PRO-cap",
-       title = "Metaplot de orientación", color = NULL, linetype = NULL) +
+       color = NULL, linetype = NULL) +
   theme_bw(base_size = 13) +
   theme(legend.position = "top", legend.text = element_text(size = 13))
 
 # --- Panel combinado -----------------------------------------------------
 
 p_combined <- (p_hist | p_oi | p_comp) / p_meta +
-  plot_annotation(title = "Orientación transcripcional del promotor (PRO-cap, HEK293)")
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(size = 22, face = "bold"))
 
-ggsave(file.path(out_dir, "orientacion_promotor.jpg"), p_combined, width = 14, height = 9, units = "in")
+for (ext in c("jpg", "pdf")) {
+  ggsave(file.path(out_dir, paste0("orientacion_promotor.", ext)), p_combined, width = 14, height = 9, units = "in")
+}
 message("Figura guardada en ", out_dir)
